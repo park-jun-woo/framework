@@ -58,7 +58,7 @@ class Parkjunwoo{
 	 * 어플리케이션 권한 배열
 	 * @return array 권한 배열
 	 */
-	public static function domainApp(string $domain):array{
+	public static function domainApp(string $domain):string{
 		if(!array_key_exists($domain,self::$man->server["domain-app"])){
 			echo "앱에 도메인(\"{$domain}\")이 입력되어 있지 않습니다.도메인을 입력해주세요.";
 			apcu_delete(self::$man->app["name"]."-server");exit;
