@@ -48,7 +48,8 @@ class Request{
 			}else{
 				foreach($router as $pattern=>$sequences){
 					if(substr($pattern, -1)!=="/"){$pattern .= "/";}$matches = null;
-					if(preg_match("/^".preg_replace("/\[([^\/]+)\]/i", "(?P<$1>[^\/]+)", str_replace("/", "\/", $pattern))."$/i",$this->uri.(substr($this->uri, -1)!=="/"?"/":""),$matches)){
+					$regex = "/^".preg_replace("/\[([^\/]+)\]/i", "(?P<$1>[^\/]+)", str_replace("/", "\/", $pattern))."$/i";
+					if(preg_match($regex,$this->uri.(substr($this->uri, -1)!=="/"?"/":""),$matches)){
 						foreach($matches as $key=>$value){if(is_string($key)){$_GET[$key] = $value;}}
 						$this->route = $pattern;
 						$this->sequences = $sequences;
