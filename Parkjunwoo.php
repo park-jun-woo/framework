@@ -1,4 +1,5 @@
 <?php
+use utils\File;
 use utils\Security;
 
 /**
@@ -34,6 +35,7 @@ class Parkjunwoo{
 			$this->error("APCU 모듈을 설치해주세요.");
 		}
 		if(apcu_exists($this->code["name"]."-blacklist-".$_SERVER["REMOTE_ADDR"])){
+			File::append($this->path("blacklist").$_SERVER["REMOTE_ADDR"], date("Y-m-d H:i:s")."\t접속시도 차단");
 			http_response_code(404);
 			exit;
 		}
