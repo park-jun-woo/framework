@@ -39,7 +39,7 @@ class Parkjunwoo{
 		$this->server = apcu_fetch($this->code["name"]."-server");
 		//블랙리스트 접속차단
 		if(apcu_exists($this->code["name"]."-blacklist-".$_SERVER["REMOTE_ADDR"])){
-			File::append($this->path("blacklist").$_SERVER["REMOTE_ADDR"], date("Y-m-d H:i:s")."\t접속시도 차단\n");
+			File::append($this->path("blacklist").$_SERVER["REMOTE_ADDR"], date("Y-m-d H:i:s")."\t접속차단\n");
 			http_response_code(404);
 			exit;
 		}
@@ -164,6 +164,7 @@ class Parkjunwoo{
 		if(!array_key_exists("root", $this->code["path"])){$this->error("path[\"root\"]를 입력해 주세요.");}
 		if(!array_key_exists("cache", $this->code["path"])){$this->error("path[\"cache\"]를 입력해 주세요.");}
 		if(!array_key_exists("log", $this->code["path"])){$this->error("path[\"log\"]를 입력해 주세요.");}
+		if(!array_key_exists("request", $this->code["path"])){$this->error("path[\"request\"]를 입력해 주세요.");}
 		if(!array_key_exists("session", $this->code["path"])){$this->error("path[\"session\"]를 입력해 주세요.");}
 		if(!array_key_exists("blacklist", $this->code["path"])){$this->error("path[\"blacklist\"]를 입력해 주세요.");}
 		if(!array_key_exists("token-expire", $this->code["config"])){$this->error("config[\"token-expire\"]를 정수로 입력해 주세요.");}
