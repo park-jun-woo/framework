@@ -9,6 +9,7 @@ class Request{
 	public function __construct(){
 		//세션 설정
 		$this->user = new User();
+		echo $_SERVER["REQUEST_URI"]."<br>";
 		echo $_SERVER["PHP_SELF"]."<br>";
 		echo $_SERVER["QUERY_STRING"]."<br>";
 		print_r($_GET);
