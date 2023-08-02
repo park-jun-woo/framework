@@ -9,15 +9,8 @@ class Request{
 	public function __construct(){
 		//세션 설정
 		$this->user = new User();
-		echo $_SERVER["REQUEST_URI"]."<br>";
-		echo $_SERVER["PHP_SELF"]."<br>";
-		echo $_SERVER["QUERY_STRING"]."<br>";
-		print_r($_GET);
-		exit;
 		//URI 분석
-		//$uriParse = explode("?",$_SERVER["REQUEST_URI"]);
-		$this->uri = $_SERVER["PHP_SELF"];//$uriParse[0].(substr($uriParse[0],-1)==="/"?"":"/");
-		//if(isset($uriParse[1])){parse_str($uriParse[1],$_GET);}
+		$this->uri = explode("?",$_SERVER["REQUEST_URI"])[0];
 		//Method 분석
 		$this->method = $_SERVER["REQUEST_METHOD"];
 		//ContentType 분석
@@ -44,7 +37,7 @@ class Request{
 		}else if($languageList[0]!=""){$language = $languageList[0];}
 		else{$language = "ko";}
 		$this->locale = strtolower($language);
-		$app = Parkjunwoo::app($appId);//Parkjunwoo::domainApp($_SERVER["SERVER_NAME"]);
+		$app = Parkjunwoo::app(strtolower($_SERVER["SERVER_NAME"]));
 		//구문 분석된 주소에 대한 컨트롤러를 생성하고 리소스 메서드를 호출
 		if(array_key_exists($this->method.$this->type, $app)){
 			if(array_key_exists($this->uri, $app[$this->method.$this->type])){

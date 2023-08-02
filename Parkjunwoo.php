@@ -28,10 +28,17 @@ class Parkjunwoo{
 	public static function man(){return self::$man;}
 	/**
 	 * 앱 정보 조회
-	 * @param string $key 키
+	 * @param string $key 키 또는 도메인
 	 * @return array|string 값 
 	 */
-	public static function app(string $key){return self::$man->app[$key];}
+	public static function app(string $key){
+		if(array_key_exists($key,self::$man->app)){return self::$man->app[$key];}
+		if(!array_key_exists($key,self::$man->server["domain-app"])){
+			echo "앱에 도메인(\"{$key}\")이 입력되어 있지 않습니다.도메인을 입력해주세요.";
+			apcu_delete(self::$man->app["name"]."-server");exit;
+		}
+		return self::$man->server["domain-app"][$key];
+	}
 	/**
 	 * 어플리케이션 루트 경로
 	 * @return string 루트 경로
@@ -54,17 +61,6 @@ class Parkjunwoo{
 	 * @return string 루트 경로
 	 */
 	public static function publicKey():string{return self::$man->server["publicKey"];}
-	/**
-	 * 어플리케이션 권한 배열
-	 * @return array 권한 배열
-	 */
-	public static function domainApp(string $domain):string{
-		if(!array_key_exists($domain,self::$man->server["domain-app"])){
-			echo "앱에 도메인(\"{$domain}\")이 입력되어 있지 않습니다.도메인을 입력해주세요.";
-			apcu_delete(self::$man->app["name"]."-server");exit;
-		}
-		return self::$man->server["domain-app"][$domain];
-	}
 	
 	protected Controller $controller;
 	protected string $path;
