@@ -6,7 +6,7 @@ use utils\Security;
  * PHP Version 8.0
  * @name Parkjunwoo Framework Version 1.0 zeolite
  * @package Parkjunwoo
- * @see https://github.com/park-jun-woo/parkjunwoo/ The Parkjunwoo GitHub project
+ * @see https://github.com/park-jun-woo/framework The Parkjunwoo GitHub project
  * @author Park Jun woo <mail@parkjunwoo.com>
  * @copyright 2023 parkJunwoo.com
  * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License

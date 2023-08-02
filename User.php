@@ -127,8 +127,8 @@ class User{
 		File::write($this->man->path("session").$sessionName,$data);
 	}
 	/**
-	 * 사용자 객체
-	 * @return User
+	 * Parkjunwoo Framework 객체
+	 * @return Parkjunwoo
 	 */
 	public function man():Parkjunwoo{return $this->man;}
 	/**

@@ -62,8 +62,8 @@ class Request{
 		if(!isset($this->route)){$this->route = "404";$this->sequences = [["method"=>"view","layout"=>"none","view"=>"404"]];}
 	}
 	/**
-	 * 사용자 객체
-	 * @return User
+	 * Parkjunwoo Framework 객체
+	 * @return Parkjunwoo
 	 */
 	public function man():Parkjunwoo{return $this->man;}
 	/**
