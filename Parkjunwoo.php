@@ -29,7 +29,7 @@ class Parkjunwoo{
 	/**
 	 * 앱 정보 조회
 	 * @param string $key 키 또는 도메인
-	 * @return array|string 값 
+	 * @return array 앱 코드 배열
 	 */
 	public static function app(string $key){
 		if(array_key_exists($key,self::$man->app)){return self::$man->app[$key];}
@@ -37,7 +37,7 @@ class Parkjunwoo{
 			echo "앱에 도메인(\"{$key}\")이 입력되어 있지 않습니다.도메인을 입력해주세요.";
 			apcu_delete(self::$man->app["name"]."-server");exit;
 		}
-		return self::$man->server["domain-app"][$key];
+		return self::$man->app[self::$man->server["domain-app"][$key]];
 	}
 	/**
 	 * 어플리케이션 루트 경로
