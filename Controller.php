@@ -1,20 +1,20 @@
 <?php
 class Controller{
-	protected Parkjunwoo $man;
+	protected Request $request;
 	protected User $user;
 	/**
 	 * 컨트롤러 실행
 	 * @param array $controller 실행할 컨트롤러
 	 */
-	public function __construct(Parkjunwoo $man, array $controller){
-		$this->man = $man;
-		$this->user = $this->man->user();
+	public function __construct(Request $request, array $controller){
+		$this->request = $request;
+		$this->user = $this->request->user();
 		
-		echo "URI: ".$this->man->uri()."<br>";
-		echo "route: ".$this->man->route()."<br>";
-		echo "method: ".$this->man->method()."<br>";
-		echo "type: ".$this->man->type()."<br>";
-		echo "locale: ".$this->man->locale()."<br><br>";
+		echo "URI: ".$this->request->uri()."<br>";
+		echo "route: ".$this->request->route()."<br>";
+		echo "method: ".$this->request->method()."<br>";
+		echo "type: ".$this->request->type()."<br>";
+		echo "locale: ".$this->request->locale()."<br><br>";
 		
 		echo "permissions: ".$this->user->permissions()."<br>";
 		

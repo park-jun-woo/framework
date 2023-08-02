@@ -2,7 +2,7 @@
 use utils\Security;
 
 /**
- * Parkjunwoo framework는 간결하고 강력한 구문을 가진 웹 어플리케이션 프레임워크입니다.
+ * Parkjunwoo Framework는 간결하고 강력한 구문을 가진 웹 어플리케이션 프레임워크입니다.
  * PHP Version 8.0
  * @name Parkjunwoo Framework Version 1.0 zeolite
  * @package Parkjunwoo
@@ -16,16 +16,53 @@ use utils\Security;
  */
 class Parkjunwoo{
 	protected static Parkjunwoo $man;
-	public static function walk(array $app):Parkjunwoo{return self::$man = new Parkjunwoo($app);}
-	protected User $user;
-	protected Controller $controller;
-	protected string $uri, $route, $method, $type, $locale, $path;
-	protected array $app, $server;
 	/**
-     * Parkjunwoo framework는 간결하고 강력한 구문을 가진 웹 어플리케이션 프레임워크입니다. 
+	 * Parkjunwoo Framework를 실행합니다.
 	 * @param array $app 실행할 어플리케이션 코드 배열
 	 */
-	public function __construct(array &$app){
+	public static function walk(array $app){self::$man = new Parkjunwoo($app);}
+	/**
+	 * Parkjunwoo Framework 객체
+	 * @return Parkjunwoo 프레임워크 객체
+	 */
+	public static function man(){return self::$man;}
+	/**
+	 * 앱 정보 조회
+	 * @param string $key 키
+	 * @return array|string 값 
+	 */
+	public static function app(string $key){return self::$man->app[$key];}
+	/**
+	 * 어플리케이션 루트 경로
+	 * @return string 루트 경로
+	 */
+	public function path(string $key="root"):string{
+		if(array_key_exists($key, self::$man->server["path"])){return self::$man->server["path"][$key];}else{return "";}
+	}
+	/**
+	 * 어플리케이션 권한 배열
+	 * @return array 권한 배열
+	 */
+	public function permissions():array{return self::$man->server["permissions"];}
+	/**
+	 * 개인키
+	 * @return string 루트 경로
+	 */
+	public function privateKey():string{return self::$man->server["privateKey"];}
+	/**
+	 * 개인키
+	 * @return string 루트 경로
+	 */
+	public function publicKey():string{return self::$man->server["publicKey"];}
+	
+	protected Controller $controller;
+	protected string $path;
+	protected array $app, $server;
+	/**
+     * Parkjunwoo Framework 생성자
+	 * @param array $app 실행할 어플리케이션 코드 배열
+	 */
+	protected function __construct(array &$app){
 		$this->app = $app;
 		//클래스 자동 로더 등록
 		spl_autoload_register([$this,"autoload"]);
@@ -41,44 +78,14 @@ class Parkjunwoo{
 		//SQL인젝션 공격 필터링
 		Security::sqlInjectionClean($_GET);
 		Security::sqlInjectionClean($_POST);
-		//세션 설정
-		$this->user = new User($this);
-		//URI 분석
-		$uriParse = explode("?",$_SERVER["REQUEST_URI"]);
-		$this->uri = $uriParse[0].(substr($uriParse[0],-1)==="/"?"":"/");
-		if(isset($uriParse[1])){parse_str($uriParse[1],$_GET);}
-		//Method 분석
-		$this->method = $_SERVER["REQUEST_METHOD"];
-		//ContentType 분석
-		if(array_key_exists("CONTENT_TYPE", $_SERVER)){
-			switch(strtolower($_SERVER["CONTENT_TYPE"])){
-				default:$this->type = "HTML";break;
-				case "json":case "application/json":$this->type = "JSON";break;
-				case "xml":case "application/xml":$this->type = "XML";break;
-			}
-		}else{$this->type = "HTML";}
-		//사용자 환경 언어 처리
-		if(!array_key_exists("HTTP_ACCEPT_LANGUAGE",$_SERVER)){$_SERVER["HTTP_ACCEPT_LANGUAGE"] = "";}
-		else{$languageList = explode("-",preg_split("[;,]",$_SERVER["HTTP_ACCEPT_LANGUAGE"])[0]);}
-		if($_SERVER["HTTP_ACCEPT_LANGUAGE"]=="" || $languageList[0]==""){$languageList = array("ko");}
-		//사용자 사용언어 지정
-		if(array_key_exists("language",$_GET) && $_GET["language"]!=""){
-			$language = $_GET["language"];
-			$this->user->set("language",$language);
-		}else if(array_key_exists("lang",$_GET) && $_GET["lang"]!=""){
-			$language = $_GET["lang"];
-			$this->user->set("language",$language);
-		}else if($this->user->is("language")){
-			$language = $this->user->get("language");
-		}else if($languageList[0]!=""){$language = $languageList[0];}
-		else{$language = "ko";}
-		$this->locale = strtolower($language);
+		//요청 분석
+		$request = new Request();
 		//구문 분석된 주소에 대한 컨트롤러를 생성하고 리소스 메서드를 호출
-		if(array_key_exists($this->uri, $this->app["controllers"][$this->method][$this->type])){
-			$sequences = $this->app["controllers"][$this->method][$this->type][$this->uri];
+		if(array_key_exists($request->uri(), $this->app["controllers"][$request->method().$request->type()])){
+			$sequences = $this->app["controllers"][$request->method().$request->type()][$this->uri];
 			$this->route = $this->uri;
 		}else{
-			foreach($this->app["CONTROLLERS"][$this->method][$this->type] as $pattern=>$sequences){
+			foreach($this->app["controllers"][$this->method][$this->type] as $pattern=>$sequences){
 				if(substr($pattern, -1)!=="/"){$pattern .= "/";}$matches = null;
 				if(preg_match("/^".preg_replace("/\[([^\/]+)\]/i", "(?P<$1>[^\/]+)", str_replace("/", "\/", $pattern))."$/i",$this->uri,$matches)){
 					foreach($matches as $key=>$value){if(is_string($key)){$_GET[$key] = $value;}}
@@ -89,7 +96,7 @@ class Parkjunwoo{
 			if(!isset($this->route)){$this->route = "404";$sequences = [["method"=>"view","layout"=>"none","view"=>"404"]];}
 		}
 		//라우트 한 컨트롤러 실행
-		$this->controller = new Controller($this, $sequences);
+		$this->controller = new Controller($request, $sequences);
 	}
 	/**
 	 * 시스템 리셋
@@ -104,14 +111,12 @@ class Parkjunwoo{
 		if(!array_key_exists("config", $this->app)){echo "config 배열을 입력해 주세요.";exit;}
 		if(!array_key_exists("messages", $this->app)){echo "messages 배열을 입력해 주세요.";exit;}
 		if(!array_key_exists("apps", $this->app)){echo "apps 배열을 입력해 주세요.";exit;}
-		if(!array_key_exists("controllers", $this->app)){echo "controllers 배열을 입력해 주세요.";exit;}
 		if(!is_array($this->app["path"])){echo "path는 배열이어야 합니다.";exit;}
 		if(!is_array($this->app["servers"])){echo "servers는 배열이어야 합니다.";exit;}
 		if(!is_array($this->app["permissions"])){echo "permissions는 배열이어야 합니다.";exit;}
 		if(!is_array($this->app["config"])){echo "config는 배열이어야 합니다.";exit;}
 		if(!is_array($this->app["messages"])){echo "messages는 배열이어야 합니다.";exit;}
 		if(!is_array($this->app["apps"])){echo "apps는 배열이어야 합니다.";exit;}
-		if(!is_array($this->app["controllers"])){echo "controllers는 배열이어야 합니다.";exit;}
 		if(!array_key_exists("root", $this->app["path"])){echo "path[\"root\"]를 입력해 주세요.";exit;}
 		if(!array_key_exists("cache", $this->app["path"])){echo "path[\"cache\"]를 입력해 주세요.";exit;}
 		if(!array_key_exists("log", $this->app["path"])){echo "path[\"log\"]를 입력해 주세요.";exit;}
@@ -123,8 +128,8 @@ class Parkjunwoo{
 		if(!is_int($this->app["config"]["session-expire"])){echo "config[\"session-expire\"]는 정수여야 합니다.";exit;}
 		//경로 설정
 		$root = str_replace(basename($_SERVER["SCRIPT_FILENAME"]),"",realpath($_SERVER["SCRIPT_FILENAME"]))."..".DIRECTORY_SEPARATOR;
-		$this->server["path"] = ["root"=>(substr($this->app["PATH"]["root"],0,1)===DIRECTORY_SEPARATOR)?$this->app["PATH"]["root"]:$root.$this->app["PATH"]["root"]];
-		foreach($this->app["PATH"] as $key=>$value){
+		$this->server["path"] = ["root"=>(substr($this->app["path"]["root"],0,1)===DIRECTORY_SEPARATOR)?$this->app["path"]["root"]:$root.$this->app["path"]["root"]];
+		foreach($this->app["path"] as $key=>$value){
 			switch($key){
 				case "root":break;
 				default:
@@ -148,77 +153,24 @@ class Parkjunwoo{
 		list($this->server["privateKey"], $this->server["publicKey"]) = Security::generateRSA();
 		//분산서버 목록 확인 및 초기 통신
 		$this->server["servers"] = [];
-		foreach($this->app["SERVERS"] as $key=>$value){
+		foreach($this->app["servers"] as $key=>$value){
 			
 		}
-		//권한 배열에 사용자 정의 권한 레벨 $this->app["PERMISSIONS"]를 합치기
+		//권한 배열에 사용자 정의 권한 레벨 $this->app["permissions"]를 합치기
 		$this->server["permissions"] = [User::GUEST=>"guest", User::MEMBER=>"member", User::STAFF=>"staff", User::ADMIN=>"admin", User::SYSTEM=>"system"];
-		foreach($this->app["PERMISSIONS"] as $key=>$value){
+		foreach($this->app["permissions"] as $key=>$value){
 			switch($key){
 				case User::GUEST:case User::MEMBER:case User::STAFF:case User::ADMIN:case User::SYSTEM:
-					echo "PERMISSIONS[\"{$key}\"]는 사용할 수 없는 권한키입니다.";exit;
+					echo "permissions[\"{$key}\"]는 사용할 수 없는 권한키입니다.";exit;
 				default:
-					if(($key&($key-1))==0&&$key>0){echo "PERMISSIONS[\"{$key}\"]는 2의 승수여야 합니다.";exit;}
-					if($key>User::STAFF){echo "PERMISSIONS[\"{$key}\"]는 ".number_format(User::STAFF)."보다 작아야합니다.";exit;}
+					if(($key&($key-1))==0&&$key>0){echo "permissions[\"{$key}\"]는 2의 승수여야 합니다.";exit;}
+					if($key>User::STAFF){echo "permissions[\"{$key}\"]는 ".number_format(User::STAFF)."보다 작아야합니다.";exit;}
 					break;
 			}
 			$this->server["permissions"][$key] = $value;
 		}
-		apcu_store($this->app["NAME"]."-server", $this->server);
+		apcu_store($this->app["name"]."-server", $this->server);
 	}
-	public function app(string $key){return $this->app[$key];}
-	/**
-	 * 사용자 객체
-	 * @return User
-	 */
-	public function user():User{return $this->user;}
-	/**
-	 * URI
-	 * @return string URI
-	 */
-	public function uri():string{return $this->uri;}
-	/**
-	 * 라우트 패턴
-	 * @return string 패턴
-	 */
-	public function route():string{return $this->route;}
-	/**
-	 * HTTP 메서드
-	 * @return string 메서드
-	 */
-	public function method():string{return $this->method;}
-	/**
-	 * 컨텐트 타입
-	 * @return string 컨텐트 타입
-	 */
-	public function type():string{return $this->type;}
-	/**
-	 * 사용언어 코드
-	 * @return string 코드
-	 */
-	public function locale():string{return $this->locale;}
-	/**
-	 * 개인키
-	 * @return string 루트 경로
-	 */
-	public function privateKey():string{return $this->server["privateKey"];}
-	/**
-	 * 개인키
-	 * @return string 루트 경로
-	 */
-	public function publicKey():string{return $this->server["publicKey"];}
-	/**
-	 * 어플리케이션 루트 경로
-	 * @return string 루트 경로
-	 */
-	public function path(string $key="root"):string{
-		if(array_key_exists($key, $this->server["path"])){return $this->server["path"][$key];}else{return "";}
-	}
-	/**
-	 * 어플리케이션 권한 배열
-	 * @return array 권한 배열
-	 */
-	public function permissions():array{return $this->server["permissions"];}
 	/**
 	 * 클래스 파일 자동 로더
 	 * @param string $className 클래스명
