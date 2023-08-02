@@ -48,6 +48,7 @@ class Request{
 			}else{
 				foreach($router as $pattern=>$sequences){
 					if(substr($pattern, -1)!=="/"){$pattern .= "/";}$matches = null;
+					echo $pattern."<br>";
 					echo "/^".preg_replace("/\[([^\/]+)\]/i", "(?P<$1>[^\/]+)", str_replace("/", "\/", $pattern))."$/i<br><br>";
 					if(preg_match("/^".preg_replace("/\[([^\/]+)\]/i", "(?P<$1>[^\/]+)", str_replace("/", "\/", $pattern))."$/i",$this->uri,$matches)){
 						foreach($matches as $key=>$value){if(is_string($key)){$_GET[$key] = $value;}}
