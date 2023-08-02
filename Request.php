@@ -9,10 +9,14 @@ class Request{
 	public function __construct(){
 		//세션 설정
 		$this->user = new User();
+		echo $_SERVER["PHP_SELF"]."<br>";
+		echo $_SERVER["QUERY_STRING"]."<br>";
+		print_r($_GET);
+		exit;
 		//URI 분석
-		$uriParse = explode("?",$_SERVER["REQUEST_URI"]);
-		$this->uri = $uriParse[0].(substr($uriParse[0],-1)==="/"?"":"/");
-		if(isset($uriParse[1])){parse_str($uriParse[1],$_GET);}
+		//$uriParse = explode("?",$_SERVER["REQUEST_URI"]);
+		$this->uri = $_SERVER["PHP_SELF"];//$uriParse[0].(substr($uriParse[0],-1)==="/"?"":"/");
+		//if(isset($uriParse[1])){parse_str($uriParse[1],$_GET);}
 		//Method 분석
 		$this->method = $_SERVER["REQUEST_METHOD"];
 		//ContentType 분석
@@ -39,14 +43,14 @@ class Request{
 		}else if($languageList[0]!=""){$language = $languageList[0];}
 		else{$language = "ko";}
 		$this->locale = strtolower($language);
-		$appId = Parkjunwoo::domainApp($_SERVER["SERVER_NAME"]);
+		$app = Parkjunwoo::app($appId);//Parkjunwoo::domainApp($_SERVER["SERVER_NAME"]);
 		//구문 분석된 주소에 대한 컨트롤러를 생성하고 리소스 메서드를 호출
-		if(array_key_exists($this->method.$this->type, $this->app["apps"][$appId])){
-			if(array_key_exists($this->uri, $this->app["apps"][$appId][$this->method.$this->type])){
-				$this->sequences = $this->app["apps"][$appId]["route"][$this->uri][$this->method.$this->type];
+		if(array_key_exists($this->method.$this->type, $app)){
+			if(array_key_exists($this->uri, $app[$this->method.$this->type])){
+				$this->sequences = $app[$this->method.$this->type][$this->uri];
 				$this->route = $this->uri;
 			}else{
-				foreach($this->app["apps"][$this->method][$this->type] as $pattern=>$sequences){
+				foreach($app[$this->method.$this->type] as $pattern=>$sequences){
 					if(substr($pattern, -1)!=="/"){$pattern .= "/";}$matches = null;
 					if(preg_match("/^".preg_replace("/\[([^\/]+)\]/i", "(?P<$1>[^\/]+)", str_replace("/", "\/", $pattern))."$/i",$this->uri,$matches)){
 						foreach($matches as $key=>$value){if(is_string($key)){$_GET[$key] = $value;}}
