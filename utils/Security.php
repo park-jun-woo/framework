@@ -1,0 +1,75 @@
+<?php
+namespace utils;
+
+use DOMDocument;
+use DOMXPath;
+
+class Security{
+	/**
+	 * RSA 키쌍이 없을 경우 생성.
+	 * @param string $path 키를 생성할 경로
+	 * @param bool $clear 강제로 초기화할지 여부
+	 */
+	public static function generateRSA():array{
+		$privateKey = null;
+		$privateKeyResource = openssl_pkey_new(["digest_alg" => "sha512","private_key_bits"=>2048,"private_key_type"=>OPENSSL_KEYTYPE_RSA]);
+		openssl_pkey_export($privateKeyResource, $privateKey);
+		$publicKey = openssl_pkey_get_details($privateKeyResource)['key'];
+		return [$privateKey, $publicKey];
+	}
+	/**
+	 * 매개 변수 값 남용 방지.
+	 */
+	public static function clearVars(){
+		$exitVars = array("PHP_SELF","_ENV","_GET","_POST","_FILES","_SERVER","_COOKIE","_SESSION","_REQUEST","HTTP_ENV_VARS","HTTP_GET_VARS","HTTP_POST_VARS","HTTP_POST_FILES","HTTP_SERVER_VARS","HTTP_COOKIE_VARS","HTTP_SESSION_VARS","GLOBALS");
+		foreach($exitVars as $var){if(isset($_GET[$var])){unset($_GET[$var]);}}
+		unset($_GET["PHPSESSID"]);
+		unset($_POST["PHPSESSID"]);
+		unset($_COOKIE["PHPSESSID"]);
+		unset($_REQUEST);
+	}
+	/**
+	 * SQL 인젝션 공격 필터링
+	 * @param array $param 필터링할 매개 변수 값의 배열
+	 */
+	public static function sqlInjectionClean(array &$param){
+		foreach($param as &$value){
+			if(is_array($value)){sqlInjectionClean($value);}
+			else{$value = addSlashes($value);}
+		}
+	}
+	/**
+	 * XSS 공격 필터링
+	 * @param string $html 필터링할 입력 값
+	 * @param array $allowed 필터링하거나 허용할 태그 및 속성
+	 */
+	public static function purifyHTML(string $html,array $allowed) {
+		$dom = new DOMDocument();
+		@$dom->loadHTML($html);
+		$xpath = new DOMXPath($dom);
+		$allowed = array_merge(["html"=>[],"head"=>[],"body"=>[]],$allowed);
+		$query ="//*[not(self::".implode(" or self::",array_keys($allowed)).")]";
+		foreach($xpath->query($query) as $node){$node->parentNode->removeChild($node);}
+		foreach($xpath->query("//@*") as $attribute) {
+			if(!in_array($attribute->nodeName,$allowed[$attribute->ownerElement->nodeName] ?? [])) {
+				$attribute->ownerElement->removeAttributeNode($attribute);
+			}
+		}
+		$body = $dom->getElementsByTagName("body")->item(0);$result = "";
+		foreach($body->childNodes as $child){$result .= $dom->saveHTML($child);}
+		return $result;
+	}
+	/**
+	 * XSS 공격 필터링 for articles
+	 * @param string $html 필터링할 입력 값
+	 */
+	public static function purifyArticle(string $html){
+		$allowed = [
+			"article"=>["class"],"p"=>["id"],"ul"=>["class"],"ol"=>["class"],"li"=>["class"],"caption"=>["class"]
+			,"img"=>["src","alt","width","height","ismap","loading"],"figure"=>["class"],"figcaption"=>["class"]
+			,"h1"=>["class"],"h2"=>["class"],"h3"=>["class"],"h4"=>["class"],"h5"=>["class"],"h6"=>["class"]
+			,"table"=>["class"],"tr"=>["class"],"th"=>["class","scope"],"td"=>["class"],"colgroup"=>["class"],"col"=>["class"]
+		];
+		return self::purifyHTML($html,$allowed);
+	}
+}
