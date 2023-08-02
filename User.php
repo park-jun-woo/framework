@@ -7,22 +7,24 @@ class User{
 	const STAFF = 536870912;
 	const ADMIN = 1073741824;
 	const SYSTEM = 2147483648;
+	protected Parkjunwoo $man;
 	protected string $token;
 	protected array $permissions, $session = [], $data = [];
 	protected bool $change = false;
 	/**
 	 * 사용자 객체 생성
 	 */
-	public function __construct(){
-		$this->permissions = Parkjunwoo::permissions();
+	public function __construct(Parkjunwoo $man){
+		$this->man = $man;
+		$this->permissions = $this->man->permissions();
 		//쿠키에 세션이 없다면 신규 생성
 		if(!array_key_exists("s", $_COOKIE)){$this->guest();return;}
 		//쿠키에 토큰은 없는데 세션은 있다면 만료된 것으로 보고 세션 로드 후 토큰 재발행
 		else if(!array_key_exists("t", $_COOKIE) && array_key_exists("s", $_COOKIE)){$this->load();return;}
 		//APCU 메모리에 토큰이 등록되어 있지 않으면 만료된 것으로 보고 세션 로드 후 토큰 재발행
-		if(!apcu_exists(Parkjunwoo::app("name")."-session-".$_COOKIE["t"])){$this->load();return;}
+		if(!apcu_exists($this->man->name()."-session-".$_COOKIE["t"])){$this->load();return;}
 		//APCU 메모리 토큰으로 조회
-		$data = apcu_fetch(Parkjunwoo::app("name")."-session-".$_COOKIE["t"]);
+		$data = apcu_fetch($this->man->name()."-session-".$_COOKIE["t"]);
 		//agent 값 일치 여부 확인, 일치하지 않으면 블랙 처리
 		if($_SERVER["HTTP_USER_AGENT"]!=$data["ra"]){$this->black();return;}
 		//언어값 일치 여부 확인, 일치하지 않으면 블랙 처리
@@ -52,7 +54,7 @@ class User{
 			"session"=>$sessionId,
 			"session-time"=>$sessionTime,
 			"server"=>ip2long($_SERVER["SERVER_ADDR"]),
-			"app"=>Parkjunwoo::app("name"),
+			"app"=>$this->man->name(),
 		];
 		//세션정보 객체 초기화
 		$this->data = [
@@ -91,7 +93,7 @@ class User{
 			$data[$key] = $value;
 		}
 		//세션 도메인 일치 여부 확인, 일치하지 않으면 블랙 처리
-		if(Parkjunwoo::app("name")!=$session["app"]){$this->black();return;}
+		if($this->man->name()!=$session["app"]){$this->black();return;}
 		//agent 값 일치 여부 확인, 일치하지 않으면 블랙 처리
 		if($_SERVER["HTTP_USER_AGENT"]!=$data["ra"]){$this->black();return;}
 		//언어값 일치 여부 확인, 일치하지 않으면 블랙 처리
@@ -110,19 +112,19 @@ class User{
 	 */
 	protected function save(){
 		//APCU 메모리에 토큰으로 세션 데이터 저장
-		apcu_store(Parkjunwoo::app("name")."-session-".$this->token, $this->data, Parkjunwoo::app("config")["token-expire"]);
+		apcu_store($this->man->name()."-session-".$this->token, $this->data, $this->man->config("token-expire"));
 		//쿠키에 토큰 등록
-		setcookie("t", $this->token, time()+Parkjunwoo::app("config")["token-expire"], "/", Parkjunwoo::app("domain"), true, true);
+		setcookie("t", $this->token, time()+$this->man->config("token-expire"), "/", $this->man->domain(), true, true);
 		//쿠키에 세션 등록
 		$data = pack("N", $this->session["permission"]).pack("J", $this->session["session"]).pack("J", $this->session["session-time"]).pack("N", $this->session["server"]).pack("a*", $this->session["app"]);
 		$crypted = "";
-		openssl_public_encrypt($data, $crypted, Parkjunwoo::publicKey());
-		setcookie("s", base64_encode($crypted), time()+Parkjunwoo::app("config")["session-expire"], "/", Parkjunwoo::app("domain"), true, true);
+		openssl_public_encrypt($data, $crypted, $this->man->publicKey());
+		setcookie("s", base64_encode($crypted), time()+$this->man->config("session-expire"), "/", $this->man->domain(), true, true);
 		//세션 파일에 정보 저장
 		$data = "";
 		foreach($this->data as $key=>$value){$data .= "{$key}\t{$value}\n";}
 		$sessionName = hash("sha256",$this->session["session-time"].$this->session["session"]);
-		File::write(Parkjunwoo::path("session").$sessionName,$data);
+		File::write($this->man->path("session").$sessionName,$data);
 	}
 	/**
 	 * 사용자 접속한 IP
@@ -185,7 +187,7 @@ class User{
 	 */
 	public function permissions():string{
 		$names = [];
-		foreach(Parkjunwoo::permissions() as $key=>$value){
+		foreach($this->man->permissions() as $key=>$value){
 			if(($this->data["up"] & $key)===$key){$names[] = $value;}
 		}
 		return implode(",", $names);
@@ -202,7 +204,7 @@ class User{
 	 */
 	protected function reset(){
 		$this->black(1);
-		Parkjunwoo::reset();
+		$this->man->reset();
 	}
 	protected function parseAgent():array{
 		$result = [];
