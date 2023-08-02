@@ -81,12 +81,13 @@ class Parkjunwoo{
 		Security::sqlInjectionClean($_POST);
 		//요청 분석
 		$request = new Request();
+		echo $_SERVER["SERVER_NAME"];exit;
 		//구문 분석된 주소에 대한 컨트롤러를 생성하고 리소스 메서드를 호출
-		if(array_key_exists($request->uri(), $this->app["controllers"][$request->method().$request->type()])){
-			$sequences = $this->app["controllers"][$request->method().$request->type()][$this->uri];
+		if(array_key_exists($request->uri(), $this->app["apps"][$request->method().$request->type()])){
+			$sequences = $this->app["apps"][$request->method().$request->type()][$this->uri];
 			$this->route = $this->uri;
 		}else{
-			foreach($this->app["controllers"][$this->method][$this->type] as $pattern=>$sequences){
+			foreach($this->app["apps"][$this->method][$this->type] as $pattern=>$sequences){
 				if(substr($pattern, -1)!=="/"){$pattern .= "/";}$matches = null;
 				if(preg_match("/^".preg_replace("/\[([^\/]+)\]/i", "(?P<$1>[^\/]+)", str_replace("/", "\/", $pattern))."$/i",$this->uri,$matches)){
 					foreach($matches as $key=>$value){if(is_string($key)){$_GET[$key] = $value;}}
