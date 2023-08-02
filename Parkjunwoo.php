@@ -81,22 +81,25 @@ class Parkjunwoo{
 		Security::sqlInjectionClean($_POST);
 		//요청 분석
 		$request = new Request();
-		echo $_SERVER["SERVER_NAME"];return;
+		if(!array_key_exists($_SERVER["SERVER_NAME"],$this->server["domain-app"])){echo "앱에 도메인(\"{$_SERVER["SERVER_NAME"]}\")이 입력되어 있지 않습니다.도메인을 입력해주세요.";exit;}
+		$appId = $this->server["domain-app"][$_SERVER["SERVER_NAME"]];
 		//구문 분석된 주소에 대한 컨트롤러를 생성하고 리소스 메서드를 호출
-		if(array_key_exists($request->uri(), $this->app["apps"][$request->method().$request->type()])){
-			$sequences = $this->app["apps"][$request->method().$request->type()][$this->uri];
-			$this->route = $this->uri;
-		}else{
-			foreach($this->app["apps"][$this->method][$this->type] as $pattern=>$sequences){
-				if(substr($pattern, -1)!=="/"){$pattern .= "/";}$matches = null;
-				if(preg_match("/^".preg_replace("/\[([^\/]+)\]/i", "(?P<$1>[^\/]+)", str_replace("/", "\/", $pattern))."$/i",$this->uri,$matches)){
-					foreach($matches as $key=>$value){if(is_string($key)){$_GET[$key] = $value;}}
-					$this->route = $pattern;break;
+		if(array_key_exists($request->method().$request->type(), $this->app["apps"][$appId])){
+			if(array_key_exists($request->uri(), $this->app["apps"][$appId][$request->method().$request->type()])){
+				$sequences = $this->app["apps"][$appId]["route"][$this->uri][$request->method().$request->type()];
+				$this->route = $this->uri;
+			}else{
+				foreach($this->app["apps"][$this->method][$this->type] as $pattern=>$sequences){
+					if(substr($pattern, -1)!=="/"){$pattern .= "/";}$matches = null;
+					if(preg_match("/^".preg_replace("/\[([^\/]+)\]/i", "(?P<$1>[^\/]+)", str_replace("/", "\/", $pattern))."$/i",$this->uri,$matches)){
+						foreach($matches as $key=>$value){if(is_string($key)){$_GET[$key] = $value;}}
+						$this->route = $pattern;break;
+					}
 				}
 			}
-			//라우터를 찾을 수 없다면
-			if(!isset($this->route)){$this->route = "404";$sequences = [["method"=>"view","layout"=>"none","view"=>"404"]];}
 		}
+		//라우터를 찾을 수 없다면
+		if(!isset($this->route)){$this->route = "404";$sequences = [["method"=>"view","layout"=>"none","view"=>"404"]];}
 		//라우트 한 컨트롤러 실행
 		$this->controller = new Controller($request, $sequences);
 	}
@@ -170,6 +173,20 @@ class Parkjunwoo{
 					break;
 			}
 			$this->server["permissions"][$key] = $value;
+		}
+		//도메인 앱아이디 연결맵 구성
+		$this->server["domain-app"] = [];
+		foreach($this->app["apps"] as $appId=>$app){
+			if(!array_key_exists("type",$app)){echo "apps[\"$appId\"]의 type을 입력하세요.";exit;}
+			switch($app["type"]){
+				default:echo "apps[\"$appId\"]에 입력한 '{$app["type"]}'은 지원하지 않는 앱 type입니다.<br>지원타입: mysql, papago, chatgpt, parkjunwoo";exit;
+				case "mysql":break;
+				case "papago":break;
+				case "chatgpt":break;
+				case "parkjunwoo":
+					foreach($app["domain"] as $domain){$this->server["domain-app"][$domain] = $appId;}
+					break;
+			}
 		}
 		apcu_store($this->app["name"]."-server", $this->server);
 	}
