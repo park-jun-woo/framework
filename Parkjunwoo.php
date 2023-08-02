@@ -81,7 +81,7 @@ class Parkjunwoo{
 		Security::sqlInjectionClean($_POST);
 		//요청 분석
 		$request = new Request();
-		echo $_SERVER["SERVER_NAME"];exit;
+		echo $_SERVER["SERVER_NAME"];return;
 		//구문 분석된 주소에 대한 컨트롤러를 생성하고 리소스 메서드를 호출
 		if(array_key_exists($request->uri(), $this->app["apps"][$request->method().$request->type()])){
 			$sequences = $this->app["apps"][$request->method().$request->type()][$this->uri];
