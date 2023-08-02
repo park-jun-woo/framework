@@ -185,6 +185,6 @@ class Parkjunwoo{
 			$fileName = str_replace("\\", DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR;
 		}
 		$fileName .= str_replace("_",DIRECTORY_SEPARATOR,$className).".php";
-		require str_replace(basename(__FILE__),"",realpath(__FILE__))."..".DIRECTORY_SEPARATOR.$fileName;
+		require str_replace(basename(__FILE__),"",realpath(__FILE__)).$fileName;
 	}
 }
