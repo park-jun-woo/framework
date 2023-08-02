@@ -20,7 +20,7 @@ class Parkjunwoo{
 	 * Parkjunwoo Framework를 실행합니다.
 	 * @param array $app 실행할 어플리케이션 코드 배열
 	 */
-	public static function walk(array $app){self::$man = new Parkjunwoo($app);}
+	public static function walk(array $app){new Parkjunwoo($app);}
 	/**
 	 * Parkjunwoo Framework 객체
 	 * @return Parkjunwoo 프레임워크 객체
@@ -63,6 +63,7 @@ class Parkjunwoo{
 	 * @param array $app 실행할 어플리케이션 코드 배열
 	 */
 	protected function __construct(array &$app){
+		self::$man = $this;
 		$this->app = $app;
 		//클래스 자동 로더 등록
 		spl_autoload_register([$this,"autoload"]);
