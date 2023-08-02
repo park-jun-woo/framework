@@ -18,19 +18,35 @@ class User{
 		$this->man = $man;
 		$this->permissions = $this->man->permissions();
 		//쿠키에 세션이 없다면 신규 생성
-		if(!array_key_exists("s", $_COOKIE)){$this->guest();return;}
+		if(!array_key_exists("s", $_COOKIE)){
+			$this->guest();
+			return;
+		}
 		//쿠키에 토큰은 없는데 세션은 있다면 만료된 것으로 보고 세션 로드 후 토큰 재발행
-		else if(!array_key_exists("t", $_COOKIE) && array_key_exists("s", $_COOKIE)){$this->load();return;}
+		else if(!array_key_exists("t", $_COOKIE) && array_key_exists("s", $_COOKIE)){
+			$this->load();
+			return;
+		}
 		//APCU 메모리에 토큰이 등록되어 있지 않으면 만료된 것으로 보고 세션 로드 후 토큰 재발행
-		if(!apcu_exists($this->man->name()."-session-".$_COOKIE["t"])){$this->load();return;}
+		if(!apcu_exists($this->man->name()."-session-".$_COOKIE["t"])){
+			$this->load();
+			return;
+		}
 		//APCU 메모리 토큰으로 조회
 		$data = apcu_fetch($this->man->name()."-session-".$_COOKIE["t"]);
 		//agent 값 일치 여부 확인, 일치하지 않으면 블랙 처리
-		if($_SERVER["HTTP_USER_AGENT"]!=$data["ra"]){$this->black(1, "토큰 HTTP_USER_AGENT 불일치");return;}
+		if($_SERVER["HTTP_USER_AGENT"]!=$data["ra"]){
+			$this->black(1, "토큰 HTTP_USER_AGENT 불일치");
+		}
 		//언어값 일치 여부 확인, 일치하지 않으면 블랙 처리
-		if($_SERVER["HTTP_ACCEPT_LANGUAGE"]!=$data["rl"]){$this->black(1, "토큰 HTTP_ACCEPT_LANGUAGE 불일치");return;}
+		if($_SERVER["HTTP_ACCEPT_LANGUAGE"]!=$data["rl"]){
+			$this->black(1, "토큰 HTTP_ACCEPT_LANGUAGE 불일치");
+		}
 		//IP가 달라졌다면 세션 로드 후 토큰 재발행.
-		if(ip2long($_SERVER["REMOTE_ADDR"])!=$data["ip"]){$this->load();return;}
+		if(ip2long($_SERVER["REMOTE_ADDR"])!=$data["ip"]){
+			$this->load();
+			return;
+		}
 		$this->data = $data;
 	}
 	/**
@@ -126,6 +142,7 @@ class User{
 	public function black(float $level,string $log){
 		apcu_store($this->man->name()."-blacklist-".$this->ip(), "", $level*3600);
 		File::append($this->man->path("blacklist").$this->ip(), date("Y-m-d H:i:s")."\t".$log);
+		exit;
 	}
 	/**
 	 * 방문자 기본 세션 설정
@@ -180,9 +197,8 @@ class User{
 		$sessionName = hash("sha256",$session["session-time"].$session["session"]);
 		//세션 파일이 존재하지 않는다면 RSA 키 탈취 가능성 있으므로 리셋.
 		if(!file_exists($sessionPath = $this->man->path("session").$sessionName)){
-			$this->black(24, "세션 파일 존재하지 않아 RSA 키 탈취 가능성");
 			$this->man->reset();
-			return;
+			$this->black(24, "세션 파일 존재하지 않아 RSA 키 탈취 가능성");
 		}
 		//세션 로드
 		foreach(explode("\n", File::read($sessionPath)) as $keyValue){
@@ -193,22 +209,18 @@ class User{
 		//세션 도메인 일치 여부 확인, 일치하지 않으면 블랙 처리
 		if($this->man->name()!=$session["app"]){
 			$this->black(1, "세션 도메인 불일치");
-			return;
 		}
 		//agent 값 일치 여부 확인, 일치하지 않으면 블랙 처리
 		if($_SERVER["HTTP_USER_AGENT"]!=$data["ra"]){
 			$this->black(1, "세션 HTTP_USER_AGENT 불일치");
-			return;
 		}
 		//언어값 일치 여부 확인, 일치하지 않으면 블랙 처리
 		if($_SERVER["HTTP_ACCEPT_LANGUAGE"]!=$data["rl"]){
 			$this->black(1, "세션 HTTP_ACCEPT_LANGUAGE 불일치");
-			return;
 		}
 		//토큰이 제시되었다면 생성시간과 세션 아이디를 sha256으로 인코딩하여 일치여부 확인
 		if(array_key_exists("t", $_COOKIE) && $_COOKIE["t"]!=hash("sha256",$data["tt"].$session["session"])){
 			$this->black(1, "토큰 불일치. 변조 가능성");
-			return;
 		}
 		$this->session = $session;
 		$this->data = $data;
