@@ -1,5 +1,6 @@
 <?php
 class Request{
+	protected Parkjunwoo $man;
 	protected User $user;
 	protected string $uri, $route, $method, $type, $locale;
 	protected array $sequences;
@@ -9,7 +10,7 @@ class Request{
 	public function __construct(Parkjunwoo $man){
 		$this->man = $man;
 		//세션 설정
-		$this->user = new User();
+		$this->user = new User($man);
 		//URI 분석
 		$this->uri = explode("?",$_SERVER["REQUEST_URI"])[0];
 		//Method 분석
@@ -38,14 +39,14 @@ class Request{
 		}else if($languageList[0]!=""){$language = $languageList[0];}
 		else{$language = "ko";}
 		$this->locale = strtolower($language);
-		$app = $this->man->app(strtolower($_SERVER["SERVER_NAME"]));
 		//구문 분석된 주소에 대한 컨트롤러를 생성하고 리소스 메서드를 호출
-		if(array_key_exists($this->method.$this->type, $app)){
-			if(array_key_exists($this->uri, $app[$this->method.$this->type])){
-				$this->sequences = $app[$this->method.$this->type][$this->uri];
+		if($this->man->isRouter($this->method, $this->type)){
+			$router = $this->man->getRouter($this->method, $this->type);
+			if(array_key_exists($this->uri, $router)){
+				$this->sequences = $router[$this->uri];
 				$this->route = $this->uri;
 			}else{
-				foreach($app[$this->method.$this->type] as $pattern=>$sequences){
+				foreach($router as $pattern=>$sequences){
 					if(substr($pattern, -1)!=="/"){$pattern .= "/";}$matches = null;
 					if(preg_match("/^".preg_replace("/\[([^\/]+)\]/i", "(?P<$1>[^\/]+)", str_replace("/", "\/", $pattern))."$/i",$this->uri,$matches)){
 						foreach($matches as $key=>$value){if(is_string($key)){$_GET[$key] = $value;}}
@@ -59,6 +60,11 @@ class Request{
 		//라우터를 찾을 수 없다면
 		if(!isset($this->route)){$this->route = "404";$this->sequences = [["method"=>"view","layout"=>"none","view"=>"404"]];}
 	}
+	/**
+	 * 사용자 객체
+	 * @return User
+	 */
+	public function man():Parkjunwoo{return $this->man;}
 	/**
 	 * 사용자 객체
 	 * @return User

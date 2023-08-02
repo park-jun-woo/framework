@@ -42,12 +42,12 @@ class Parkjunwoo{
 		Security::sqlInjectionClean($_POST);
 		//접속한 도메인으로 앱 조회
 		if(!array_key_exists($domain = strtolower($_SERVER["SERVER_NAME"]),$this->server["domain-app"])){
-			echo "앱에 도메인(\"{$domain}\")이 입력되어 있지 않습니다.도메인을 입력해주세요.";
-			apcu_delete($this->code["name"]."-server");exit;
+			apcu_delete($this->code["name"]."-server");
+			$this->error("앱에 도메인(\"{$domain}\")이 입력되어 있지 않습니다.도메인을 입력해주세요.");
 		}
 		$this->thisApp = $this->code["apps"][$this->server["domain-app"][$domain]];
 		//요청 분석
-		$request = new Request();
+		$request = new Request($this);
 		//라우트 한 컨트롤러 실행
 		$this->controller = new Controller($request);
 	}
@@ -59,10 +59,23 @@ class Parkjunwoo{
 		if(!isset(self::$man)){new Parkjunwoo($app);}
 	}
 	/**
-	 * 접속한 도메인의 앱 코드 배열
-	 * @return array 앱 코드 배열
+	 * 접속한 도메인의 앱 코드에 라우터가 있는지 확인
+	 * @param string $method 메서드
+	 * @param string $type 컨텐트 타입
+	 * @return bool 존재여부
 	 */
-	public function this():array{return $this->thisApp;}
+	public function isRouter(string $method, string $type):bool{
+		return array_key_exists($method.$type, $this->thisApp);
+	}
+	/**
+	 * 접속한 도메인의 앱 코드에서 라우터 배열 조회
+	 * @param string $method 메서드
+	 * @param string $type 컨텐트 타입
+	 * @return array 라우터 배열
+	 */
+	public function getRouter(string $method, string $type):array{
+		return $this->thisApp[$method.$type];
+	}
 	/**
 	 * 앱 코드 조회
 	 * @param string $key 키 또는 도메인
@@ -75,12 +88,16 @@ class Parkjunwoo{
 	 * 어플리케이션 이름
 	 * @return string 어플리케이션 이름
 	 */
-	public function name():string{return $this->code["name"];}
+	public function name():string{
+		return $this->code["name"];
+	}
 	/**
 	 * 세션 도메인
 	 * @return string 도메인
 	 */
-	public function domain():string{return $this->code["domain"];}
+	public function domain():string{
+		return $this->code["domain"];
+	}
 	/**
 	 * 어플리케이션 루트 경로
 	 * @return string 루트 경로
@@ -92,17 +109,23 @@ class Parkjunwoo{
 	 * 어플리케이션 권한 배열
 	 * @return array 권한 배열
 	 */
-	public function permissions():array{return $this->server["permissions"];}
+	public function permissions():array{
+		return $this->server["permissions"];
+	}
 	/**
 	 * 개인키
 	 * @return string 루트 경로
 	 */
-	public function privateKey():string{return $this->server["privateKey"];}
+	public function privateKey():string{
+		return $this->server["privateKey"];
+	}
 	/**
 	 * 개인키
 	 * @return string 루트 경로
 	 */
-	public function publicKey():string{return $this->server["publicKey"];}
+	public function publicKey():string{
+		return $this->server["publicKey"];
+	}
 	/**
 	 * 시스템 리셋
 	 */

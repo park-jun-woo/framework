@@ -1,5 +1,6 @@
 <?php
 class Controller{
+	protected Parkjunwoo $man;
 	protected Request $request;
 	protected User $user;
 	/**
@@ -9,6 +10,7 @@ class Controller{
 	public function __construct(Request $request){
 		$this->request = $request;
 		$this->user = $this->request->user();
+		$this->man = $this->request->man();
 		
 		echo "URI: ".$this->request->uri()."<br>";
 		echo "route: ".$this->request->route()."<br>";

@@ -44,7 +44,7 @@ class User{
 	 */
 	protected function guest(){
 		//마지막 세션 아이디 조회 및 부여
-		$sessionId = File::increase(Parkjunwoo::path("session")."id");
+		$sessionId = File::increase($this->man->path("session")."id");
 		$sessionTime = time();
 		//토큰 생성
 		$this->token = hash("sha256",$sessionTime.$sessionId);
@@ -74,7 +74,7 @@ class User{
 		//쿠키에 저장한 세션 복호화
 		if(!array_key_exists("s", $_COOKIE)){$this->guest();return;}
 		$decrypted = "";
-		if(openssl_private_decrypt(base64_decode($_COOKIE["s"]), $decrypted, Parkjunwoo::privateKey())===false){$this->guest();return;}
+		if(openssl_private_decrypt(base64_decode($_COOKIE["s"]), $decrypted, $this->man->privateKey())===false){$this->guest();return;}
 		//사용자 인증 배열에 복호화한 데이터 입력
 		$session = [
 			"permission"=>unpack("N", substr($decrypted, 0, 4))[1],
@@ -85,7 +85,7 @@ class User{
 		];
 		$sessionName = hash("sha256",$session["session-time"].$session["session"]);
 		//세션 파일이 존재하지 않는다면 RSA 키 탈취 가능성 있으므로 리셋.
-		if(!file_exists($sessionPath = Parkjunwoo::path("session").$sessionName)){$this->reset();return;}
+		if(!file_exists($sessionPath = $this->man->path("session").$sessionName)){$this->reset();return;}
 		//세션 로드
 		foreach(explode("\n", File::read($sessionPath)) as $keyValue){
 			if($keyValue==""){continue;}
@@ -126,6 +126,11 @@ class User{
 		$sessionName = hash("sha256",$this->session["session-time"].$this->session["session"]);
 		File::write($this->man->path("session").$sessionName,$data);
 	}
+	/**
+	 * 사용자 객체
+	 * @return User
+	 */
+	public function man():Parkjunwoo{return $this->man;}
 	/**
 	 * 사용자 접속한 IP
 	 * @return string IP;
