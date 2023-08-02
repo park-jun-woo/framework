@@ -14,15 +14,15 @@ class Request{
 		//URI 분석
 		$this->uri = explode("?",$_SERVER["REQUEST_URI"])[0];
 		//Method 분석
-		$this->method = $_SERVER["REQUEST_METHOD"];
+		$this->method = strtolower($_SERVER["REQUEST_METHOD"]);
 		//ContentType 분석
 		if(array_key_exists("CONTENT_TYPE", $_SERVER)){
 			switch(strtolower($_SERVER["CONTENT_TYPE"])){
-				default:$this->type = "HTML";break;
-				case "json":case "application/json":$this->type = "JSON";break;
-				case "xml":case "application/xml":$this->type = "XML";break;
+				default:$this->type = "html";break;
+				case "json":case "application/json":$this->type = "json";break;
+				case "xml":case "application/xml":$this->type = "xml";break;
 			}
-		}else{$this->type = "HTML";}
+		}else{$this->type = "html";}
 		//사용자 환경 언어 처리
 		if(!array_key_exists("HTTP_ACCEPT_LANGUAGE",$_SERVER)){$_SERVER["HTTP_ACCEPT_LANGUAGE"] = "";}
 		else{$languageList = explode("-",preg_split("[;,]",$_SERVER["HTTP_ACCEPT_LANGUAGE"])[0]);}
@@ -42,7 +42,6 @@ class Request{
 		//구문 분석된 주소에 대한 컨트롤러를 생성하고 리소스 메서드를 호출
 		if($this->man->isRouter($this->method, $this->type)){
 			$router = $this->man->router($this->method, $this->type);
-			print_r($router);
 			if(array_key_exists($this->uri, $router)){
 				$this->sequences = $router[$this->uri];
 				$this->route = $this->uri;
