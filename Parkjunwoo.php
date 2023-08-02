@@ -127,7 +127,7 @@ class Parkjunwoo{
 		if(!array_key_exists("session-expire", $this->app["config"])){echo "config[\"session-expire\"]를 입력해 주세요.";exit;}
 		if(!is_int($this->app["config"]["session-expire"])){echo "config[\"session-expire\"]는 정수여야 합니다.";exit;}
 		//경로 설정
-		$root = realpath(str_replace(basename($_SERVER["SCRIPT_FILENAME"]),"",realpath($_SERVER["SCRIPT_FILENAME"]))."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR);
+		$root = realpath(str_replace(basename($_SERVER["SCRIPT_FILENAME"]),"",realpath($_SERVER["SCRIPT_FILENAME"]))."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
 		$this->server["path"] = ["root"=>(substr($this->app["path"]["root"],0,1)===DIRECTORY_SEPARATOR)?$this->app["path"]["root"]:$root.$this->app["path"]["root"]];
 		foreach($this->app["path"] as $key=>$value){
 			switch($key){
