@@ -54,6 +54,17 @@ class Parkjunwoo{
 	 * @return string 루트 경로
 	 */
 	public static function publicKey():string{return self::$man->server["publicKey"];}
+	/**
+	 * 어플리케이션 권한 배열
+	 * @return array 권한 배열
+	 */
+	public static function domainApp(string $domain):array{
+		if(!array_key_exists($domain,self::$man->server["domain-app"])){
+			echo "앱에 도메인(\"{$domain}\")이 입력되어 있지 않습니다.도메인을 입력해주세요.";
+			apcu_delete(self::$man->app["name"]."-server");exit;
+		}
+		return self::$man->server["domain-app"][$domain];
+	}
 	
 	protected Controller $controller;
 	protected string $path;
@@ -81,27 +92,8 @@ class Parkjunwoo{
 		Security::sqlInjectionClean($_POST);
 		//요청 분석
 		$request = new Request();
-		if(!array_key_exists($_SERVER["SERVER_NAME"],$this->server["domain-app"])){echo "앱에 도메인(\"{$_SERVER["SERVER_NAME"]}\")이 입력되어 있지 않습니다.도메인을 입력해주세요.";exit;}
-		$appId = $this->server["domain-app"][$_SERVER["SERVER_NAME"]];
-		//구문 분석된 주소에 대한 컨트롤러를 생성하고 리소스 메서드를 호출
-		if(array_key_exists($request->method().$request->type(), $this->app["apps"][$appId])){
-			if(array_key_exists($request->uri(), $this->app["apps"][$appId][$request->method().$request->type()])){
-				$sequences = $this->app["apps"][$appId]["route"][$this->uri][$request->method().$request->type()];
-				$this->route = $this->uri;
-			}else{
-				foreach($this->app["apps"][$this->method][$this->type] as $pattern=>$sequences){
-					if(substr($pattern, -1)!=="/"){$pattern .= "/";}$matches = null;
-					if(preg_match("/^".preg_replace("/\[([^\/]+)\]/i", "(?P<$1>[^\/]+)", str_replace("/", "\/", $pattern))."$/i",$this->uri,$matches)){
-						foreach($matches as $key=>$value){if(is_string($key)){$_GET[$key] = $value;}}
-						$this->route = $pattern;break;
-					}
-				}
-			}
-		}
-		//라우터를 찾을 수 없다면
-		if(!isset($this->route)){$this->route = "404";$sequences = [["method"=>"view","layout"=>"none","view"=>"404"]];}
 		//라우트 한 컨트롤러 실행
-		$this->controller = new Controller($request, $sequences);
+		$this->controller = new Controller($request);
 	}
 	/**
 	 * 시스템 리셋

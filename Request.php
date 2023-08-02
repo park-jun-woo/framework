@@ -2,8 +2,9 @@
 class Request{
 	protected User $user;
 	protected string $uri, $route, $method, $type, $locale;
+	protected array $sequences;
 	/**
-	 * 요청 생성자
+	 * 요청 분석하는 생성자
 	 */
 	public function __construct(){
 		//세션 설정
@@ -38,6 +39,26 @@ class Request{
 		}else if($languageList[0]!=""){$language = $languageList[0];}
 		else{$language = "ko";}
 		$this->locale = strtolower($language);
+		$appId = Parkjunwoo::domainApp($_SERVER["SERVER_NAME"]);
+		//구문 분석된 주소에 대한 컨트롤러를 생성하고 리소스 메서드를 호출
+		if(array_key_exists($this->method.$this->type, $this->app["apps"][$appId])){
+			if(array_key_exists($this->uri, $this->app["apps"][$appId][$this->method.$this->type])){
+				$this->sequences = $this->app["apps"][$appId]["route"][$this->uri][$this->method.$this->type];
+				$this->route = $this->uri;
+			}else{
+				foreach($this->app["apps"][$this->method][$this->type] as $pattern=>$sequences){
+					if(substr($pattern, -1)!=="/"){$pattern .= "/";}$matches = null;
+					if(preg_match("/^".preg_replace("/\[([^\/]+)\]/i", "(?P<$1>[^\/]+)", str_replace("/", "\/", $pattern))."$/i",$this->uri,$matches)){
+						foreach($matches as $key=>$value){if(is_string($key)){$_GET[$key] = $value;}}
+						$this->route = $pattern;
+						$this->sequences = $sequences;
+						break;
+					}
+				}
+			}
+		}
+		//라우터를 찾을 수 없다면
+		if(!isset($this->route)){$this->route = "404";$this->sequences = [["method"=>"view","layout"=>"none","view"=>"404"]];}
 	}
 	/**
 	 * 사용자 객체
@@ -69,5 +90,10 @@ class Request{
 	 * @return string 코드
 	 */
 	public function locale():string{return $this->locale;}
+	/**
+	 * 시퀀스 배열
+	 * @return array 시퀀스 배열
+	 */
+	public function sequences():array{return $this->sequences;}
 }
 ?>
