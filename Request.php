@@ -65,41 +65,57 @@ class Request{
 	 * Parkjunwoo Framework 객체
 	 * @return Parkjunwoo
 	 */
-	public function man():Parkjunwoo{return $this->man;}
+	public function man():Parkjunwoo{
+		return $this->man;
+	}
 	/**
 	 * 사용자 객체
 	 * @return User
 	 */
-	public function user():User{return $this->user;}
+	public function user():User{
+		return $this->user;
+	}
 	/**
 	 * URI
 	 * @return string URI
 	 */
-	public function uri():string{return $this->uri;}
+	public function uri():string{
+		return $this->uri;
+	}
 	/**
 	 * 라우트 패턴
 	 * @return string 패턴
 	 */
-	public function route():string{return $this->route;}
+	public function route():string{
+		return $this->route;
+	}
 	/**
 	 * HTTP 메서드
 	 * @return string 메서드
 	 */
-	public function method():string{return $this->method;}
+	public function method():string{
+		return $this->method;
+	}
 	/**
 	 * 컨텐트 타입
 	 * @return string 컨텐트 타입
 	 */
-	public function type():string{return $this->type;}
+	public function type():string{
+		return $this->type;
+	}
 	/**
 	 * 사용언어 코드
 	 * @return string 코드
 	 */
-	public function locale():string{return $this->locale;}
+	public function locale():string{
+		return $this->locale;
+	}
 	/**
 	 * 시퀀스 배열
 	 * @return array 시퀀스 배열
 	 */
-	public function sequences():array{return $this->sequences;}
+	public function sequences():array{
+		return $this->sequences;
+	}
 }
 ?>

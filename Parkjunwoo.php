@@ -33,8 +33,10 @@ class Parkjunwoo{
 			if(!version_compare(PHP_VERSION, "8.0.0", ">=")){$this->error("Parkjunwoo 프레임워크는 PHP 8.0 이상에서 정상적으로 동작합니다.");}
 			$this->error("APCU 모듈을 설치해주세요.");
 		}
+		if(apcu_exists($this->code["name"]."-blacklist-".$_SERVER["REMOTE_ADDR"])){exit;}
 		//APCU 메모리에서 서버 배열을 불러올 수 없으면 리셋합니다.
-		if(!apcu_exists($this->code["name"]."-server")){$this->reset();}else{$this->server = apcu_fetch($this->code["name"]."-server");}
+		if(!apcu_exists($this->code["name"]."-server")){$this->reset();}
+		$this->server = apcu_fetch($this->code["name"]."-server");
 		//매개 변수 값 남용 방지.
 		Security::clearVars();
 		//SQL인젝션 공격 필터링
@@ -221,6 +223,10 @@ class Parkjunwoo{
 		}
 		apcu_store($this->code["name"]."-server", $this->server);
 	}
+	/**
+	 * 에러 메세지 출력 후 강제종료
+	 * @param string $message 에러 메세지
+	 */
 	protected function error(string $message){
 		echo $message;exit;
 	}

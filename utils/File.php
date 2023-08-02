@@ -8,8 +8,6 @@ class File{
 	 * @param string $content 저장할 텍스트 내용
 	 */
 	public static function write(string $path, string $content){
-		//디렉토리가 없으면 만든다.
-		if(!is_dir($dir = dirname($path))){mkdir($dir, 0777, true);}
 		$handle = fopen($path, "wb+");
 		if(flock($handle, LOCK_EX)){
 			fwrite($handle, $content);
@@ -18,8 +16,6 @@ class File{
 		fclose($handle);
 	}
 	public static function append(string $path, string $content){
-		//디렉토리가 없으면 만든다.
-		if(!is_dir($dir = dirname($path))){mkdir($dir, 0777, true);}
 		$handle = fopen($path, "a");
 		if(flock($handle, LOCK_EX)){
 			fwrite($handle, $content);
@@ -38,8 +34,6 @@ class File{
 		return $result;
 	}
 	public static function increase(string $path){
-		//디렉토리가 없으면 만든다.
-		if(!is_dir($dir = dirname($path))){mkdir($dir, 0777, true);}
 		//파일을 읽는다.
 		if(file_exists($path)){
 			if(flock($handle = fopen($path, "r"), LOCK_EX)){$key = unpack("J", fread($handle, 8))[1];}
