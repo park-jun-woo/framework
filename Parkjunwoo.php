@@ -36,24 +36,24 @@ class Parkjunwoo{
 	 * 어플리케이션 루트 경로
 	 * @return string 루트 경로
 	 */
-	public function path(string $key="root"):string{
+	public static function path(string $key="root"):string{
 		if(array_key_exists($key, self::$man->server["path"])){return self::$man->server["path"][$key];}else{return "";}
 	}
 	/**
 	 * 어플리케이션 권한 배열
 	 * @return array 권한 배열
 	 */
-	public function permissions():array{return self::$man->server["permissions"];}
+	public static function permissions():array{return self::$man->server["permissions"];}
 	/**
 	 * 개인키
 	 * @return string 루트 경로
 	 */
-	public function privateKey():string{return self::$man->server["privateKey"];}
+	public static function privateKey():string{return self::$man->server["privateKey"];}
 	/**
 	 * 개인키
 	 * @return string 루트 경로
 	 */
-	public function publicKey():string{return self::$man->server["publicKey"];}
+	public static function publicKey():string{return self::$man->server["publicKey"];}
 	
 	protected Controller $controller;
 	protected string $path;
