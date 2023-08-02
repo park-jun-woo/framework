@@ -50,7 +50,7 @@ class Request{
 					if(substr($pattern, -1)!=="/"){$pattern .= "/";}$matches = null;
 					echo $pattern."<br>";
 					echo "/^".preg_replace("/\[([^\/]+)\]/i", "(?P<$1>[^\/]+)", str_replace("/", "\/", $pattern))."$/i<br>";
-					if(preg_match("/^".preg_replace("/\[([^\/]+)\]/i", "(?P<$1>[^\/]+)", str_replace("/", "\/", $pattern))."$/i",$this->uri,$matches)){
+					if(preg_match("/^".preg_replace("/\[([^\/]+)\]/i", "(?P<$1>[^\/]+)", $pattern)."$/i",$this->uri,$matches)){
 						echo "!!!!!!!!!!!<br>";
 						foreach($matches as $key=>$value){if(is_string($key)){$_GET[$key] = $value;}}
 						$this->route = $pattern;
