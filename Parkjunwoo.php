@@ -16,7 +16,7 @@ use utils\Security;
  */
 class Parkjunwoo{
 	protected static Parkjunwoo $man;
-	public static function walk(array &$app):Parkjunwoo{return self::$man = new Parkjunwoo($app);}
+	public static function walk(array $app):Parkjunwoo{return self::$man = new Parkjunwoo($app);}
 	protected User $user;
 	protected Controller $controller;
 	protected string $uri, $route, $method, $type, $locale, $path;
