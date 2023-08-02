@@ -34,14 +34,15 @@ class Parkjunwoo{
 			if(!version_compare(PHP_VERSION, "8.0.0", ">=")){$this->error("Parkjunwoo 프레임워크는 PHP 8.0 이상에서 정상적으로 동작합니다.");}
 			$this->error("APCU 모듈을 설치해주세요.");
 		}
+		//APCU 메모리에서 서버 배열을 불러올 수 없으면 리셋합니다.
+		if(!apcu_exists($this->code["name"]."-server")){$this->reset();}
+		$this->server = apcu_fetch($this->code["name"]."-server");
+		//블랙리스트 접속차단
 		if(apcu_exists($this->code["name"]."-blacklist-".$_SERVER["REMOTE_ADDR"])){
 			File::append($this->path("blacklist").$_SERVER["REMOTE_ADDR"], date("Y-m-d H:i:s")."\t접속시도 차단");
 			http_response_code(404);
 			exit;
 		}
-		//APCU 메모리에서 서버 배열을 불러올 수 없으면 리셋합니다.
-		if(!apcu_exists($this->code["name"]."-server")){$this->reset();}
-		$this->server = apcu_fetch($this->code["name"]."-server");
 		//매개 변수 값 남용 방지.
 		Security::clearVars();
 		//SQL인젝션 공격 필터링
