@@ -55,8 +55,8 @@ class Parkjunwoo{
 	 * Parkjunwoo Framework를 실행합니다.
 	 * @param array $app 실행할 어플리케이션 코드 배열
 	 */
-	public static function walk(array $app){
-		if(!isset(self::$man)){new Parkjunwoo($app);}
+	public static function walk(array $code){
+		if(!isset(self::$man)){new Parkjunwoo($code);}
 	}
 	/**
 	 * 접속한 도메인의 앱 코드에 라우터가 있는지 확인
@@ -103,7 +103,7 @@ class Parkjunwoo{
 	 * @return string 루트 경로
 	 */
 	public function config(string $key){
-		if(array_key_exists($key, $this->code["config"])){$this->error("config[\"{$key}\"]이 입력되어 있지 않습니다.");}
+		if(!array_key_exists($key, $this->code["config"])){$this->error("config[\"{$key}\"]이 입력되어 있지 않습니다.");}
 		return $this->code["config"][$key];
 	}
 	/**
