@@ -39,7 +39,7 @@ class Parkjunwoo{
 		$this->server = apcu_fetch($this->code["name"]."-server");
 		//블랙리스트 접속차단
 		if(apcu_exists($this->code["name"]."-blacklist-".$_SERVER["REMOTE_ADDR"])){
-			File::append($this->path("blacklist").$_SERVER["REMOTE_ADDR"], date("Y-m-d H:i:s")."\t접속시도 차단");
+			File::append($this->path("blacklist").$_SERVER["REMOTE_ADDR"], date("Y-m-d H:i:s")."\t접속시도 차단\n");
 			http_response_code(404);
 			exit;
 		}

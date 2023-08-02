@@ -141,7 +141,7 @@ class User{
 	 */
 	public function black(float $level,string $log){
 		apcu_store($this->man->name()."-blacklist-".$this->ip(), "", $level*3600);
-		File::append($this->man->path("blacklist").$this->ip(), date("Y-m-d H:i:s")."\t".$log);
+		File::append($this->man->path("blacklist").$this->ip(), date("Y-m-d H:i:s")."\t{$log}\n");
 		exit;
 	}
 	/**
