@@ -42,13 +42,13 @@ class Request{
 		//구문 분석된 주소에 대한 컨트롤러를 생성하고 리소스 메서드를 호출
 		if($this->man->isRouter($this->method, $this->type)){
 			$router = $this->man->router($this->method, $this->type);
-			print_r($router);
 			if(array_key_exists($this->uri, $router)){
 				$this->route = $this->uri;
 				$this->sequences = $router[$this->uri];
 			}else{
 				foreach($router as $pattern=>$sequences){
 					if(substr($pattern, -1)!=="/"){$pattern .= "/";}$matches = null;
+					echo "/^".preg_replace("/\[([^\/]+)\]/i", "(?P<$1>[^\/]+)", str_replace("/", "\/", $pattern))."$/i<br><br>";
 					if(preg_match("/^".preg_replace("/\[([^\/]+)\]/i", "(?P<$1>[^\/]+)", str_replace("/", "\/", $pattern))."$/i",$this->uri,$matches)){
 						foreach($matches as $key=>$value){if(is_string($key)){$_GET[$key] = $value;}}
 						$this->route = $pattern;
