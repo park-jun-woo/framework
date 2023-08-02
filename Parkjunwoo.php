@@ -73,7 +73,7 @@ class Parkjunwoo{
 	 * @param string $type 컨텐트 타입
 	 * @return array 라우터 배열
 	 */
-	public function getRouter(string $method, string $type):array{
+	public function router(string $method, string $type):array{
 		return $this->thisApp[$method.$type];
 	}
 	/**
@@ -97,6 +97,14 @@ class Parkjunwoo{
 	 */
 	public function domain():string{
 		return $this->code["domain"];
+	}
+	/**
+	 * 어플리케이션 설정값
+	 * @return string 루트 경로
+	 */
+	public function config(string $key){
+		if(array_key_exists($key, $this->code["config"])){$this->error("config[\"{$key}\"]이 입력되어 있지 않습니다.");}
+		return $this->code["config"][$key];
 	}
 	/**
 	 * 어플리케이션 루트 경로
