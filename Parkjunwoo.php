@@ -29,11 +29,6 @@ class Parkjunwoo{
 		$this->code = $code;
 		//클래스 자동 로더 등록
 		spl_autoload_register([$this,"autoload"]);
-		//APCU 사용 가능 여부 확인
-		if(!function_exists("apcu_enabled")){
-			if(!version_compare(PHP_VERSION, "8.0.0", ">=")){$this->error("Parkjunwoo 프레임워크는 PHP 8.0 이상에서 정상적으로 동작합니다.");}
-			$this->error("APCU 모듈을 설치해주세요.");
-		}
 		//APCU 메모리에서 서버 배열을 불러올 수 없으면 리셋합니다.
 		if(!apcu_exists($this->code["name"]."-server")){$this->reset();}
 		$this->server = apcu_fetch($this->code["name"]."-server");
@@ -48,11 +43,6 @@ class Parkjunwoo{
 		//SQL인젝션 공격 필터링
 		Security::sqlInjectionClean($_GET);
 		Security::sqlInjectionClean($_POST);
-		//접속한 도메인으로 앱 조회
-		if(!array_key_exists($domain = strtolower($_SERVER["SERVER_NAME"]),$this->server["domain-app"])){
-			apcu_delete($this->code["name"]."-server");
-			$this->error("앱에 도메인(\"{$domain}\")이 입력되어 있지 않습니다.도메인을 입력해주세요.");
-		}
 		$this->thisApp = $this->code["apps"][$this->server["domain-app"][$domain]];
 		//요청 분석
 		$request = new Request($this);
@@ -146,31 +136,6 @@ class Parkjunwoo{
 	 * 시스템 리셋
 	 */
 	public function reset(){
-		//App 유효한지 확인
-		if(!array_key_exists("name", $this->code)){$this->error("name에 어플리케이션 이름을 영문으로 입력해 주세요.");}
-		if(!array_key_exists("domain", $this->code)){$this->error("domain에 쿠키 설정에 입력할 도메인을 입력해 주세요.");}
-		if(!array_key_exists("path", $this->code)){$this->error("path 배열을 입력해 주세요.");}
-		if(!array_key_exists("servers", $this->code)){$this->error("servers 배열을 입력해 주세요.");}
-		if(!array_key_exists("permissions", $this->code)){$this->error("permissions 배열을 입력해 주세요.");}
-		if(!array_key_exists("config", $this->code)){$this->error("config 배열을 입력해 주세요.");}
-		if(!array_key_exists("messages", $this->code)){$this->error("messages 배열을 입력해 주세요.");}
-		if(!array_key_exists("apps", $this->code)){$this->error("apps 배열을 입력해 주세요.");}
-		if(!is_array($this->code["path"])){$this->error("path는 배열이어야 합니다.");}
-		if(!is_array($this->code["servers"])){$this->error("servers는 배열이어야 합니다.");}
-		if(!is_array($this->code["permissions"])){$this->error("permissions는 배열이어야 합니다.");}
-		if(!is_array($this->code["config"])){$this->error("config는 배열이어야 합니다.");}
-		if(!is_array($this->code["messages"])){$this->error("messages는 배열이어야 합니다.");}
-		if(!is_array($this->code["apps"])){$this->error("apps는 배열이어야 합니다.");}
-		if(!array_key_exists("root", $this->code["path"])){$this->error("path[\"root\"]를 입력해 주세요.");}
-		if(!array_key_exists("cache", $this->code["path"])){$this->error("path[\"cache\"]를 입력해 주세요.");}
-		if(!array_key_exists("log", $this->code["path"])){$this->error("path[\"log\"]를 입력해 주세요.");}
-		if(!array_key_exists("request", $this->code["path"])){$this->error("path[\"request\"]를 입력해 주세요.");}
-		if(!array_key_exists("session", $this->code["path"])){$this->error("path[\"session\"]를 입력해 주세요.");}
-		if(!array_key_exists("blacklist", $this->code["path"])){$this->error("path[\"blacklist\"]를 입력해 주세요.");}
-		if(!array_key_exists("token-expire", $this->code["config"])){$this->error("config[\"token-expire\"]를 정수로 입력해 주세요.");}
-		if(!is_int($this->code["config"]["token-expire"])){$this->error("config[\"token-expire\"]는 정수여야 합니다.");}
-		if(!array_key_exists("session-expire", $this->code["config"])){$this->error("config[\"session-expire\"]를 입력해 주세요.");}
-		if(!is_int($this->code["config"]["session-expire"])){$this->error("config[\"session-expire\"]는 정수여야 합니다.");}
 		//경로 설정
 		$root = realpath(str_replace(basename($_SERVER["SCRIPT_FILENAME"]),"",realpath($_SERVER["SCRIPT_FILENAME"]))."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
 		$this->server["path"] = ["root"=>(substr($this->code["path"]["root"],0,1)===DIRECTORY_SEPARATOR)?$this->code["path"]["root"]:$root.$this->code["path"]["root"]];
@@ -229,6 +194,13 @@ class Parkjunwoo{
 			}
 		}
 		apcu_store($this->code["name"]."-server", $this->server);
+	}
+	/**
+	 * 에러 메세지 출력 후 강제종료
+	 * @param string $message 에러 메세지
+	 */
+	protected static function installError(string $message){
+		echo $message;exit;
 	}
 	/**
 	 * 에러 메세지 출력 후 강제종료
