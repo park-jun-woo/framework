@@ -35,35 +35,38 @@ class Debug{
 		$message .= PHP_EOL;echo $message;
 		if($path!=""){$fp = fopen($path,"a");if(flock($fp,LOCK_EX)){fwrite($fp,$message);flock($fp,LOCK_UN);}fclose($fp);}
 	}
-	
-	public static function print($array,int $intent=1){
+	/**
+	 * 배열을 출력합니다.
+	 * @param array $array 배열
+	 * @param string $indent 띄어쓰기
+	 * @param int $icount 띄어쓰기 카운트
+	 * @return string 결과 문자열
+	 */
+	public static function print($array,string $indent="\t",int $icount=1){
 		$iu = 0;
 		$isSubArray = false;
 		$result = "";
-		if($intent==1){$result .= (is_array($array)?"Array":get_class($array))."[";}
-		$noArray = array();
-		$yesArray = array();
-		foreach($array as $key=>$value){
-			if(is_array($value)){$isSubArray = true;$yesArray[$key] = $value;}
-			else{$noArray[$key] = $value;}
-		}
-		$array = array_merge($noArray,$yesArray);
-		foreach($array as $key=>$value){
+		if($icount==1){$result .= (is_array($array)?"":get_class($array))."[";}
+		$sortedArray = array();
+		foreach($array as $key=>$value){if(!is_array($value)){$sortedArray[$key] = $value;}}
+		foreach($array as $key=>$value){if(is_array($value)){$isSubArray = true;$sortedArray[$key] = $value;}}
+		foreach($sortedArray as $key=>$value){
 			if($iu>0){$result .= ",";}
 			if(is_array($value) || is_object($value)){
-				if($isSubArray){$result .= PHP_EOL.str_repeat("    ",$intent);}
-				$result .= is_numeric($key)?"":"\"{$key}\":";
-				$result .= (is_array($value)?"":get_class($value))."[";
-				$result .= Debug::print($value,$intent+1);
+				if($isSubArray){$result .= PHP_EOL.str_repeat($indent,$icount);}
+				$result .= !is_string($key)?"{$key}=>":"\"{$key}\"=>";
+				$result .= is_array($value)?"":get_class($value);
+				$result .= "[";
+				$result .= self::print($value,$indent,$icount+1);
 				$result .= "]";
 			}else{
-				if($isSubArray && $iu==0){$result .= PHP_EOL.str_repeat("    ",$intent);}
-				$result .= is_numeric($key)?"":"\"{$key}\":";
-				$result .= "\"{$value}\"";
+				if($isSubArray && $iu==0){$result .= PHP_EOL.str_repeat($indent,$icount);}
+				$result .= !is_string($key)?"{$key}=>":"\"{$key}\"=>";
+				$result .= !is_string($value)?$value:"\"{$value}\"";
 			}
 			$iu++;
 		}
-		if($isSubArray){$result .= PHP_EOL.str_repeat("    ",$intent-1);}
-		if($intent==1){$result .= "]".PHP_EOL;echo $result;}else{return $result;}
+		if($isSubArray){$result .= PHP_EOL.str_repeat($indent,$icount-1);}
+		if($icount==1){$result .= "]".PHP_EOL;return $result;}else{return $result;}
 	}
 }
