@@ -234,7 +234,8 @@ foreach($code["app"] as $id=>$app){
 	if(!file_exists($publicPath."scripts")){mkdir($publicPath."scripts", 0755);}
 	if(!file_exists($publicPath."styles")){mkdir($publicPath."styles", 0755);}
 	write("{$publicPath}index.php", $indexPHP);
-	if(isset($app["icon"]) && file_exists($iconPath = $root.$app["icon"])){
+	if(isset($app["icon"]) && file_exists($iconPath = $rootPath.$app["icon"])){
+		echo "Icon create from".$iconPath.PHP_EOL;
 		imageResize($iconPath,$publicPath."favicon.ico",72);
 		imageResize($iconPath,$publicPath."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."72x72.png",72);
 		imageResize($iconPath,$publicPath."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."96x96.png",96);
