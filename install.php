@@ -219,38 +219,38 @@ foreach($code["path"] as $path){
 	if(!file_exists($path)){mkdir($path, 0755);chown($path, "apache");}
 }
 //source 폴더 생성
-if(!file_exists($root."source")){mkdir($root."source", 0755);}
+if(!file_exists("{$rootPath}source")){mkdir("{$rootPath}source", 0755);}
 //어플리케이션 리소스 폴더 생성
-if(!file_exists($path = "{$root}public".DIRECTORY_SEPARATOR)){mkdir($path, 0755);}
+if(!file_exists($path = "{$rootPath}public")){mkdir($path, 0755);}
 $indexPHP = "<?PHP".PHP_EOL."require \"..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."app.php\";".PHP_EOL."?>";
 foreach($code["app"] as $id=>$app){
 	if($app["type"]!="parkjunwoo"){continue;}
-	$path = "{$root}public".DIRECTORY_SEPARATOR.$id.DIRECTORY_SEPARATOR;
-	if(!file_exists($path)){mkdir($path, 0755);}
-	if(!file_exists($path."assets")){mkdir($path."assets", 0755);}
-	if(!file_exists($path."images")){mkdir($path."images", 0755);}
-	if(!file_exists($path."images".DIRECTORY_SEPARATOR."icon")){mkdir($path."images".DIRECTORY_SEPARATOR."icon", 0755);}
-	if(!file_exists($path."scripts")){mkdir($path."scripts", 0755);}
-	if(!file_exists($path."styles")){mkdir($path."styles", 0755);}
-	write("{$path}index.php", $indexPHP);
+	$publicPath = "{$rootPath}public".DIRECTORY_SEPARATOR.$id.DIRECTORY_SEPARATOR;
+	if(!file_exists($publicPath)){mkdir($publicPath, 0755);}
+	if(!file_exists($publicPath."assets")){mkdir($publicPath."assets", 0755);}
+	if(!file_exists($publicPath."images")){mkdir($publicPath."images", 0755);}
+	if(!file_exists($publicPath."images".DIRECTORY_SEPARATOR."icon")){mkdir($publicPath."images".DIRECTORY_SEPARATOR."icon", 0755);}
+	if(!file_exists($publicPath."scripts")){mkdir($publicPath."scripts", 0755);}
+	if(!file_exists($publicPath."styles")){mkdir($publicPath."styles", 0755);}
+	write("{$publicPath}index.php", $indexPHP);
 	if(isset($app["icon"]) && file_exists($iconPath = $root.$app["icon"])){
-		imageResize($iconPath,$path."favicon.ico",72);
-		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."72x72.png",72);
-		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."96x96.png",96);
-		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."144x144.png",144);
-		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."192x192.png",192);
-		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."120x120.png",120);
-		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."180x180.png",180);
-		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."76x76.png",76);
-		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."152x152.png",152);
-		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."167x167.png",167);
+		imageResize($iconPath,$publicPath."favicon.ico",72);
+		imageResize($iconPath,$publicPath."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."72x72.png",72);
+		imageResize($iconPath,$publicPath."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."96x96.png",96);
+		imageResize($iconPath,$publicPath."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."144x144.png",144);
+		imageResize($iconPath,$publicPath."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."192x192.png",192);
+		imageResize($iconPath,$publicPath."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."120x120.png",120);
+		imageResize($iconPath,$publicPath."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."180x180.png",180);
+		imageResize($iconPath,$publicPath."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."76x76.png",76);
+		imageResize($iconPath,$publicPath."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."152x152.png",152);
+		imageResize($iconPath,$publicPath."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."167x167.png",167);
 	}
 }
 //app.php 파일 생성
 $appPHP = "<?PHP".PHP_EOL."require \"".DIRECTORY_SEPARATOR."home".DIRECTORY_SEPARATOR."framework".DIRECTORY_SEPARATOR."Parkjunwoo.php\";".PHP_EOL."Parkjunwoo::walk(".printArray($code).");".PHP_EOL."?>";
-write("{$root}app.php", $appPHP);
-rename($sourcePath, $root."source".DIRECTORY_SEPARATOR.$sourceFile);
-rename(realpath(__FILE__), $root."source".DIRECTORY_SEPARATOR.basename(__FILE__));
+write("{$rootPath}app.php", $appPHP);
+rename($sourcePath, "{$rootPath}source".DIRECTORY_SEPARATOR.$sourceFile);
+rename(realpath(__FILE__), "{$rootPath}source".DIRECTORY_SEPARATOR.basename(__FILE__));
 echo "Install Complete!".PHP_EOL;
 
 /**
