@@ -23,15 +23,6 @@ class Controller{
 	}
 	
 	/**
-	 * 지정한 사용자만 허용
-	 * @param string $allows 허용할 유저 목록
-	 * @param string $message 오류시 메세지
-	 */
-	protected static function user(string $allows,string $message){
-		
-	}
-	
-	/**
 	 * 지정한 컨텐트 타입에 맞춰 뷰 출력
 	 * @param string $layout 레이아웃 이름
 	 * @param string $view 뷰 이름
