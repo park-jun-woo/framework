@@ -250,7 +250,6 @@ foreach($code["app"] as $id=>$app){
 $appPHP = "<?PHP".PHP_EOL."require \"".DIRECTORY_SEPARATOR."home".DIRECTORY_SEPARATOR."framework".DIRECTORY_SEPARATOR."Parkjunwoo.php\";".PHP_EOL."Parkjunwoo::walk(".printArray($code).");".PHP_EOL."?>";
 write("{$rootPath}app.php", $appPHP);
 rename($sourcePath, "{$rootPath}source".DIRECTORY_SEPARATOR.$sourceFile);
-rename(realpath(__FILE__), "{$rootPath}source".DIRECTORY_SEPARATOR.basename(__FILE__));
 echo "Install Complete!".PHP_EOL;
 
 /**
