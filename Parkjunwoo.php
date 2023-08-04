@@ -43,7 +43,8 @@ class Parkjunwoo{
 		//SQL인젝션 공격 필터링
 		Security::sqlInjectionClean($_GET);
 		Security::sqlInjectionClean($_POST);
-		$this->thisApp = $this->code["apps"][$this->server["domain-app"][$domain]];
+		//현재 접속한 앱
+		$this->thisApp = $this->code["app"][$this->code["domain-app"][$_SERVER["SERVER_NAME"]]];
 		//요청 분석
 		$request = new Request($this);
 		//라우트 한 컨트롤러 실행
@@ -80,7 +81,7 @@ class Parkjunwoo{
 	 * @return array 앱 코드 배열
 	 */
 	public function app(string $key):array{
-		if(array_key_exists($key,$this->code["apps"])){return $this->code["apps"][$key];}
+		if(array_key_exists($key,$this->code["app"])){return $this->code["app"][$key];}
 	}
 	/**
 	 * 어플리케이션 이름
@@ -109,14 +110,14 @@ class Parkjunwoo{
 	 * @return string 루트 경로
 	 */
 	public function path(string $key="root"):string{
-		if(array_key_exists($key, $this->server["path"])){return $this->server["path"][$key];}else{return "";}
+		if(array_key_exists($key, $this->code["path"])){return $this->code["path"][$key];}else{return "";}
 	}
 	/**
 	 * 어플리케이션 권한 배열
 	 * @return array 권한 배열
 	 */
 	public function permissions():array{
-		return $this->server["permissions"];
+		return $this->code["permission"];
 	}
 	/**
 	 * 개인키
@@ -136,62 +137,12 @@ class Parkjunwoo{
 	 * 시스템 리셋
 	 */
 	public function reset(){
-		//경로 설정
-		$root = realpath(str_replace(basename($_SERVER["SCRIPT_FILENAME"]),"",realpath($_SERVER["SCRIPT_FILENAME"]))."..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR;
-		$this->server["path"] = ["root"=>(substr($this->code["path"]["root"],0,1)===DIRECTORY_SEPARATOR)?$this->code["path"]["root"]:$root.$this->code["path"]["root"]];
-		foreach($this->code["path"] as $key=>$value){
-			switch($key){
-				case "root":break;
-				default:
-					$this->server["path"][$key] = $this->server["path"]["root"].$value;
-					//끝 문자가 DIRECTORY_SEPARATOR가 아니라면 에러
-					if(substr($this->server["path"][$key], -1)!=DIRECTORY_SEPARATOR){$this->error("PATH[\"$key\"]는 '".DIRECTORY_SEPARATOR."'로 끝나야 합니다.");}
-					//경로가 없거나 읽거나 쓸수 없다면 안내문 출력 후 종료
-					if(!file_exists($this->server["path"][$key]) || !is_readable($this->server["path"][$key]) || !is_writable($this->server["path"][$key])){
-						echo "{$this->server["path"][$key]} 폴더를 생성하고 읽고 쓰기가 가능한 user로 소유권을 변경하세요.<br>mkdir {$this->server["path"][$key]}<br>";
-						if(strpos($_SERVER['SERVER_SOFTWARE'], 'Apache')!==false){
-							echo "chown apache:apache {$this->server["path"][$key]}";
-						}elseif(strpos($_SERVER['SERVER_SOFTWARE'], 'nginx')!==false){
-							echo "chown nginx:nginx {$this->server["path"][$key]}";
-						}
-						exit;
-					}break;
-			}
-		}
-		
 		//RSA 키 쌍 생성
 		list($this->server["privateKey"], $this->server["publicKey"]) = Security::generateRSA();
 		//분산서버 목록 확인 및 초기 통신
 		$this->server["servers"] = [];
 		foreach($this->code["servers"] as $key=>$value){
 			
-		}
-		//권한 배열에 사용자 정의 권한 레벨 $this->code["permissions"]를 합치기
-		$this->server["permissions"] = [User::GUEST=>"guest", User::MEMBER=>"member", User::STAFF=>"staff", User::ADMIN=>"admin", User::SYSTEM=>"system"];
-		foreach($this->code["permissions"] as $key=>$value){
-			switch($key){
-				case User::GUEST:case User::MEMBER:case User::STAFF:case User::ADMIN:case User::SYSTEM:
-					$this->error("permissions[\"{$key}\"]는 사용할 수 없는 권한키입니다.");
-				default:
-					if(($key&($key-1))==0&&$key>0){$this->error("permissions[\"{$key}\"]는 2의 승수여야 합니다.");}
-					if($key>User::STAFF){$this->error("permissions[\"{$key}\"]는 ".number_format(User::STAFF)."보다 작아야합니다.");}
-					break;
-			}
-			$this->server["permissions"][$key] = $value;
-		}
-		//도메인 앱아이디 연결맵 구성
-		$this->server["domain-app"] = [];
-		foreach($this->code["apps"] as $appId=>$app){
-			if(!array_key_exists("type",$app)){$this->error("apps[\"$appId\"]의 type을 입력하세요.");}
-			switch($app["type"]){
-				default:$this->error("apps[\"$appId\"]에 입력한 '{$app["type"]}'은 지원하지 않는 앱 type입니다.<br>지원타입: mysql, papago, chatgpt, parkjunwoo");
-				case "mysql":break;
-				case "papago":break;
-				case "chatgpt":break;
-				case "parkjunwoo":
-					foreach($app["domain"] as $domain){$this->server["domain-app"][$domain] = $appId;}
-					break;
-			}
 		}
 		apcu_store($this->code["name"]."-server", $this->server);
 	}

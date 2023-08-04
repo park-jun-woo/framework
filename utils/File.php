@@ -2,7 +2,7 @@
 namespace utils;
 
 class File{
-	protected const MAP = ["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
+	protected const MAP = ["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","-","_"];
 	/**
 	 * 지정한 경로에 텍스트를 저장해준다.
 	 * @param string $path 저장할 경로
@@ -10,10 +10,8 @@ class File{
 	 */
 	public static function write(string $path, string $content){
 		$handle = fopen($path, "wb+");
-		if(flock($handle, LOCK_EX)){
-			fwrite($handle, $content);
-			flock($handle, LOCK_UN);
-		}
+		if(flock($handle, LOCK_EX)){fwrite($handle, $content);}
+		flock($handle, LOCK_UN);
 		fclose($handle);
 	}
 	/**
