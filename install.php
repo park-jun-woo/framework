@@ -1,7 +1,7 @@
 <?php
 switch(count($argv)){
-	default:error("사용법: php install.php main.bml");
-	case 2:$sourceFile = $argv[1];break;
+	default:error("사용법: php install.php /home/sample/sample.bml");
+	case 2:$sourcePath = $argv[1];break;
 }
 //PHP 버전 확인
 if(!version_compare(PHP_VERSION, "8.0.0", ">=")){error("Parkjunwoo 프레임워크는 PHP 8.0 이상에서 정상적으로 동작합니다.");}
@@ -9,10 +9,9 @@ if(!version_compare(PHP_VERSION, "8.0.0", ">=")){error("Parkjunwoo 프레임워�
 if(!function_exists("apcu_enabled")){error("APCU 모듈을 설치해주세요.");}
 //Imagick 설치 여부 확인
 if(!extension_loaded("imagick")){error("Imagick을 설치해주세요.");}
-//루트 경로
-$root = realpath(str_replace(basename($sourceFile),"",realpath($sourceFile))).DIRECTORY_SEPARATOR;
-$sourcePath = "{$root}{$sourceFile}";
+//소스 파일 존재 여부 확인
 if(!file_exists($sourcePath)){error("{$sourcePath} 파일이 없습니다. BML 파일 경로를 정확히 입력해주세요.");}
+$sourceFile = basename($sourcePath);
 //소스코드 불러오기
 $handle = fopen($sourcePath,"r");$result = fread($handle,filesize($sourcePath));fclose($handle);
 $bml = simplexml_load_string($result,"SimpleXMLElement",LIBXML_NOCDATA | LIBXML_NOBLANKS);
@@ -28,6 +27,7 @@ if(!isset($bml->config)){error("<config> 태그를 작성해 주세요.");}
 if(count($bml->config)>1){error("<config> 태그를 하나만 작성해 주세요.");}
 if(!isset($bml->app)){error("<app> 태그를 적어도 하나 작성해 주세요.");}
 //루트 경로
+$root = realpath(str_replace(basename($sourcePath),"",realpath($sourcePath))).DIRECTORY_SEPARATOR;
 $rootPath = isset($bml->path->root)?(string)$bml->path->root:"";
 $rootPath = (substr($rootPath,0,1)===DIRECTORY_SEPARATOR)?$rootPath:$root.$rootPath;
 //코드 기본 골격
@@ -49,6 +49,7 @@ $code = [
 		"session-expire"=>isset($bml->config->{"session-expire"})?(int)$bml->config->{"session-expire"}:15552000,
 	],
 	"permission"=>[0=>"guest", 1=>"member", 536870912=>"staff", 1073741824=>"admin", 2147483648=>"system"],
+	"user"=>[],
 	"message"=>[],
 	"app"=>[],
 	"domain-app"=>[],
@@ -67,6 +68,7 @@ if(isset($bml->permission)){
 		}
 		$code["permission"][$permissionId] = (string)$permission;
 	}
+	foreach($code["permission"] as $key=>$value){$code["user"][$value] = $key;}
 }
 //코드 배열에 메세지 검증 및 등록
 foreach($bml->message as $message){
@@ -90,8 +92,14 @@ foreach($bml->app as $app){
 				"name"=>isset($app->name)?(string)$app->name:(isset($app->attributes()->name)?(string)$app->attributes()->name:$code["name"]),
 				"description"=>isset($app->description)?(string)$app->description:(isset($app->attributes()->description)?(string)$app->attributes()->description:$code["description"]),
 				"domain"=>[],
-				"gethtml"=>[],
+				"icon"=>isset($app->icon)?(string)$app->icon:"",
 			];
+			//라우터 배열 생성
+			foreach(["get","post","put","delete"] as $method){
+				foreach(["html","json"] as $type){
+					$code["app"][$appId]["{$method}-{$type}"] = [];
+				}
+			}
 			//도메인 입력
 			if(isset($app->domain)){
 				foreach($app->domain as $domain){$code["app"][$appId]["domain"][] = (string)$domain;}
@@ -102,38 +110,63 @@ foreach($bml->app as $app){
 			//라우터 입력
 			if(isset($app->route)){
 				foreach($app->route as $route){
+					//id를 입력 안했다면 오류 처리
 					if(!isset($route->attributes()->id) || (string)$route->attributes()->id==""){error("<route> 태그에 id 속성을 입력해 주세요.");}
-					if(!isset($route->sequence)){error("<sequence> 태그를 적어도 하나 입력해주세요.");}
-					if(!isset($route->attributes()->method) || (string)$route->attributes()->method==""){$app->addAttribute("method", "get");}
-					if(!isset($route->attributes()->type) || (string)$route->attributes()->type==""){$app->addAttribute("type", "html");}
-					$method = (string)$route->attributes()->method;
-					$type = (string)$route->attributes()->type;
-					if(!array_key_exists($method.$type, $code["app"][$appId])){$code["app"][$appId][$method.$type] = [];}
+					//메소드, 기본값은 get
+					if(!isset($route->attributes()->method) || (string)$route->attributes()->method==""){$method = "get";}
+					else{$method = (string)$route->attributes()->method;}
+					//컨텐트 타입, 기본값은 html
+					if(!isset($route->attributes()->type) || (string)$route->attributes()->type==""){$type = "html";}
+					else{$type = (string)$route->attributes()->type;}
 					$routeId = (string)$route->attributes()->id;
 					//라우트 코드 기본 골격
-					$routeCode = ["id"=>$routeId,"sequence"=>[]];
+					$routeCode = [];
 					//라우트 별로 시퀀스 추가
-					foreach($route->sequence as $sequence){
-						if(!isset($sequence->attributes()->method) || (string)$sequence->attributes()->method==""){error("<sequence> 태그에 method 속성을 입력해 주세요.");}
-						$smethod = (string)$sequence->attributes()->method;
-						switch($smethod){
-							case "view":
-								if(!isset($sequence->attributes()->layout) || (string)$sequence->attributes()->layout==""){error("<sequence method=\"view\"> 태그에 layout 속성을 입력해 주세요.");}
-								if(!isset($sequence->attributes()->view) || (string)$sequence->attributes()->view==""){error("<sequence method=\"view\"> 태그에 view 속성을 입력해 주세요.");}
-								$routeCode["sequence"][] = ["method"=>$smethod, "layout"=>(string)$sequence->attributes()->layout, "view"=>(string)$sequence->attributes()->view];
-								break;
+					if(isset($route->sequence)){
+						foreach($route->sequence as $sequence){
+							if(!isset($sequence->attributes()->method) || (string)$sequence->attributes()->method==""){error("<sequence> 태그에 method 속성을 입력해 주세요.");}
+							$smethod = (string)$sequence->attributes()->method;
+							switch($smethod){
+								case "view":
+									if(!isset($sequence->attributes()->layout) || (string)$sequence->attributes()->layout=="")
+									{error("<sequence method=\"view\"> 태그에 layout 속성을 입력해 주세요.");}
+									if(!isset($sequence->attributes()->view) || (string)$sequence->attributes()->view=="")
+									{error("<sequence method=\"view\"> 태그에 view 속성을 입력해 주세요.");}
+									$routeCode[] = [
+										"method"=>$smethod,
+										"layout"=>(string)$sequence->attributes()->layout,
+										"view"=>(string)$sequence->attributes()->view
+									];
+									break;
+							}
 						}
 					}
-					$code["app"][$appId][$method.$type][$routeId] = $routeCode;
+					//사용자 권한
+					if(isset($route->user)){
+						foreach($route->user as $user){
+							$code["app"][$appId]["{$method}-{$type}"][$routeId][(string)$user] = $routeCode;
+						}
+					}else if(isset($route->attributes()->user) && (string)$route->attributes()->user!=""){
+						$users = explode("|",(string)$route->attributes()->user);
+						foreach($users as $user){
+							$code["app"][$appId]["{$method}-{$type}"][$routeId][$user] = $routeCode;
+						}
+					}else{
+						$code["app"][$appId]["{$method}-{$type}"][$routeId][0] = $routeCode;
+					}
 				}
 			}
 			//Route "404" 없으면 추가
-			if(!array_key_exists("404", $code["app"][$appId]["gethtml"])){
-				$code["app"][$appId]["gethtml"]["404"] = ["id"=>"404","sequence"=>[["method"=>"view", "layout"=>"none", "view"=>"404"]]];
+			if(!array_key_exists("404", $code["app"][$appId]["get"]["html"])){
+				$code["app"][$appId]["get-html"]["404"] = [
+					0=>[["method"=>"view", "layout"=>"none", "view"=>"404"]]
+				];
 			}
 			//Route "/" 없으면 추가
-			if(!array_key_exists("/", $code["app"][$appId]["gethtml"])){
-				$code["app"][$appId]["gethtml"]["/"] = ["id"=>"/","sequence"=>[["method"=>"view", "layout"=>"none", "view"=>"404"]]];
+			if(!array_key_exists("/", $code["app"][$appId]["get"]["html"])){
+				$code["app"][$appId]["get-html"]["/"] = [
+					0=>[["method"=>"view", "layout"=>"none", "view"=>"index"]]
+				];
 			}
 			//도메인-앱 매칭맵 구성
 			foreach($code["app"][$appId]["domain"] as $domain){
@@ -200,7 +233,7 @@ foreach($code["app"] as $id=>$app){
 	if(!file_exists($path."scripts")){mkdir($path."scripts", 0755);}
 	if(!file_exists($path."styles")){mkdir($path."styles", 0755);}
 	write("{$path}index.php", $indexPHP);
-	if(file_exists($iconPath = $path."images".DIRECTORY_SEPARATOR."icon.png")){
+	if(isset($app["icon"]) && file_exists($iconPath = $root.$app["icon"])){
 		imageResize($iconPath,$path."favicon.ico",72);
 		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."72x72.png",72);
 		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."96x96.png",96);
@@ -211,19 +244,6 @@ foreach($code["app"] as $id=>$app){
 		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."76x76.png",76);
 		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."152x152.png",152);
 		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."167x167.png",167);
-	}else if(file_exists($iconPath = $root."icon.png")){
-		imageResize($iconPath,$path."favicon.ico",72);
-		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."72x72.png",72);
-		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."96x96.png",96);
-		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."144x144.png",144);
-		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."192x192.png",192);
-		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."120x120.png",120);
-		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."180x180.png",180);
-		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."76x76.png",76);
-		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."152x152.png",152);
-		imageResize($iconPath,$path."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."167x167.png",167);
-		//아이콘 이미지를 source 폴더로 이동
-		rename($iconPath, $root."source".DIRECTORY_SEPARATOR."icon.png");
 	}
 }
 //app.php 파일 생성
@@ -237,7 +257,7 @@ echo "Install Complete!".PHP_EOL;
  * 에러 메세지 출력 후 종료
  * @param string $message 에러 메세지
  */
-function error($message){echo "{$message}\n";exit;}
+function error($message){echo $message.PHP_EOL;exit;}
 /**
  * 파일에 쓰기
  * @param string $path 경로
