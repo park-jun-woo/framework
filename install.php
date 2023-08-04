@@ -54,6 +54,7 @@ $code = [
 	"app"=>[],
 	"domain-app"=>[],
 ];
+//사용자 권한 검증 및 등록
 if(isset($bml->permission)){
 	foreach($bml->permission as $permission){
 		if((string)$permission==""){error("<permission> 태그 안에 권한 이름을 입력해 주세요. 예: <permission id=\"2\">sample</permission>");}
@@ -313,7 +314,13 @@ function printArray($array,string $indent="\t",int $icount=1){
 	if($isSubArray || $arrayCount>4){$result .= PHP_EOL.str_repeat($indent,$icount-1);}
 	if($icount==1){$result .= "]";return $result;}else{return $result;}
 }
-
+/**
+ * 이미지를 리사이즈해서 지정한 포맷으로 저장합니다.
+ * @param string $sourcePath 원본 이미지 경로
+ * @param string $resizePath 수정한 이미지 경로
+ * @param int $size 이미지 크기
+ * @param string $format 이미지 포맷
+ */
 function imageResize(string $sourcePath, string $resizePath, int $size, string $format=""){
 	try {
 		//Imagick 객체 생성

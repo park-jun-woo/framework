@@ -18,17 +18,6 @@ class Security{
 		return [$privateKey, $publicKey];
 	}
 	/**
-	 * 매개 변수 값 남용 방지.
-	 */
-	public static function clearVars(){
-		$exitVars = array("PHP_SELF","_ENV","_GET","_POST","_FILES","_SERVER","_COOKIE","_SESSION","_REQUEST","HTTP_ENV_VARS","HTTP_GET_VARS","HTTP_POST_VARS","HTTP_POST_FILES","HTTP_SERVER_VARS","HTTP_COOKIE_VARS","HTTP_SESSION_VARS","GLOBALS");
-		foreach($exitVars as $var){if(isset($_GET[$var])){unset($_GET[$var]);}}
-		unset($_GET["PHPSESSID"]);
-		unset($_POST["PHPSESSID"]);
-		unset($_COOKIE["PHPSESSID"]);
-		unset($_REQUEST);
-	}
-	/**
 	 * SQL 인젝션 공격 필터링
 	 * @param array $param 필터링할 매개 변수 값의 배열
 	 */

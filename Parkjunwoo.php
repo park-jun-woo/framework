@@ -38,11 +38,6 @@ class Parkjunwoo{
 			http_response_code(404);
 			exit;
 		}
-		//매개 변수 값 남용 방지.
-		Security::clearVars();
-		//SQL인젝션 공격 필터링
-		Security::sqlInjectionClean($_GET);
-		Security::sqlInjectionClean($_POST);
 		//현재 접속한 앱
 		$this->thisApp = $this->code["app"][$this->code["domain-app"][$_SERVER["SERVER_NAME"]]];
 		//요청 분석
