@@ -157,13 +157,13 @@ foreach($bml->app as $app){
 				}
 			}
 			//Route "404" 없으면 추가
-			if(!array_key_exists("404", $code["app"][$appId]["get"]["html"])){
+			if(!array_key_exists("404", $code["app"][$appId]["get-html"])){
 				$code["app"][$appId]["get-html"]["404"] = [
 					0=>[["method"=>"view", "layout"=>"none", "view"=>"404"]]
 				];
 			}
 			//Route "/" 없으면 추가
-			if(!array_key_exists("/", $code["app"][$appId]["get"]["html"])){
+			if(!array_key_exists("/", $code["app"][$appId]["get-html"])){
 				$code["app"][$appId]["get-html"]["/"] = [
 					0=>[["method"=>"view", "layout"=>"none", "view"=>"index"]]
 				];
