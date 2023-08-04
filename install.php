@@ -93,7 +93,7 @@ foreach($bml->app as $app){
 				"name"=>isset($app->name)?(string)$app->name:(isset($app->attributes()->name)?(string)$app->attributes()->name:$code["name"]),
 				"description"=>isset($app->description)?(string)$app->description:(isset($app->attributes()->description)?(string)$app->attributes()->description:$code["description"]),
 				"domain"=>[],
-				"icon"=>isset($app->icon)?(string)$app->icon:"",
+				"icon"=>isset($app->icon)?(string)$app->icon:"icon.png",
 			];
 			//라우터 배열 생성
 			foreach(["get","post","put","delete"] as $method){
@@ -235,7 +235,6 @@ foreach($code["app"] as $id=>$app){
 	if(!file_exists($publicPath."styles")){mkdir($publicPath."styles", 0755);}
 	write("{$publicPath}index.php", $indexPHP);
 	if(isset($app["icon"]) && file_exists($iconPath = $rootPath.$app["icon"])){
-		echo "Icon create from".$iconPath.PHP_EOL;
 		imageResize($iconPath,$publicPath."favicon.ico",72);
 		imageResize($iconPath,$publicPath."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."72x72.png",72);
 		imageResize($iconPath,$publicPath."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."96x96.png",96);
