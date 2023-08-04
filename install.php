@@ -68,8 +68,8 @@ if(isset($bml->permission)){
 		}
 		$code["permission"][$permissionId] = (string)$permission;
 	}
-	foreach($code["permission"] as $key=>$value){$code["user"][$value] = $key;}
 }
+foreach($code["permission"] as $key=>$value){$code["user"][$value] = $key;}
 //코드 배열에 메세지 검증 및 등록
 foreach($bml->message as $message){
 	if(!isset($message->attributes()->id) || (string)$message->attributes()->id==""){error("<message> 태그에 id 속성을 입력해 주세요.");}
@@ -144,12 +144,12 @@ foreach($bml->app as $app){
 					//사용자 권한
 					if(isset($route->user)){
 						foreach($route->user as $user){
-							$code["app"][$appId]["{$method}-{$type}"][$routeId][(string)$user] = $routeCode;
+							$code["app"][$appId]["{$method}-{$type}"][$routeId][$code["user"][(string)$user]] = $routeCode;
 						}
 					}else if(isset($route->attributes()->user) && (string)$route->attributes()->user!=""){
 						$users = explode("|",(string)$route->attributes()->user);
 						foreach($users as $user){
-							$code["app"][$appId]["{$method}-{$type}"][$routeId][$user] = $routeCode;
+							$code["app"][$appId]["{$method}-{$type}"][$routeId][$code["user"][$user]] = $routeCode;
 						}
 					}else{
 						$code["app"][$appId]["{$method}-{$type}"][$routeId][0] = $routeCode;
