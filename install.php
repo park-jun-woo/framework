@@ -18,7 +18,7 @@ $bml = simplexml_load_string($result,"SimpleXMLElement",LIBXML_NOCDATA | LIBXML_
 //소스코드 검증
 if($bml===false){error("{$sourcePath}는 BML이 아닙니다. 올바른 BML 파일 경로를 입력해주세요.");}
 if($bml->getName()!="project"){error("{$sourcePath}는 BML이 아닙니다. 올바른 BML 파일 경로를 입력해주세요.");}
-if(!isset($bml->id) || !isset($bml->attributes()->id)){error("<project> 태그에 프로젝트 아이디를 id 속성이나 <id>태그로 입력하세요.");}
+if(!isset($bml->id) && !isset($bml->attributes()->id)){error("<project> 태그에 프로젝트 아이디를 id 속성이나 <id>태그로 입력하세요.");}
 if(!isset($bml->name)){error("<name> 태그에 프로젝트 이름를 입력해 주세요.");}
 if(!isset($bml->domain)){error("<domain>.domain.com</domain>에 쿠키 설정에 입력할 도메인을 입력해 주세요.");}
 if(!isset($bml->path)){error("<path> 태그를 작성해 주세요.");}
