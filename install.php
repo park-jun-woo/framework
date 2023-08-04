@@ -30,6 +30,7 @@ if(!isset($bml->app)){error("<app> 태그를 적어도 하나 작성해 주세�
 $root = realpath(str_replace(basename($sourcePath),"",realpath($sourcePath))).DIRECTORY_SEPARATOR;
 $rootPath = isset($bml->path->root)?(string)$bml->path->root:"";
 $rootPath = (substr($rootPath,0,1)===DIRECTORY_SEPARATOR)?$rootPath:$root.$rootPath;
+echo $rootPath.PHP_EOL;
 //코드 기본 골격
 $code = [
 	"name"=>(string)$bml->name,
