@@ -19,7 +19,17 @@ class Controller{
 	
 	protected function info(){
 		$html = new DOMDocument();
-		$html->loadHTML(<<<HTML
+		$html->loadHTML(str_replace(
+			["{uri}","{route}","{method}","{type}","{locale}","{permissionNames}","{sequences}"],
+			[
+				$this->request->uri(),
+				$this->request->route(),
+				$this->request->method(),
+				$this->request->type(),
+				$this->request->locale(),
+				$this->user->permissionNames(),
+				Debug::print($this->request->sequences(),"\t","<br>")
+			], <<<HTML
 <!DOCTYPE html>
 <html>
 	<head>
@@ -30,30 +40,30 @@ class Controller{
 		<article>
 			<h2>Request Information</h2>
 			<dl>
-				<dt>URI</dt><dd>{$this->request->uri()}</dd>
-				<dt>route</dt><dd>{$this->request->route()}</dd>
-				<dt>method</dt><dd>{$this->request->method()}</dd>
-				<dt>type</dt><dd>{$this->request->type()}</dd>
-				<dt>locale</dt><dd>{$this->request->locale()}</dd>
+				<dt>URI</dt><dd>{uri}</dd>
+				<dt>route</dt><dd>{route}</dd>
+				<dt>method</dt><dd>{method}</dd>
+				<dt>type</dt><dd>{type}</dd>
+				<dt>locale</dt><dd>{locale}</dd>
 			</dl>
 		</article>
 		
 		<article>
 			<h2>User Information</h2>
 			<dl>
-				<dt>permissions</dt><dd>{$this->user->permissionNames()}</dd>
+				<dt>permissions</dt><dd>{permissionNames}</dd>
 			</dl>
 		</article>
 		
 		<article>
 			<h2>Route Sequences</h2>
 			<p>
-				{Debug::print($this->request->sequences(),"\t","<br>")}
+				{sequences}
 			</p>
 		</article>
 	</body>
 </html>
-HTML);
+HTML));
 		echo $html->saveHTML();
 	}
 	
