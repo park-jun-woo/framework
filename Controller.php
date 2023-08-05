@@ -18,8 +18,9 @@ class Controller{
 	}
 	
 	protected function info(){
-		$html = new DOMDocument();
-		$html->loadHTML(str_replace(
+		//$html = new DOMDocument();
+		//$html->loadHTML(
+		echo str_replace(
 			["{name}","{uri}","{route}","{method}","{type}","{locale}","{permissionNames}","{sequences}"],
 			[
 				$this->man->name(),
@@ -64,8 +65,8 @@ class Controller{
 		</section>
 	</body>
 </html>
-HTML));
-		echo $html->saveHTML();
+HTML);
+		//echo $html->saveHTML();
 	}
 	
 	/**
