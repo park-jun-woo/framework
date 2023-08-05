@@ -3,10 +3,6 @@ use utils\File;
 
 class User{
 	const GUEST = 0;
-	const MEMBER = 1;
-	const STAFF = 536870912;
-	const ADMIN = 1073741824;
-	const SYSTEM = 2147483648;
 	protected Parkjunwoo $man;
 	protected string $token;
 	protected array $permissions, $session = [], $data = [];
@@ -103,7 +99,8 @@ class User{
 	 * @return bool 권한 일치하는지 여부
 	 */
 	public function check(int $permission):bool{
-		return ($this->data["up"] & $permission) === $permission;
+		if($permission===0){return false;}
+		return ($this->data["up"] & $permission) !== 0;
 	}
 	/**
 	 * 권한 추가
@@ -124,10 +121,10 @@ class User{
 		$this->change = true;
 	}
 	/**
-	 * 접속자 보유 권한 배열 조회
-	 * @return string 권한 이름 목록
+	 * 접속자 보유 권한 조회
+	 * @return string 권한 이름 나열 ,로 묶음
 	 */
-	public function permissions():string{
+	public function permissionNames():string{
 		$names = [];
 		foreach($this->man->permissions() as $key=>$value){
 			if(($this->data["up"] & $key)===$key){$names[] = $value;}

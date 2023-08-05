@@ -43,17 +43,25 @@ class Request{
 		if($this->man->isRouter($this->method, $this->type)){
 			$router = $this->man->router($this->method, $this->type);
 			if(array_key_exists($this->uri, $router)){
-				$this->route = $this->uri;
-				$this->sequences = $router[$this->uri];
+				$routeId = $this->uri;
+				$userRouter = $router[$this->uri];
 			}else{
 				foreach($router as $pattern=>$sequences){
 					if(substr($pattern, -1)!=="/"){$pattern .= "/";}$matches = null;
 					$regex = "/^".preg_replace("/\[([^\/]+)\]/i", "(?P<$1>[^\/]+)", str_replace("/", "\/", $pattern))."$/i";
 					if(preg_match($regex,$this->uri.(substr($this->uri, -1)!=="/"?"/":""),$matches)){
 						foreach($matches as $key=>$value){if(is_string($key)){$_GET[$key] = $value;}}
-						$this->route = $pattern;
-						$this->sequences = $sequences;
+						$routeId = $pattern;
+						$userRouter = $sequences;
 						break;
+					}
+				}
+			}
+			if(isset($userRouter)){
+				foreach($userRouter as $permission=>$sequences){
+					if($this->user->check($permission)){
+						$this->route = $routeId;
+						$this->sequences = $sequences;
 					}
 				}
 			}

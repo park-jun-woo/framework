@@ -27,6 +27,13 @@ class Security{
 			else{$value = addSlashes($value);}
 		}
 	}
+	public static function valid(string $value, string $type="key"):bool{
+		switch($type){
+			case "key":case "unsigned int":$regex = "/^\d+$/";break;
+			case "int":$regex = "/^-?\d+$/";break;
+			case "name":$regex = "/^[0-9a-zA-Z가-힣]+$/";break;
+		}
+	}
 	/**
 	 * XSS 공격 필터링
 	 * @param string $html 필터링할 입력 값

@@ -59,7 +59,7 @@ class Parkjunwoo{
 	 * @return bool 존재여부
 	 */
 	public function isRouter(string $method, string $type):bool{
-		return array_key_exists($method.$type, $this->thisApp);
+		return array_key_exists("{$method}-{$type}", $this->thisApp);
 	}
 	/**
 	 * 접속한 도메인의 앱 코드에서 라우터 배열 조회
@@ -68,7 +68,7 @@ class Parkjunwoo{
 	 * @return array 라우터 배열
 	 */
 	public function router(string $method, string $type):array{
-		return $this->thisApp[$method.$type];
+		return $this->thisApp["{$method}-{$type}"];
 	}
 	/**
 	 * 앱 코드 조회

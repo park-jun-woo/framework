@@ -143,18 +143,16 @@ foreach($bml->app as $app){
 						}
 					}
 					//사용자 권한
+					$permission = 0;
 					if(isset($route->user)){
 						foreach($route->user as $user){
-							$code["app"][$appId]["{$method}-{$type}"][$routeId][$code["user"][(string)$user]] = $routeCode;
+							$permission |= $code["user"][(string)$user];
 						}
 					}else if(isset($route->attributes()->user) && (string)$route->attributes()->user!=""){
 						$users = explode("|",(string)$route->attributes()->user);
-						foreach($users as $user){
-							$code["app"][$appId]["{$method}-{$type}"][$routeId][$code["user"][$user]] = $routeCode;
-						}
-					}else{
-						$code["app"][$appId]["{$method}-{$type}"][$routeId][0] = $routeCode;
+						foreach($users as $user){$permission |= $code["user"][$user];}
 					}
+					$code["app"][$appId]["{$method}-{$type}"][$routeId][$permission] = $routeCode;
 				}
 			}
 			//Route "404" 없으면 추가
