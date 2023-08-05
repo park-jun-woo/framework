@@ -222,15 +222,14 @@ if(!file_exists("{$rootPath}source")){mkdir("{$rootPath}source", 0755);}
 //어플리케이션 리소스 폴더 생성
 if(!file_exists($path = "{$rootPath}public")){mkdir($path, 0755);}
 
-$indexPHP = <<<PHPCODE
+$indexPHP = str_replace("{DIRECTORY_SEPARATOR}", DIRECTORY_SEPARATOR, <<<PHPCODE
 <?PHP
 	\$start_time = microtime();
 	require "..{DIRECTORY_SEPARATOR}..{DIRECTORY_SEPARATOR}app.php";
 	\$end_time = microtime();
 	echo "<br>실행시간: ".\$end_time-\$start_time."s";
 ?>
-PHPCODE;
-"<?PHP".PHP_EOL."require \"..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."app.php\";".PHP_EOL."?>";
+PHPCODE);
 foreach($code["app"] as $id=>$app){
 	if($app["type"]!="parkjunwoo"){continue;}
 	$publicPath = "{$rootPath}public".DIRECTORY_SEPARATOR.$id.DIRECTORY_SEPARATOR;
@@ -255,14 +254,14 @@ foreach($code["app"] as $id=>$app){
 	}
 }
 //app.php 파일 생성
-$appPHP = <<<PHPCODE
+$appPHP = str_replace(["{DIRECTORY_SEPARATOR}","{code}"], [DIRECTORY_SEPARATOR,printArray($code)], <<<PHPCODE
 <?PHP
 	require "{DIRECTORY_SEPARATOR}home{DIRECTORY_SEPARATOR}framework{DIRECTORY_SEPARATOR}Parkjunwoo.php";
-	Parkjunwoo::walk({printArray($code)});
+	Parkjunwoo::walk({code});
 ?>
-PHPCODE;
+PHPCODE);
 write("{$rootPath}app.php", $appPHP);
-rename($sourcePath, "{$rootPath}source".DIRECTORY_SEPARATOR.$sourceFile);
+//rename($sourcePath, "{$rootPath}source".DIRECTORY_SEPARATOR.$sourceFile);
 echo "Install Complete!".PHP_EOL;
 
 /**
