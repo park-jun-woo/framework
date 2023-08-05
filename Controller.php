@@ -20,8 +20,9 @@ class Controller{
 	protected function info(){
 		$html = new DOMDocument();
 		$html->loadHTML(str_replace(
-			["{uri}","{route}","{method}","{type}","{locale}","{permissionNames}","{sequences}"],
+			["{name}","{uri}","{route}","{method}","{type}","{locale}","{permissionNames}","{sequences}"],
 			[
+				$this->man->name(),
 				$this->request->uri(),
 				$this->request->route(),
 				$this->request->method(),
@@ -33,7 +34,7 @@ class Controller{
 <!DOCTYPE html>
 <html>
 	<head>
-		<title>Parkjunwoo Framework Informations</title>
+		<title>{name} Informations</title>
 	</head>
 	<body>
 		<h1>Parkjunwoo Framework Informations</h1>
