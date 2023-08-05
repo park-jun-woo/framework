@@ -36,6 +36,11 @@ class Debug{
 		if($path!=""){$fp = fopen($path,"a");if(flock($fp,LOCK_EX)){fwrite($fp,$message);flock($fp,LOCK_UN);}fclose($fp);}
 	}
 	/**
+	 * 에러 메세지 출력 후 종료
+	 * @param string $message 에러 메세지
+	 */
+	public static function error($message){echo $message.PHP_EOL;exit;}
+	/**
 	 * 배열을 출력합니다.
 	 * @param array $array 배열
 	 * @param string $indent 띄어쓰기
