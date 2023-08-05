@@ -42,31 +42,39 @@ class Debug{
 	 * @param int $icount 띄어쓰기 카운트
 	 * @return string 결과 문자열
 	 */
-	public static function print($array,string $indent="\t",int $icount=1){
-		$iu = 0;
-		$isSubArray = false;
-		$result = "";
+	public static function print($array, string $indent="\t", string $eol=PHP_EOL, int $icount=1):string{
+		$result = "";$isSubArray = false;$isStringKey = false;$isOrderedKey = true;
 		if($icount==1){$result .= (is_array($array)?"":get_class($array))."[";}
 		$sortedArray = array();
-		foreach($array as $key=>$value){if(!is_array($value)){$sortedArray[$key] = $value;}}
-		foreach($array as $key=>$value){if(is_array($value)){$isSubArray = true;$sortedArray[$key] = $value;}}
+		$arrayCount = count($array);
+		foreach($array as $key=>$value){
+			if(!is_array($value)){$sortedArray[$key] = $value;}
+			if(is_string($key)){$isStringKey = true;$isOrderedKey = false;}
+		}
+		$iu = 0;
+		foreach($array as $key=>$value){
+			if(is_array($value)){$isSubArray = true;$sortedArray[$key] = $value;}
+			if($isOrderedKey && (int)$key!=$iu){$isOrderedKey = false;}
+			$iu++;
+		}
+		$iu = 0;
 		foreach($sortedArray as $key=>$value){
 			if($iu>0){$result .= ",";}
 			if(is_array($value) || is_object($value)){
-				if($isSubArray){$result .= PHP_EOL.str_repeat($indent,$icount);}
-				$result .= !is_string($key)?"{$key}=>":"\"{$key}\"=>";
+				if($isSubArray){$result .= $eol.str_repeat($indent,$icount);}
+				$result .= $isStringKey?"\"{$key}\"=>":($isOrderedKey?"":"{$key}=>");
 				$result .= is_array($value)?"":get_class($value);
 				$result .= "[";
-				$result .= self::print($value,$indent,$icount+1);
+				$result .= self::print($value, $indent, $eol, $icount+1);
 				$result .= "]";
 			}else{
-				if($isSubArray && $iu==0){$result .= PHP_EOL.str_repeat($indent,$icount);}
-				$result .= !is_string($key)?"{$key}=>":"\"{$key}\"=>";
-				$result .= !is_string($value)?$value:"\"{$value}\"";
+				if(($isSubArray && $iu==0) || $arrayCount>4){$result .= $eol.str_repeat($indent,$icount);}
+				$result .= $isStringKey?"\"{$key}\"=>":($isOrderedKey?"":"{$key}=>");
+				$result .= is_numeric($value)?$value:"\"{$value}\"";
 			}
 			$iu++;
 		}
-		if($isSubArray){$result .= PHP_EOL.str_repeat($indent,$icount-1);}
-		if($icount==1){$result .= "]".PHP_EOL;return $result;}else{return $result;}
+		if($isSubArray || $arrayCount>4){$result .= $eol.str_repeat($indent,$icount-1);}
+		if($icount==1){$result .= "]";return $result;}else{return $result;}
 	}
 }

@@ -274,11 +274,8 @@ function write(string $path, string $content){
  * @param int $icount 띄어쓰기 카운트
  * @return string 결과 문자열
  */
-function printArray($array,string $indent="\t",int $icount=1){
-	$isSubArray = false;
-	$isStringKey = false;
-	$isOrderedKey = true;
-	$result = "";
+function printArray($array, string $indent="\t", string $eol=PHP_EOL, int $icount=1){
+	$result = "";$isSubArray = false;$isStringKey = false;$isOrderedKey = true;
 	if($icount==1){$result .= (is_array($array)?"":get_class($array))."[";}
 	$sortedArray = array();
 	$arrayCount = count($array);
@@ -296,20 +293,20 @@ function printArray($array,string $indent="\t",int $icount=1){
 	foreach($sortedArray as $key=>$value){
 		if($iu>0){$result .= ",";}
 		if(is_array($value) || is_object($value)){
-			if($isSubArray){$result .= PHP_EOL.str_repeat($indent,$icount);}
+			if($isSubArray){$result .= $eol.str_repeat($indent,$icount);}
 			$result .= $isStringKey?"\"{$key}\"=>":($isOrderedKey?"":"{$key}=>");
 			$result .= is_array($value)?"":get_class($value);
 			$result .= "[";
-			$result .= printArray($value,$indent,$icount+1);
+			$result .= printArray($value, $indent, $eol, $icount+1);
 			$result .= "]";
 		}else{
-			if(($isSubArray && $iu==0) || $arrayCount>4){$result .= PHP_EOL.str_repeat($indent,$icount);}
+			if(($isSubArray && $iu==0) || $arrayCount>4){$result .= $eol.str_repeat($indent,$icount);}
 			$result .= $isStringKey?"\"{$key}\"=>":($isOrderedKey?"":"{$key}=>");
 			$result .= is_numeric($value)?$value:"\"{$value}\"";
 		}
 		$iu++;
 	}
-	if($isSubArray || $arrayCount>4){$result .= PHP_EOL.str_repeat($indent,$icount-1);}
+	if($isSubArray || $arrayCount>4){$result .= $eol.str_repeat($indent,$icount-1);}
 	if($icount==1){$result .= "]";return $result;}else{return $result;}
 }
 /**

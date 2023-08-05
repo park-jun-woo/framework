@@ -1,4 +1,6 @@
 <?php
+use utils\Debug;
+
 class Controller{
 	protected Parkjunwoo $man;
 	protected Request $request;
@@ -12,14 +14,35 @@ class Controller{
 		$this->user = $this->request->user();
 		$this->man = $this->request->man();
 		
-		echo "URI: ".$this->request->uri()."<br>";
-		echo "route: ".$this->request->route()."<br>";
-		echo "method: ".$this->request->method()."<br>";
-		echo "type: ".$this->request->type()."<br>";
-		echo "locale: ".$this->request->locale()."<br><br>";
+		$this->info();
 		
-		echo "permissions: ".$this->user->permissions()."<br>";
+	}
+	
+	protected function info(){
+		echo "<article>";
+		echo "	<h1>Request Information</h1>";
+		echo "	<dl>";
+		echo "		<dt>URI:</dt><dd>".$this->request->uri()."</dd>";
+		echo "		<dt>route:</dt><dd>".$this->request->route()."</dd>";
+		echo "		<dt>method:</dt><dd>".$this->request->method()."</dd>";
+		echo "		<dt>type:</dt><dd>".$this->request->type()."</dd>";
+		echo "		<dt>locale:</dt><dd>".$this->request->locale()."</dd>";
+		echo "	</dl>";
+		echo "</article>";
 		
+		echo "<article>";
+		echo "	<h1>User Information</h1>";
+		echo "	<dl>";
+		echo "		<dt>permissions:</dt><dd>".$this->user->permissions()."</dd>";
+		echo "	</dl>";
+		echo "</article>";
+		
+		echo "<article>";
+		echo "	<h1>Route Sequences</h1>";
+		echo "	<p>";
+		echo Debug::print($this->request->sequences(),"\t","<br>");
+		echo "	</p>";
+		echo "</article>";
 	}
 	
 	/**
