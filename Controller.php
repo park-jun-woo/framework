@@ -37,7 +37,7 @@ class Controller{
 		<title>{name} Informations</title>
 	</head>
 	<body>
-		<h1>Parkjunwoo Framework Informations</h1>
+		<h1>{name} Informations</h1>
 		<section>
 			<h2>Request Information</h2>
 			<dl>
