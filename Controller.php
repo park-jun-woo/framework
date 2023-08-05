@@ -11,11 +11,10 @@ class Controller{
 	 */
 	public function __construct(Request $request){
 		$this->request = $request;
-		$this->user = $this->request->user();
 		$this->man = $this->request->man();
+		$this->user = $this->man->user();
 		
 		$this->info();
-		
 	}
 	
 	protected function info(){

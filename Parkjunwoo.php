@@ -17,6 +17,8 @@ use utils\Security;
  */
 class Parkjunwoo{
 	protected static Parkjunwoo $man;
+	protected User $user;
+	protected Request $request;
 	protected Controller $controller;
 	protected string $path;
 	protected array $code, $server, $thisApp;
@@ -40,10 +42,12 @@ class Parkjunwoo{
 		}
 		//현재 접속한 앱
 		$this->thisApp = $this->code["app"][$this->code["domain-app"][$_SERVER["SERVER_NAME"]]];
+		//세션 설정
+		$this->user = new User($this);
 		//요청 분석
-		$request = new Request($this);
+		$this->request = new Request($this);
 		//라우트 한 컨트롤러 실행
-		$this->controller = new Controller($request);
+		$this->controller = new Controller($this->request);
 	}
 	/**
 	 * Parkjunwoo Framework를 실행합니다.
@@ -52,6 +56,9 @@ class Parkjunwoo{
 	public static function walk(array $code){
 		if(!isset(self::$man)){new Parkjunwoo($code);}
 	}
+	public function user():User{return $this->user;}
+	public function request():Request{return $this->request;}
+	public function controller():Controller{return $this->controller;}
 	/**
 	 * 접속한 도메인의 앱 코드에 라우터가 있는지 확인
 	 * @param string $method 메서드

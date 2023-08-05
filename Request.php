@@ -10,7 +10,7 @@ class Request{
 	public function __construct(Parkjunwoo $man){
 		$this->man = $man;
 		//세션 설정
-		$this->user = new User($man);
+		$this->user = $this->man->user();
 		//URI 분석
 		$this->uri = explode("?",$_SERVER["REQUEST_URI"])[0];
 		//Method 분석
