@@ -32,7 +32,7 @@ class Controller{
 		echo "<article>";
 		echo "	<h1>User Information</h1>";
 		echo "	<dl>";
-		echo "		<dt>permissions:</dt><dd>".$this->user->permissions()."</dd>";
+		echo "		<dt>permissions:</dt><dd>".$this->user->permissionNames()."</dd>";
 		echo "	</dl>";
 		echo "</article>";
 		
