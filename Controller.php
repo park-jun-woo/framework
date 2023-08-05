@@ -38,7 +38,7 @@ class Controller{
 	</head>
 	<body>
 		<h1>Parkjunwoo Framework Informations</h1>
-		<article>
+		<section>
 			<h2>Request Information</h2>
 			<dl>
 				<dt>URI</dt><dd>{uri}</dd>
@@ -47,21 +47,21 @@ class Controller{
 				<dt>type</dt><dd>{type}</dd>
 				<dt>locale</dt><dd>{locale}</dd>
 			</dl>
-		</article>
+		</section>
 		
-		<article>
+		<section>
 			<h2>User Information</h2>
 			<dl>
 				<dt>permissions</dt><dd>{permissionNames}</dd>
 			</dl>
-		</article>
+		</section>
 		
-		<article>
+		<section>
 			<h2>Route Sequences</h2>
 			<p>
 				{sequences}
 			</p>
-		</article>
+		</section>
 	</body>
 </html>
 HTML));
