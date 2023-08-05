@@ -192,7 +192,7 @@ class User{
 			"app"=>unpack("a*", substr($decrypted, 24))[1],
 		];
 		//세션 파일이 존재하지 않는다면 RSA 키 탈취 가능성 있으므로 리셋.
-		if(!file_exists($sessionPath = $this->man->path("session").base64_encode($session["session"]))){
+		if(!file_exists($sessionPath = $this->man->path("session").base64_encode(pack("J", $session["session"])))){
 			$this->man->reset();
 			$this->black(24, "세션 파일 존재하지 않아 RSA 키 탈취 가능성");
 		}
@@ -241,6 +241,6 @@ class User{
 		//세션 파일에 정보 저장
 		$data = "";
 		foreach($this->data as $key=>$value){$data .= "{$key}\t{$value}\n";}
-		File::write($this->man->path("session").base64_encode($this->session["session"]),$data);
+		File::write($this->man->path("session").base64_encode(pack("J", $this->session["session"])),$data);
 	}
 }
