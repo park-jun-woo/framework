@@ -57,7 +57,7 @@ class Request{
 					}
 				}
 			}
-			if(isset($userRouter)){
+			if(isset($userRouter)){echo "userRouter is set!<br>";
 				foreach($userRouter as $permission=>$sequences){
 					if($this->user->check($permission)){
 						$this->route = $routeId;
