@@ -43,9 +43,11 @@ class Request{
 		if($this->man->isRouter($this->method, $this->type)){
 			$router = $this->man->router($this->method, $this->type);
 			if(array_key_exists($this->uri, $router)){
+				//URI로 라우터 검색
 				$routeId = $this->uri;
 				$userRouter = $router[$this->uri];
 			}else{
+				//URI 패턴으로 라우터 검색
 				foreach($router as $pattern=>$sequences){
 					if(substr($pattern, -1)!=="/"){$pattern .= "/";}$matches = null;
 					$regex = "/^".preg_replace("/\[([^\/]+)\]/i", "(?P<$1>[^\/]+)", str_replace("/", "\/", $pattern))."$/i";
@@ -57,10 +59,9 @@ class Request{
 					}
 				}
 			}
+			//권한에 따른 라우터 최종 선택
 			if(isset($userRouter)){
-				echo "userRouter is set!<br>";
 				foreach($userRouter as $permission=>$sequences){
-					echo "$permission : <br>";
 					if($this->user->check($permission)){
 						$this->route = $routeId;
 						$this->sequences = $sequences;
@@ -68,7 +69,7 @@ class Request{
 				}
 			}
 		}
-		//라우터를 찾을 수 없다면
+		//라우터를 찾을 수 없다면 404
 		if(!isset($this->route)){$this->route = "404";$this->sequences = [["method"=>"view","layout"=>"none","view"=>"404"]];}
 	}
 	/**
