@@ -32,7 +32,9 @@ class Security{
 			case "key":case "unsigned int":$regex = "/^\d+$/";break;
 			case "int":$regex = "/^-?\d+$/";break;
 			case "name":$regex = "/^[0-9a-zA-Z가-힣]+$/";break;
+			default:return false;
 		}
+		return preg_match($regex, $value);
 	}
 	/**
 	 * XSS 공격 필터링
