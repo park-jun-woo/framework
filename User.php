@@ -99,7 +99,7 @@ class User{
 	 * @return bool 권한 일치하는지 여부
 	 */
 	public function check(int $permission):bool{
-		if($permission===0){return false;}
+		if($permission==0){return true;}
 		return ($this->data["up"] & $permission) !== 0;
 	}
 	/**
