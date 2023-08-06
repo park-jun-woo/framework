@@ -7,7 +7,7 @@ use utils\File;
 use utils\Image;
 
 switch(count($argv)){
-	default:Debug::error("사용법: php install.php /home/sample/sample.bml");
+	default:Debug::error("사용법: php install.php /home/sample/source/sample.bml");
 	case 2:$sourcePath = $argv[1];break;
 }
 //PHP 버전 확인
@@ -36,7 +36,6 @@ if(!isset($bml->app)){Debug::error("<app> 태그를 적어도 하나 작성해 �
 $root = realpath(str_replace(basename($sourcePath),"",realpath($sourcePath))).DIRECTORY_SEPARATOR;
 $rootPath = isset($bml->path->root)?(string)$bml->path->root:"";
 $rootPath = realpath((substr($rootPath,0,1)===DIRECTORY_SEPARATOR)?$rootPath:$root.$rootPath);
-echo $rootPath.PHP_EOL;exit;
 //코드 기본 골격
 $code = [
 	"name"=>(string)$bml->name,
