@@ -24,8 +24,7 @@ class Controller{
 	 * @param mixed $data 뷰에 전달할 데이터
 	 */
 	protected function view(string $layout,string $view,$data=null){
-		$html = new DOMDocument();
-		$html->loadHTML("<!DOCTYPE html><html><head></head><body></body></html>");
+		
 	}
 	
 	/**
@@ -45,14 +44,14 @@ class Controller{
 	<body>
 		<h1>{$this->man->name()} Informations</h1>
 		<section>
-			<h2>User Information</h2>
+			<h2>User</h2>
 			<dl>
 				<dt>permissions</dt><dd>{$this->user->permissionNames()}</dd>
 				<dt>IP</dt><dd>{$this->user->ip()}</dd>
 			</dl>
 		</section>
 		<section>
-			<h2>Request Information</h2>
+			<h2>Request</h2>
 			<dl>
 				<dt>URI</dt><dd>{$this->request->uri()}</dd>
 				<dt>route</dt><dd>{$this->request->route()}</dd>
@@ -62,7 +61,7 @@ class Controller{
 			</dl>
 		</section>
 		<section>
-			<h2>Route Sequences</h2>
+			<h2>Route</h2>
 			<p>
 				".Debug::print($this->request->sequences())."
 			</p>
