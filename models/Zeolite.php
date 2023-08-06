@@ -10,7 +10,7 @@ class Zeolite extends Model{
 		$this->man = $man;
 	}
 	
-	public function get(){
+	public function get(array $query){
 		
 	}
 	
