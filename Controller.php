@@ -14,59 +14,7 @@ class Controller{
 		$this->user = $this->man->user();
 		$this->request = $man->request();
 		
-		$this->info();
-	}
-	
-	protected function info(){
-		//$html = new DOMDocument();
-		//$html->loadHTML(
-		echo str_replace(
-			["{name}","{uri}","{route}","{method}","{type}","{locale}","{permissionNames}","{sequences}"],
-			[
-				$this->man->name(),
-				$this->request->uri(),
-				$this->request->route(),
-				$this->request->method(),
-				$this->request->type(),
-				$this->request->locale(),
-				$this->user->permissionNames(),
-				Debug::print($this->request->sequences(),"\t","<br>")
-			], <<<HTML
-<!DOCTYPE html>
-<html>
-	<head>
-		<title>{name} Informations</title>
-	</head>
-	<body>
-		<h1>{name} Informations</h1>
-		<section>
-			<h2>Request Information</h2>
-			<dl>
-				<dt>URI</dt><dd>{uri}</dd>
-				<dt>route</dt><dd>{route}</dd>
-				<dt>method</dt><dd>{method}</dd>
-				<dt>type</dt><dd>{type}</dd>
-				<dt>locale</dt><dd>{locale}</dd>
-			</dl>
-		</section>
-		
-		<section>
-			<h2>User Information</h2>
-			<dl>
-				<dt>permissions</dt><dd>{permissionNames}</dd>
-			</dl>
-		</section>
-		
-		<section>
-			<h2>Route Sequences</h2>
-			<p>
-				{sequences}
-			</p>
-		</section>
-	</body>
-</html>
-HTML);
-		//echo $html->saveHTML();
+		$this->information();
 	}
 	
 	/**
@@ -86,6 +34,41 @@ HTML);
 	 */
 	protected function message(string $message){
 		
+	}
+	
+	protected function information(){
+		echo "<!DOCTYPE html>
+<html>
+	<head>
+		<title>{$this->man->name()} Informations</title>
+	</head>
+	<body>
+		<h1>{$this->man->name()} Informations</h1>
+		<section>
+			<h2>User Information</h2>
+			<dl>
+				<dt>permissions</dt><dd>{$this->user->permissionNames()}</dd>
+				<dt>IP</dt><dd>{$this->user->ip()}</dd>
+			</dl>
+		</section>
+		<section>
+			<h2>Request Information</h2>
+			<dl>
+				<dt>URI</dt><dd>{$this->request->uri()}</dd>
+				<dt>route</dt><dd>{$this->request->route()}</dd>
+				<dt>method</dt><dd>{$this->request->method()}</dd>
+				<dt>type</dt><dd>{$this->request->type()}</dd>
+				<dt>locale</dt><dd>{$this->request->locale()}</dd>
+			</dl>
+		</section>
+		<section>
+			<h2>Route Sequences</h2>
+			<p>
+				{Debug::print($this->request->sequences()}
+			</p>
+		</section>
+	</body>
+</html>";
 	}
 }
 ?>
