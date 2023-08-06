@@ -41,12 +41,19 @@ class Controller{
 	<head>
 		<title>{$this->man->name()} Informations</title>
 		<style>
+permissions{display:block;}
 permissions::before{content:\"permissions: \";}
+ip{display:block;}
 ip::before{content:\"ip: \";}
+uri{display:block;}
 uri::before{content:\"uri: \";}
+route{display:block;}
 route::before{content:\"route: \";}
+method{display:block;}
 method::before{content:\"method: \";}
+type{display:block;}
 type::before{content:\"type: \";}
+locale{display:block;}
 locale::before{content:\"locale: \";}
 		</style>
 	</head>
