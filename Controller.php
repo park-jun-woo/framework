@@ -39,7 +39,7 @@ class Controller{
 		echo "<!DOCTYPE html>
 <html>
 	<head>
-		<title>{$this->man->name()} Informations</title>
+		<title>{$this->man->app()["name"]}</title>
 		<style>
 permissions{display:block;}
 permissions::before{content:\"permissions: \";}
@@ -58,7 +58,7 @@ locale::before{content:\"locale: \";}
 		</style>
 	</head>
 	<body>
-		<h1>{$this->man->name()} Informations</h1>
+		<h1>{$this->man->app()["name"]} Informations</h1>
 		<section>
 			<h2>User</h2>
 			<permissions>{$this->user->permissionNames()}</permissions>

@@ -102,10 +102,12 @@ class Parkjunwoo{
 	/**
 	 * 앱 코드 조회
 	 * @param string $key 키 또는 도메인
-	 * @return array 앱 코드 배열
+	 * @return array|bool 앱 코드 배열
 	 */
-	public function app(string $key):array{
+	public function app(string $key=""){
+		if($key==""){return $this->thisApp;}
 		if(array_key_exists($key,$this->code["app"])){return $this->code["app"][$key];}
+		return false;
 	}
 	/**
 	 * 어플리케이션 이름
