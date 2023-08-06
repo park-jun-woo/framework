@@ -13,8 +13,9 @@ class Image{
 	 * @param int $size 이미지 크기
 	 * @param string $format 이미지 포맷
 	 */
-	public static function resize(string $sourcePath, string $resizePath, int $size, string $format=""){
+	public static function resize(string $sourcePath, string $resizePath, int $size, int $height=null, string $format=""){
 		try {
+			if($height==null){$height = $size;}
 			//Imagick 객체 생성
 			$image = new Imagick($sourcePath);
 			//투명 배경 설정
@@ -22,7 +23,7 @@ class Image{
 			//알파 채널 활성화
 			$image->setImageAlphaChannel(Imagick::ALPHACHANNEL_ACTIVATE);
 			//이미지 리사이즈
-			$image->resizeImage($size, $size, Imagick::FILTER_LANCZOS, 1);
+			$image->resizeImage($size, $height, Imagick::FILTER_LANCZOS, 1);
 			//이미지 포맷 설정
 			if($format!=""){$image->setImageFormat($format);}
 			//리사이즈 이미지의 확장자를 입력한 경우

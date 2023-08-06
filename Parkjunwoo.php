@@ -1,6 +1,8 @@
 <?php
 use utils\File;
 use utils\Security;
+use models\Model;
+use models\Zeolite;
 
 /**
  * Parkjunwoo Framework는 간결하고 강력한 구문을 가진 웹 어플리케이션 프레임워크입니다.
@@ -17,6 +19,7 @@ use utils\Security;
  */
 class Parkjunwoo{
 	protected static Parkjunwoo $man;
+	protected Zeolite $model;
 	protected User $user;
 	protected Request $request;
 	protected Controller $controller;
@@ -42,12 +45,14 @@ class Parkjunwoo{
 		}
 		//현재 접속한 앱
 		$this->thisApp = $this->code["app"][$this->code["domain-app"][$_SERVER["SERVER_NAME"]]];
-		//세션 설정
+		//파일 기반 캐시형 데이터베이스
+		$this->model = new Zeolite($this);
+		//사용자 세션
 		$this->user = new User($this);
 		//요청 분석
 		$this->request = new Request($this);
-		//라우트 한 컨트롤러 실행
-		$this->controller = new Controller($this->request);
+		//요청 실행
+		$this->controller = new Controller($this);
 	}
 	/**
 	 * Parkjunwoo Framework를 실행합니다.
@@ -56,8 +61,25 @@ class Parkjunwoo{
 	public static function walk(array $code){
 		if(!isset(self::$man)){new Parkjunwoo($code);}
 	}
+	/**
+	 * 사용자 세션 정보
+	 * @return User 사용자 객체
+	 */
+	public function model():Model{return $this->model;}
+	/**
+	 * 사용자 세션 정보
+	 * @return User 사용자 객체
+	 */
 	public function user():User{return $this->user;}
+	/**
+	 * 요청 분석 정보
+	 * @return Request 요청 객체
+	 */
 	public function request():Request{return $this->request;}
+	/**
+	 * 요청 실행 컨트롤러
+	 * @return Controller 콘트롤러 객체
+	 */
 	public function controller():Controller{return $this->controller;}
 	/**
 	 * 접속한 도메인의 앱 코드에 라우터가 있는지 확인

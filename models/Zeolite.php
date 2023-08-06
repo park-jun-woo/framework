@@ -3,9 +3,11 @@ namespace models;
 
 use Parkjunwoo;
 
-class Log extends Model{
-	public function __construct(){
-		
+class Zeolite extends Model{
+	protected Parkjunwoo $man;
+	
+	public function __construct(Parkjunwoo $man){
+		$this->man = $man;
 	}
 	
 	public function get(){
@@ -24,8 +26,8 @@ class Log extends Model{
 		
 	}
 	
-	public static function error(string $path, string $message){
-		$path = Parkjunwoo::man()->path("log")."error";
+	protected function error(string $path, string $message){
+		$path = $this->man->path("log")."error";
 		if($path==""){$path = str_replace(basename(__FILE__),"",realpath(__FILE__))."log".DIRECTORY_SEPARATOR."error";}
 		self::append($path, date("Y-m-d H:i:s")."\t".$message, 1);
 	}
