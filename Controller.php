@@ -40,31 +40,34 @@ class Controller{
 <html>
 	<head>
 		<title>{$this->man->name()} Informations</title>
+		<style>
+permissions::before{content:\"permissions: \";}
+ip::before{content:\"ip: \";}
+uri::before{content:\"uri: \";}
+route::before{content:\"route: \";}
+method::before{content:\"method: \";}
+type::before{content:\"type: \";}
+locale::before{content:\"locale: \";}
+		</style>
 	</head>
 	<body>
 		<h1>{$this->man->name()} Informations</h1>
 		<section>
 			<h2>User</h2>
-			<dl>
-				<dt>permissions</dt><dd>{$this->user->permissionNames()}</dd>
-				<dt>IP</dt><dd>{$this->user->ip()}</dd>
-			</dl>
+			<permissions>{$this->user->permissionNames()}</permissions>
+			<ip>{$this->user->ip()}</ip>
 		</section>
 		<section>
 			<h2>Request</h2>
-			<dl>
-				<dt>URI</dt><dd>{$this->request->uri()}</dd>
-				<dt>route</dt><dd>{$this->request->route()}</dd>
-				<dt>method</dt><dd>{$this->request->method()}</dd>
-				<dt>type</dt><dd>{$this->request->type()}</dd>
-				<dt>locale</dt><dd>{$this->request->locale()}</dd>
-			</dl>
+			<uri>{$this->request->uri()}</uri>
+			<route>{$this->request->route()}</route>
+			<method>{$this->request->method()}</method>
+			<type>{$this->request->type()}</type>
+			<locale>{$this->request->locale()}</locale>
 		</section>
 		<section>
 			<h2>Route</h2>
-			<p>
-				".Debug::print($this->request->sequences())."
-			</p>
+			<p>".Debug::print($this->request->sequences())."</p>
 		</section>
 	</body>
 </html>";
