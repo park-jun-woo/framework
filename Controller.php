@@ -64,7 +64,7 @@ class Controller{
 		<section>
 			<h2>Route Sequences</h2>
 			<p>
-				{Debug::print($this->request->sequences()}
+				".Debug::print($this->request->sequences())."
 			</p>
 		</section>
 	</body>
