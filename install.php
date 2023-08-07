@@ -36,6 +36,7 @@ if(!isset($bml->app)){Debug::error("<app> 태그를 적어도 하나 작성해 �
 $root = realpath(str_replace(basename($sourcePath),"",realpath($sourcePath))).DIRECTORY_SEPARATOR;
 $rootPath = isset($bml->path->root)?(string)$bml->path->root:"";
 $rootPath = realpath((substr($rootPath,0,1)===DIRECTORY_SEPARATOR)?$rootPath:$root.$rootPath);
+echo $rootPath.PHP_EOL;
 //코드 기본 골격
 $code = [
 	"name"=>(string)$bml->name,
@@ -60,6 +61,7 @@ $code = [
 	"app"=>[],
 	"domain-app"=>[],
 ];
+echo "init Project(name: {$code["name"]})".PHP_EOL;
 //사용자 권한 검증 및 등록
 if(isset($bml->permission)){
 	foreach($bml->permission as $permission){
@@ -90,6 +92,7 @@ foreach($bml->app as $app){
 	if(!isset($app->attributes()->type) || (string)$app->attributes()->type==""){$app->addAttribute("type", "parkjunwoo");}
 	$appId = (string)$app->attributes()->id;
 	$appType = (string)$app->attributes()->type;
+	echo "  add an App(id: {$appId}, type: {$appType})".PHP_EOL;
 	switch($appType){
 		case "parkjunwoo":
 			//앱 코드 기본 골격
@@ -158,6 +161,7 @@ foreach($bml->app as $app){
 						$users = explode("|",(string)$route->attributes()->user);
 						foreach($users as $user){$permission |= $code["user"][$user];}
 					}
+					echo "    add a {$method} {$type} route(id: {$routeId}, p: {$permission})".PHP_EOL;
 					$code["app"][$appId]["{$method}-{$type}"][$routeId][$permission] = $routeCode;
 				}
 			}
