@@ -2,12 +2,15 @@
 namespace models;
 
 use Parkjunwoo;
+use User;
 
 class Zeolite extends Model{
 	protected Parkjunwoo $man;
+	protected User $user;
 	
 	public function __construct(Parkjunwoo $man){
 		$this->man = $man;
+		$this->user = $this->man->user();
 	}
 	
 	public function get(array $query){
