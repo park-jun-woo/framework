@@ -224,11 +224,9 @@ foreach($bml->app as $app){
 foreach($code["path"] as $path){
 	if(!file_exists($path)){mkdir($path, 0755);chown($path, "apache");}
 }
-//source 폴더 생성
-if(!file_exists("{$rootPath}source")){mkdir("{$rootPath}source", 0755);}
 //어플리케이션 리소스 폴더 생성
 if(!file_exists($path = "{$rootPath}public")){mkdir($path, 0755);}
-
+//index 파일
 $indexPHP = "<\?PHP
 	\$start_time = microtime();
 	require \"..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."app.php\";
