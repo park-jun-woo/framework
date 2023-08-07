@@ -45,12 +45,12 @@ class Parkjunwoo{
 		}
 		//현재 접속한 앱
 		$this->thisApp = $this->code["app"][$this->code["domain-app"][$_SERVER["SERVER_NAME"]]];
-		//파일 기반 캐시형 데이터베이스
-		$this->model = new Zeolite($this);
 		//사용자 세션
 		$this->user = new User($this);
 		//요청 분석
 		$this->request = new Request($this);
+		//파일 기반 캐시형 데이터베이스
+		$this->model = new Zeolite($this);
 		//요청 실행
 		$this->controller = new Controller($this);
 	}
