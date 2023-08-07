@@ -260,7 +260,7 @@ foreach($code["app"] as $id=>$app){
 	}
 }
 //app.php 파일 생성
-File::write("{$rootPath}app.php", "<\?PHP
+File::write("{$rootPath}app.php", "<?PHP
 	require \"".DIRECTORY_SEPARATOR."home".DIRECTORY_SEPARATOR."framework".DIRECTORY_SEPARATOR."Parkjunwoo.php\";
 	Parkjunwoo::walk(".Debug::print($code).");
 ?>");
