@@ -227,11 +227,11 @@ foreach($code["path"] as $path){
 //어플리케이션 리소스 폴더 생성
 if(!file_exists($path = "{$rootPath}public")){mkdir($path, 0755);}
 //index 파일
-$indexPHP = "<\?PHP
+$indexPHP = "<?PHP
 	\$start_time = microtime();
 	require \"..".DIRECTORY_SEPARATOR."..".DIRECTORY_SEPARATOR."app.php\";
 	\$end_time = microtime();
-	echo \"<br>실행시간: \".\$end_time-\$start_time.\"s\";
+	echo \"<p>실행시간: \".\$end_time-\$start_time.\"s</p>\";
 ?>";
 foreach($code["app"] as $id=>$app){
 	if($app["type"]!="parkjunwoo"){continue;}
