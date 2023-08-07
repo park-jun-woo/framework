@@ -241,6 +241,7 @@ $indexPHP = "<\?PHP
 foreach($code["app"] as $id=>$app){
 	if($app["type"]!="parkjunwoo"){continue;}
 	$publicPath = "{$rootPath}public".DIRECTORY_SEPARATOR.$id.DIRECTORY_SEPARATOR;
+	echo "create folder(path: {$publicPath})".PHP_EOL;
 	if(!file_exists($publicPath)){mkdir($publicPath, 0755);}
 	if(!file_exists($publicPath."assets")){mkdir($publicPath."assets", 0755);}
 	if(!file_exists($publicPath."images")){mkdir($publicPath."images", 0755);}
@@ -248,7 +249,9 @@ foreach($code["app"] as $id=>$app){
 	if(!file_exists($publicPath."scripts")){mkdir($publicPath."scripts", 0755);}
 	if(!file_exists($publicPath."styles")){mkdir($publicPath."styles", 0755);}
 	File::write("{$publicPath}index.php", $indexPHP);
+	echo "create file(path: {$publicPath}index.php)".PHP_EOL;
 	if(isset($app["icon"]) && file_exists($iconPath = $rootPath.$app["icon"])){
+		echo "create image(from: {$iconPath})".PHP_EOL;
 		Image::resize($iconPath,$publicPath."favicon.ico",72);
 		Image::resize($iconPath,$publicPath."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."72x72.png",72);
 		Image::resize($iconPath,$publicPath."images".DIRECTORY_SEPARATOR."icon".DIRECTORY_SEPARATOR."96x96.png",96);
