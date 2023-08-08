@@ -12,7 +12,6 @@ class Setup{
 	protected array $code;
 	
 	public function __construct(string $source){
-		$this->sourcePath = $source;
 		//필수 설치 확인
 		$this->required();
 		//소스 불러오기
@@ -149,6 +148,9 @@ class Setup{
 			if(isset($message->en) && (string)$message->en!=""){$this->code["message"][$messageId]["en"] = (string)$message->en;}
 		}
 	}
+	/**
+	 * parkjunwoo 앱 설정
+	 */
 	protected function parkjunwoo(SimpleXMLElement $app){
 		$id = (string)$app->attributes()->id;
 		$type = (string)$app->attributes()->type;
@@ -239,6 +241,9 @@ class Setup{
 		//코드에 앱 코드 등록
 		$this->code["app"][$id] = $code;
 	}
+	/**
+	 * mysql 앱 설정
+	 */
 	protected function mysql(SimpleXMLElement $app){
 		$id = (string)$app->attributes()->id;
 		$type = (string)$app->attributes()->type;
