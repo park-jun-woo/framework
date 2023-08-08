@@ -1,8 +1,11 @@
 <?php
-use utils\File;
-use utils\Security;
-use models\Model;
-use models\Zeolite;
+use core\Controller;
+use core\Model;
+use core\Request;
+use core\User;
+use model\Zeolite;
+use util\File;
+use util\Security;
 
 /**
  * Parkjunwoo Framework는 간결하고 강력한 구문을 가진 웹 어플리케이션 프레임워크입니다.
@@ -12,7 +15,7 @@ use models\Zeolite;
  * @see https://github.com/park-jun-woo/framework The Parkjunwoo GitHub project
  * @author Park Jun woo <mail@parkjunwoo.com>
  * @copyright 2023 parkJunwoo.com
- * @license http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License
+ * @license https://opensource.org/license/bsd-2-clause/ The BSD 2-Clause License
  * @note This program is distributed in the hope that it will be useful - WITHOUT
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.

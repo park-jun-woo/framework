@@ -23,7 +23,7 @@ class Setup{
 			"domain"=>(string)$this->bml->domain,
 			"path"=>[],
 			"config"=>[],
-			"permission"=>[0=>"member", 61=>"admin", 62=>"owner", 63=>"system"],
+			"permission"=>[0=>"member", 61=>"writer", 62=>"admin", 63=>"system"],
 			"user"=>["guest"=>0],
 			"message"=>[],
 			"app"=>[],
@@ -118,7 +118,7 @@ class Setup{
 					if($permissionId<1 || $permissionId>60){Debug::error("<permission> 태그의 아이디는 1부터 60까지만 가능합니다.");}
 				}else{
 					$permissionId = 1;
-					while(array_key_exists($permissionId, $this->code["permission"]) && $permissionId<61){$permissionId++;}
+					while(array_key_exists($permissionId, $this->code["permission"]) && $permissionId<=60){$permissionId++;}
 					if($permissionId>60){Debug::error("<permission> 태그가 너무 많습니다.");}
 				}
 				$this->code["permission"][$permissionId] = (string)$permission;
