@@ -1,5 +1,5 @@
 <?php
-namespace models;
+namespace core;
 
 abstract class Model{
 	protected array $enableMethods;

@@ -1,5 +1,5 @@
 <?php
-namespace utils;
+namespace util;
 
 class Debug{
 	public static bool $debug = true;

@@ -1,5 +1,8 @@
 <?php
-use utils\File;
+namespace core;
+
+use Parkjunwoo;
+use util\File;
 
 class User{
 	const GUEST = 0;
@@ -185,11 +188,11 @@ class User{
 		}
 		//사용자 인증 배열에 복호화한 데이터 입력
 		$session = [
-			"permission"=>unpack("N", substr($decrypted, 0, 4))[1],
-			"session"=>unpack("J", substr($decrypted, 4, 8))[1],
-			"session-time"=>unpack("J", substr($decrypted, 12, 8))[1],
-			"server"=>unpack("N", substr($decrypted, 20, 4))[1],
-			"app"=>unpack("a*", substr($decrypted, 24))[1],
+			"permission"=>unpack("J", substr($decrypted, 0, 8))[1],
+			"session"=>unpack("J", substr($decrypted, 8, 16))[1],
+			"session-time"=>unpack("J", substr($decrypted, 16, 8))[1],
+			"server"=>unpack("N", substr($decrypted, 24, 4))[1],
+			"app"=>unpack("a*", substr($decrypted, 28))[1],
 		];
 		//세션 파일이 존재하지 않는다면 RSA 키 탈취 가능성 있으므로 리셋.
 		if(!file_exists($sessionPath = $this->man->path("session").base64_encode(pack("J", $session["session"])))){
@@ -234,7 +237,11 @@ class User{
 		//쿠키에 토큰 등록
 		setcookie("t", $this->token, time()+$this->man->config("token-expire"), "/", $this->man->domain(), true, true);
 		//쿠키에 세션 등록
-		$data = pack("N", $this->session["permission"]).pack("J", $this->session["session"]).pack("J", $this->session["session-time"]).pack("N", $this->session["server"]).pack("a*", $this->session["app"]);
+		$data = pack("J", $this->session["permission"]);
+		$data .= pack("J", $this->session["session"]);
+		$data .= pack("J", $this->session["session-time"]);
+		$data .= pack("N", $this->session["server"]);
+		$data .= pack("a*", $this->session["app"]);
 		$crypted = "";
 		openssl_public_encrypt($data, $crypted, $this->man->publicKey());
 		setcookie("s", base64_encode($crypted), time()+$this->man->config("session-expire"), "/", $this->man->domain(), true, true);

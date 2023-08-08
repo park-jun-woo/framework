@@ -1,8 +1,9 @@
 <?php
-namespace models;
+namespace model;
 
 use Parkjunwoo;
-use User;
+use core\User;
+use core\Model;
 
 class Zeolite extends Model{
 	protected Parkjunwoo $man;

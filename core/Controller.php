@@ -1,5 +1,8 @@
 <?php
-use utils\Debug;
+namespace core;
+
+use Parkjunwoo;
+use util\Debug;
 
 class Controller{
 	protected Parkjunwoo $man;

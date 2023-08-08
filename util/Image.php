@@ -1,5 +1,5 @@
 <?php
-namespace utils;
+namespace util;
 
 use Imagick;
 use ImagickPixel;

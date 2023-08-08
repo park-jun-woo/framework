@@ -1,4 +1,8 @@
 <?php
+namespace core;
+
+use Parkjunwoo;
+
 class Request{
 	protected Parkjunwoo $man;
 	protected User $user;

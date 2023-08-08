@@ -1,7 +1,7 @@
 <?php
-namespace models;
+namespace model;
 
-use utils\Debug;
+use util\Debug;
 
 class Papago{
 	protected static Papago $instance;

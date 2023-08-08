@@ -1,8 +1,8 @@
 <?php
-namespace utils;
+namespace util;
 
 class File{
-	protected const MAP = ["0","1","2","3","4","5","6","7","8","9","a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z","-","_"];
+	protected const MAP = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_";
 	/**
 	 * 지정한 경로에 텍스트를 덮어쓰기로 저장해준다.
 	 * 덮어 쓰기이므로 멀티쓰레드 기능은 제공하지 않는다.
