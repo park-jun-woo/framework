@@ -93,17 +93,14 @@ class Setup{
 	protected function path(string $source){
 		$this->log("경로 설정");
 		//루트 경로
+		$path = $this->bml->path->attributes();
 		$root = realpath(str_replace(basename($source),"",realpath($source))).DIRECTORY_SEPARATOR;
-		$this->root = isset($this->bml->path->root)?(string)$this->bml->path->root:"";
+		$this->root = isset($path->root)?(string)$path->root:"";
 		$this->root = realpath((substr($this->root,0,1)===DIRECTORY_SEPARATOR)?$this->root:$root.$this->root).DIRECTORY_SEPARATOR;
 		$this->log("Root: {$this->root}");
 		$this->code["path"]["root"] = $this->root;
-		$this->code["path"]["upload"] = $this->root.(isset($this->bml->path->upload)?(string)$this->bml->path->upload:"upload".DIRECTORY_SEPARATOR);
-		$this->code["path"]["cache"] = $this->root.(isset($this->bml->path->cache)?(string)$this->bml->path->cache:"cache".DIRECTORY_SEPARATOR);
-		$this->code["path"]["log"] = $this->root.(isset($this->bml->path->log)?(string)$this->bml->path->log:"log".DIRECTORY_SEPARATOR);
-		$this->code["path"]["request"] = $this->root.(isset($this->bml->path->request)?(string)$this->bml->path->request:"log".DIRECTORY_SEPARATOR."request".DIRECTORY_SEPARATOR);
-		$this->code["path"]["session"] = $this->root.(isset($this->bml->path->session)?(string)$this->bml->path->session:"log".DIRECTORY_SEPARATOR."session".DIRECTORY_SEPARATOR);
-		$this->code["path"]["blacklist"] = $this->root.(isset($this->bml->path->blacklist)?(string)$this->bml->path->blacklist:"log".DIRECTORY_SEPARATOR."blacklist".DIRECTORY_SEPARATOR);
+		$this->code["path"]["upload"] = $this->root.(isset($path->upload)?(string)$path->upload:"upload".DIRECTORY_SEPARATOR);
+		$this->code["path"]["data"] = $this->root.(isset($path->data)?(string)$path->data:"data".DIRECTORY_SEPARATOR);
 	}
 	/**
 	 * 권한 설정
@@ -133,8 +130,9 @@ class Setup{
 	 */
 	protected function config(){
 		$this->log("설정값 설정");
-		$this->code["config"]["token-expire"] = isset($this->bml->config->{"token-expire"})?(int)$this->bml->config->{"token-expire"}:3600;
-		$this->code["config"]["session-expire"] = isset($this->bml->config->{"session-expire"})?(int)$this->bml->config->{"session-expire"}:15552000;
+		$config = $this->bml->config->attributes();
+		$this->code["config"]["token-expire"] = isset($config->{"token-expire"})?(int)$config->{"token-expire"}:3600;
+		$this->code["config"]["session-expire"] = isset($config->{"session-expire"})?(int)$config->{"session-expire"}:15552000;
 	}
 	/**
 	 * 언어팩 설정
