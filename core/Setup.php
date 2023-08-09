@@ -30,7 +30,7 @@ class Setup{
 			"domain-app"=>[],
 		];
 		//경로 설정
-		$this->path();
+		$this->path($source);
 		//권한 설정
 		$this->permission();
 		//설정값 설정
@@ -90,7 +90,7 @@ class Setup{
 	/**
 	 * 경로 설정
 	 */
-	protected function path(){
+	protected function path(string $source){
 		$this->log("경로 설정");
 		//루트 경로
 		$root = realpath(str_replace(basename($source),"",realpath($source))).DIRECTORY_SEPARATOR;
