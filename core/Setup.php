@@ -123,7 +123,12 @@ class Setup{
 			}
 		}
 		//권한명-권한 배열
-		foreach($this->code["permission"] as $key=>$value){$this->code["user"][$value] = $key;}
+		$permission = [];
+		foreach($this->code["permission"] as $key=>$value){
+			$this->code["user"][$value] = 1<<$key;
+			$permission[1<<$key] = $value;
+		}
+		$this->code["permission"] = $permission;
 	}
 	/**
 	 * 설정값 설정
