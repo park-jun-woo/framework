@@ -27,19 +27,21 @@ class Zeolite extends Model{
 		$this->user = $this->man->user();
 	}
 	
-	public function get(array $query){
+	public function options():array{return ["get","post","put","delete"];}
+	
+	public function get(array $entity, array $where){
 		
 	}
 	
-	public function post(){
+	public function post(array $entity, array $data){
 		
 	}
 	
-	public function put(){
+	public function put(array $entity, array $data, array $where){
 		
 	}
 	
-	public function delete(){
+	public function delete(array $entity, array $where){
 		
 	}
 	

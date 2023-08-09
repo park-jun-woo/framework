@@ -2,9 +2,9 @@
 namespace core;
 
 abstract class Model{
-	protected array $enableMethods;
-	abstract public function get(array $query);
-	abstract public function post();
-	abstract public function put();
-	abstract public function delete();
+	abstract public function options():array;
+	abstract public function get(array $entity, array $where):array;
+	abstract public function post(array $entity, array $data):int;
+	abstract public function put(array $entity, array $data, array $where):bool;
+	abstract public function delete(array $entity, array $where):bool;
 }
