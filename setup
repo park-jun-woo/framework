@@ -1,4 +1,3 @@
-#!/usr/local/bin/php -q
 <?php
 require "core/Setup.php";
 require "util/Debug.php";
@@ -9,7 +8,7 @@ use core\Setup;
 use util\Debug;
 
 switch(count($argv)){
-	default:Debug::error("사용법: setup /home/sample/source/sample.bml");
+	default:Debug::error("사용법: php setup /home/sample/source/sample.bml");
 	case 2:new Setup($argv[1]);;break;
 }
 ?>
