@@ -96,6 +96,7 @@ class Setup{
 		$root = realpath(str_replace(basename($source),"",realpath($source))).DIRECTORY_SEPARATOR;
 		$this->root = isset($this->bml->path->root)?(string)$this->bml->path->root:"";
 		$this->root = realpath((substr($this->root,0,1)===DIRECTORY_SEPARATOR)?$this->root:$root.$this->root).DIRECTORY_SEPARATOR;
+		$this->log("Root: {$this->root}");
 		$this->code["path"]["root"] = $this->root;
 		$this->code["path"]["upload"] = $this->root.(isset($this->bml->path->upload)?(string)$this->bml->path->upload:"upload".DIRECTORY_SEPARATOR);
 		$this->code["path"]["cache"] = $this->root.(isset($this->bml->path->cache)?(string)$this->bml->path->cache:"cache".DIRECTORY_SEPARATOR);
