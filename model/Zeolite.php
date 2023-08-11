@@ -55,7 +55,7 @@ class Zeolite extends Model{
 				else if(is_string($value)){return pack("J", strtotime($value));}
 				return;
 			case "ip":
-				return pack("J", ip2long($value));
+				return pack("N", ip2long($value));
 			case "text":
 		}
 		
