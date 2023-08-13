@@ -60,9 +60,11 @@ class Setup{
 		//PHP 버전 확인
 		if(!version_compare(PHP_VERSION, "8.0.0", ">=")){Debug::error("Parkjunwoo 프레임워크는 PHP 8.0 이상에서 정상적으로 동작합니다.");}
 		//APCU 사용 가능 여부 확인
-		if(!function_exists("apcu_enabled")){Debug::error("APCU 모듈을 설치해주세요.");}
+		if(!extension_loaded("apcu")){Debug::error("APCU 모듈을 설치해주세요.");}
+		//세마포어 설치 여부 확인
+		if(!extension_loaded("sysvsem")){Debug::error("세마포어 모듈을 설치해주세요.");}
 		//Imagick 설치 여부 확인
-		if(!extension_loaded("imagick")){Debug::error("Imagick을 설치해주세요.");}
+		if(!extension_loaded("imagick")){Debug::error("Imagick 모듈을 설치해주세요.");}
 	}
 	/**
 	 * 소스파일 불러오기

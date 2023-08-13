@@ -163,12 +163,12 @@ class User{
 		];
 		//세션정보 객체 초기화
 		$this->data = [
-			"up"=>self::GUEST,
+			"permission"=>self::GUEST,
 			"ip"=>ip2long($_SERVER["REMOTE_ADDR"]),
-			"fr"=>isset($_SERVER["HTTP_REFERER"])?$_SERVER["HTTP_REFERER"]:"",
-			"ra"=>isset($_SERVER["HTTP_USER_AGENT"])?$_SERVER["HTTP_USER_AGENT"]:"",
-			"rl"=>isset($_SERVER["HTTP_ACCEPT_LANGUAGE"])?$_SERVER["HTTP_ACCEPT_LANGUAGE"]:"",
-			"tt"=>$sessionTime,
+			"first-referer"=>isset($_SERVER["HTTP_REFERER"])?$_SERVER["HTTP_REFERER"]:"",
+			"user-agent"=>isset($_SERVER["HTTP_USER_AGENT"])?$_SERVER["HTTP_USER_AGENT"]:"",
+			"user-language"=>isset($_SERVER["HTTP_ACCEPT_LANGUAGE"])?$_SERVER["HTTP_ACCEPT_LANGUAGE"]:"",
+			"token-time"=>$sessionTime,
 		];
 		$this->change = true;
 	}
@@ -225,7 +225,7 @@ class User{
 		$this->data = $data;
 		//토큰 신규 생성
 		$this->token = hash("sha256",($tokenTime = time()).$this->session["session"]);
-		$this->data["tt"] = $tokenTime;
+		$this->data["token-time"] = $tokenTime;
 		$this->change = true;
 	}
 	/**

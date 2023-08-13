@@ -18,7 +18,7 @@ use core\Model;
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
-class Zeolite extends Model{
+class Zeolite{
 	protected Parkjunwoo $man;
 	protected User $user;
 	
@@ -27,25 +27,27 @@ class Zeolite extends Model{
 		$this->user = $this->man->user();
 	}
 	
-	public function options():array{return ["get","post","put","delete"];}
+	public function options():array{
+		return ["get","post","put","delete"];
+	}
 	
-	public function get(array $entity, array $where){
+	public function get(string $entity, array $where){
 		
 	}
 	
-	public function post(array $entity, array $data){
+	public function post(string $entity, array $data){
 		
 	}
 	
-	public function put(array $entity, array $data, array $where){
+	public function put(string $entity, array $data, array $where){
 		
 	}
 	
-	public function delete(array $entity, array $where){
+	public function delete(string $entity, array $where){
 		
 	}
 	
-	protected static function pack(array &$attirute, $value) {
+	protected function pack(array &$attirute, $value) {
 		switch($attirute["define"]){
 			case "key":
 			case "permission":
