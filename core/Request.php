@@ -35,14 +35,12 @@ class Request{
 		if(array_key_exists("language",$_GET) && $_GET["language"]!=""){
 			$language = $_GET["language"];
 			$this->user->set("language",$language);
-		}else if(array_key_exists("lang",$_GET) && $_GET["lang"]!=""){
-			$language = $_GET["lang"];
-			$this->user->set("language",$language);
 		}else if($this->user->is("language")){
 			$language = $this->user->get("language");
 		}else if($languageList[0]!=""){$language = $languageList[0];}
 		else{$language = "ko";}
 		$this->locale = strtolower($language);
+		/*
 		//구문 분석된 주소에 대한 컨트롤러를 생성하고 리소스 메서드를 호출
 		if($this->man->isRouter($this->method, $this->type)){
 			$router = $this->man->router($this->method, $this->type);
@@ -73,22 +71,9 @@ class Request{
 				}
 			}
 		}
+		*/
 		//라우터를 찾을 수 없다면 404
 		if(!isset($this->route)){$this->route = "404";$this->sequences = [["method"=>"view","layout"=>"none","view"=>"404"]];}
-	}
-	/**
-	 * Parkjunwoo Framework 객체
-	 * @return Parkjunwoo
-	 */
-	public function man():Parkjunwoo{
-		return $this->man;
-	}
-	/**
-	 * 사용자 객체
-	 * @return User
-	 */
-	public function user():User{
-		return $this->user;
 	}
 	/**
 	 * URI

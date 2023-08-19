@@ -52,18 +52,16 @@ class Parkjunwoo{
 		$this->user = new User($this);
 		//요청 분석
 		$this->request = new Request($this);
-		//파일 기반 캐시형 데이터베이스
+		//캐시형 데이터베이스
 		$this->model = new Zeolite($this);
 		//요청 실행
 		$this->controller = new Controller($this);
 	}
 	/**
-	 * Parkjunwoo Framework를 실행합니다.
-	 * @param array $app 실행할 어플리케이션 코드 배열
+	 * Parkjunwoo 객체
+	 * @return Parkjunwoo 맨 객체
 	 */
-	public static function walk(array $code){
-		if(!isset(self::$man)){new Parkjunwoo($code);}
-	}
+	public static function man():Parkjunwoo{return self::$man;}
 	/**
 	 * 사용자 세션 정보
 	 * @return User 사용자 객체
@@ -111,6 +109,13 @@ class Parkjunwoo{
 		if($key==""){return $this->thisApp;}
 		if(array_key_exists($key,$this->code["app"])){return $this->code["app"][$key];}
 		return false;
+	}
+	/**
+	 * 어플리케이션 번호
+	 * @return int 어플리케이션 번호
+	 */
+	public function key():int{
+		return $this->code["key"];
 	}
 	/**
 	 * 어플리케이션 이름

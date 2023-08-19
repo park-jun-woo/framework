@@ -27,18 +27,18 @@ class User{
 			return;
 		}
 		//APCU 메모리에 토큰이 등록되어 있지 않으면 만료된 것으로 보고 세션 로드 후 토큰 재발행
-		if(!apcu_exists($this->man->name()."-session-".$_COOKIE["t"])){
+		if(!apcu_exists($this->man->key()."s".$_COOKIE["t"])){
 			$this->load();
 			return;
 		}
 		//APCU 메모리 토큰으로 조회
-		$data = apcu_fetch($this->man->name()."-session-".$_COOKIE["t"]);
+		$data = apcu_fetch($this->man->key()."s".$_COOKIE["t"]);
 		//agent 값 일치 여부 확인, 일치하지 않으면 블랙 처리
-		if($_SERVER["HTTP_USER_AGENT"]!=$data["ra"]){
+		if($_SERVER["HTTP_USER_AGENT"]!=$data["user-agent"]){
 			$this->black(1, "토큰 HTTP_USER_AGENT 불일치");
 		}
 		//언어값 일치 여부 확인, 일치하지 않으면 블랙 처리
-		if($_SERVER["HTTP_ACCEPT_LANGUAGE"]!=$data["rl"]){
+		if($_SERVER["HTTP_ACCEPT_LANGUAGE"]!=$data["user-language"]){
 			$this->black(1, "토큰 HTTP_ACCEPT_LANGUAGE 불일치");
 		}
 		//IP가 달라졌다면 세션 로드 후 토큰 재발행.
@@ -53,13 +53,6 @@ class User{
 	 */
 	public function __destruct(){
 		if($this->change){$this->save();}
-	}
-	/**
-	 * Parkjunwoo Framework 객체
-	 * @return Parkjunwoo
-	 */
-	public function man():Parkjunwoo{
-		return $this->man;
 	}
 	/**
 	 * 사용자 접속한 IP
@@ -91,7 +84,7 @@ class User{
 	 * @return bool 성공 여부
 	 */
 	public function set(string $key, string $value):bool{
-		if(in_array($key, ["up","ip","fr","ra","rl","tt"])){return false;}
+		if(in_array($key, ["permission","ip","first-referer","user-agent","user-language","token-time"])){return false;}
 		$this->data[$key] = $value;
 		$this->change = true;
 		return true;
@@ -103,7 +96,7 @@ class User{
 	 */
 	public function check(int $permission):bool{
 		if($permission==0){return true;}
-		return ($this->data["up"] & $permission) !== 0;
+		return ($this->data["permission"] & $permission) !== 0;
 	}
 	/**
 	 * 권한 추가
@@ -111,7 +104,7 @@ class User{
 	 */
 	public function add(int $permission){
 		$this->session["permission"] |= $permission;
-		$this->data["up"] = $this->session["permission"];
+		$this->data["permission"] = $this->session["permission"];
 		$this->change = true;
 	}
 	/**
@@ -120,7 +113,7 @@ class User{
 	 */
 	public function remove(int $permission){
 		$this->session["permission"] &= ~$permission;
-		$this->data["up"] = $this->session["permission"];
+		$this->data["permission"] = $this->session["permission"];
 		$this->change = true;
 	}
 	/**
@@ -130,7 +123,7 @@ class User{
 	public function permissionNames():string{
 		$names = [];
 		foreach($this->man->permissions() as $key=>$value){
-			if(($this->data["up"] & $key)===$key){$names[] = $value;}
+			if(($this->data["permission"] & $key)===$key){$names[] = $value;}
 		}
 		return implode(",", $names);
 	}
@@ -140,7 +133,7 @@ class User{
 	 * @param string $log 로그 
 	 */
 	public function black(float $level,string $log){
-		apcu_store($this->man->name()."-blacklist-".$this->ip(), "", $level*3600);
+		apcu_store($this->man->key()."b".$this->ip(), "", $level*3600);
 		File::append($this->man->path("blacklist").$this->ip(), date("Y-m-d H:i:s")."\t{$log}\n");
 		exit;
 	}
@@ -159,7 +152,7 @@ class User{
 			"session"=>$sessionId,
 			"session-time"=>$sessionTime,
 			"server"=>ip2long($_SERVER["SERVER_ADDR"]),
-			"app"=>$this->man->name(),
+			"app"=>$this->man->key(),
 		];
 		//세션정보 객체 초기화
 		$this->data = [
@@ -192,7 +185,7 @@ class User{
 			"session"=>unpack("J", substr($decrypted, 8, 16))[1],
 			"session-time"=>unpack("J", substr($decrypted, 16, 8))[1],
 			"server"=>unpack("N", substr($decrypted, 24, 4))[1],
-			"app"=>unpack("a*", substr($decrypted, 28))[1],
+			"app"=>unpack("C", substr($decrypted, 28))[1],
 		];
 		//세션 파일이 존재하지 않는다면 RSA 키 탈취 가능성 있으므로 리셋.
 		if(!file_exists($sessionPath = $this->man->path("session").base64_encode(pack("J", $session["session"])))){
@@ -206,7 +199,7 @@ class User{
 			$data[$key] = $value;
 		}
 		//세션 도메인 일치 여부 확인, 일치하지 않으면 블랙 처리
-		if($this->man->name()!=$session["app"]){
+		if($this->man->key()!=$session["app"]){
 			$this->black(1, "세션 도메인 불일치");
 		}
 		//agent 값 일치 여부 확인, 일치하지 않으면 블랙 처리
@@ -218,7 +211,7 @@ class User{
 			$this->black(1, "세션 HTTP_ACCEPT_LANGUAGE 불일치");
 		}
 		//토큰이 제시되었다면 생성시간과 세션 아이디를 sha256으로 인코딩하여 일치여부 확인
-		if(array_key_exists("t", $_COOKIE) && $_COOKIE["t"]!=hash("sha256",$data["tt"].$session["session"])){
+		if(array_key_exists("t", $_COOKIE) && $_COOKIE["t"]!=hash("sha256",$data["token-time"].$session["session"])){
 			$this->black(1, "토큰 불일치. 변조 가능성");
 		}
 		$this->session = $session;
@@ -233,7 +226,7 @@ class User{
 	 */
 	protected function save(){
 		//APCU 메모리에 토큰으로 세션 데이터 저장
-		apcu_store($this->man->name()."-session-".$this->token, $this->data, $this->man->config("token-expire"));
+		apcu_store($this->man->key()."s".$this->token, $this->data, $this->man->config("token-expire"));
 		//쿠키에 토큰 등록
 		setcookie("t", $this->token, time()+$this->man->config("token-expire"), "/", $this->man->domain(), true, true);
 		//쿠키에 세션 등록
@@ -241,7 +234,7 @@ class User{
 		$data .= pack("J", $this->session["session"]);
 		$data .= pack("J", $this->session["session-time"]);
 		$data .= pack("N", $this->session["server"]);
-		$data .= pack("a*", $this->session["app"]);
+		$data .= pack("C", $this->session["app"]);
 		$crypted = "";
 		openssl_public_encrypt($data, $crypted, $this->man->publicKey());
 		setcookie("s", base64_encode($crypted), time()+$this->man->config("session-expire"), "/", $this->man->domain(), true, true);

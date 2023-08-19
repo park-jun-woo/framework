@@ -16,19 +16,8 @@ class Setup{
 		$this->required();
 		//소스 불러오기
 		$this->load($source);
-		//코드 기본 골격
-		$this->code = [
-			"name"=>(string)$this->bml->name,
-			"description"=>isset($this->bml->description)?(string)$this->bml->description:(isset($this->bml->attributes()->description)?(string)$this->bml->attributes()->description:""),
-			"domain"=>(string)$this->bml->domain,
-			"path"=>[],
-			"config"=>[],
-			"permission"=>[0=>"member", 61=>"writer", 62=>"admin", 63=>"system"],
-			"user"=>["guest"=>0],
-			"message"=>[],
-			"app"=>[],
-			"domain-app"=>[],
-		];
+		//코드 골격
+		$this->code();
 		//경로 설정
 		$this->path($source);
 		//권한 설정
@@ -80,14 +69,127 @@ class Setup{
 		//소스코드 간단한 검증
 		if($this->bml===false){Debug::error("{$source}는 BML이 아닙니다. 올바른 BML 파일 경로를 입력해주세요.");}
 		if($this->bml->getName()!="project"){Debug::error("{$source}는 BML이 아닙니다. 올바른 BML 파일 경로를 입력해주세요.");}
-		if(!isset($this->bml->id) && !isset($this->bml->attributes()->id)){Debug::error("<project> 태그에 프로젝트 아이디를 id 속성이나 <id>태그로 입력하세요.");}
-		if(!isset($this->bml->name)){Debug::error("<name> 태그에 프로젝트 이름를 입력해 주세요.");}
+		
+		if(!isset($this->bml->id) && !isset($this->bml->attributes()->id))
+		{Debug::error("<project> 태그에 프로젝트 아이디를 id 속성이나 <id>태그에 입력하세요.");}
+		
+		if(!isset($this->bml->key) && !isset($this->bml->attributes()->key))
+		{Debug::error("<project> 태그에 프로젝트 번호를 key 속성이나 <key>태그에 1~64 사이의 정수로 입력하세요.");}
+		$key = isset($this->bml->key)?(string)$this->bml->key:(string)$this->bml->attributes()->key;
+		if(!is_numeric($key) || (int)$key<1 || (int)$key>64)
+		{Debug::error("<project> 태그에 프로젝트 번호를 key 속성이나 <key>태그에 1~64 사이의 정수로 입력하세요.");}
+		
+		if(!isset($this->bml->name) && !isset($this->bml->attributes()->name))
+		{Debug::error("<project> 태그에 프로젝트 아이디를 name 속성이나 <name>태그에 입력하세요.");}
+		
 		if(!isset($this->bml->domain)){Debug::error("<domain>.domain.com</domain>에 쿠키 설정에 입력할 도메인을 입력해 주세요.");}
 		if(!isset($this->bml->path)){Debug::error("<path> 태그를 작성해 주세요.");}
 		if(count($this->bml->path)>1){Debug::error("<path> 태그를 하나만 작성해 주세요.");}
 		if(!isset($this->bml->config)){Debug::error("<config> 태그를 작성해 주세요.");}
 		if(count($this->bml->config)>1){Debug::error("<config> 태그를 하나만 작성해 주세요.");}
 		if(!isset($this->bml->app)){Debug::error("<app> 태그를 적어도 하나 작성해 주세요.");}
+	}
+	/**
+	 * 코드 골격 생성
+	 */
+	protected function code(){
+		//코드 기본 골격
+		$this->code = [
+			"key"=>isset($this->bml->key)?(int)$this->bml->key:(int)$this->bml->attributes()->key,
+			"id"=>isset($this->bml->id)?(string)$this->bml->id:(string)$this->bml->attributes()->id,
+			"name"=>isset($this->bml->name)?(string)$this->bml->name:(string)$this->bml->attributes()->name,
+			"description"=>isset($this->bml->description)?(string)$this->bml->description:(isset($this->bml->attributes()->description)?(string)$this->bml->attributes()->description:""),
+			"domain"=>(string)$this->bml->domain,
+			"path"=>[],
+			"config"=>[],
+			"permission"=>[0=>"member", 61=>"writer", 62=>"admin", 63=>"system"],
+			"user"=>["guest"=>0],
+			"message"=>[],
+			"entity"=>[
+				[
+					"id"=>"user","route"=>"users","engine"=>"zeolite",
+					"write"=>["memory","file"],
+					"attributes"=>[
+						"key"=>["primary key"],
+						"permission"=>["permission"],
+						"join-time"=>["datetime"],
+					]
+				], [
+					"id"=>"token","route"=>"tokens","engine"=>"zeolite",
+					"write"=>["memory","file"],
+					"attributes"=>[
+						"user"=>["parent"],
+						"permission"=>["permission"],
+						"ip"=>["ip","N",16,4],
+						"first-referer"=>["text"],
+						"user-agent"=>["text"],
+						"user-language"=>["text"],
+						"token-time"=>["datetime"],
+					]
+				], [
+					"id"=>"session","route"=>"sessions","engine"=>"rsa",
+					"attributes"=>[
+						"permission"=>["permission"],
+						"session"=>["primary key"],
+						"session-time"=>["datetime"],
+						"server"=>["ip"],
+						"app"=>["unsigned char"],
+					]
+				], [
+					"id"=>"request","route"=>"requests","engine"=>"log",
+					"write"=>["file"],
+					"attributes"=>[
+						"user"=>["parent"],
+						"request-time"=>["datetime"],
+						"uri"=>["uri"],
+					]
+				],
+			],
+			"entity-keys"=>[],
+			"app"=>[],
+			"domain-app"=>[],
+		];
+	}
+	/**
+	 * 엔티티 설정
+	 */
+	protected function entity(){
+		
+		//엔티티 및 속성 코드 등록
+		$s = 0;
+		foreach($this->code["entity"] as &$entity){
+			if(array_key_exists("attributes", $entity)){
+				foreach($entity["attributes"] as &$attribute){
+					switch($attribute[0]){
+						case "primary key":
+						case "permission":
+						case "parent":
+						case "datetime":
+							$attribute[1] = "J";$attribute[2] = $s;$attribute[3] = 8;
+							break;
+						case "ip":
+							$attribute[1] = "N";$attribute[2] = $s;$attribute[3] = 4;
+							break;
+						case "unsigned char":
+							$attribute[1] = "C";$attribute[2] = $s;$attribute[3] = 1;
+							break;
+						case "uri":
+						case "text":
+							$attribute[1] = "JJ";$attribute[2] = $s;$attribute[3] = 8+8;
+							break;
+					}
+					if(isset($attribute[3])){$s += $attribute[3];}
+				}
+			}
+		}
+		$iu = 0;
+		foreach($this->code["entity"] as &$entity){
+			$this->code["entity-keys"][$entity["id"]] = $iu;
+			if(isset($entity["route"])){
+				$this->code["entity-keys"][$entity["route"]] = $iu;
+			}
+			$iu++;
+		}
 	}
 	/**
 	 * 경로 설정
