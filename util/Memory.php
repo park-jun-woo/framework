@@ -2,22 +2,29 @@
 namespace util;
 
 class Memory{
-	public static function get(int $key){
+	public static function get(string $key){
 		return apcu_fetch($key);
 	}
 	
-	public static function set(int $key, $value):int{
+	public static function set(string $key, $value):int{
 		
 		apcu_store($key, $value);
 	}
 	
-	public static function delete(int $key):bool{
+	public static function delete(string $key):bool{
 		return apcu_delete($key);
 	}
 	
-	public static function lock(int $key, int $operation, int &$wouldblock=null):bool{
+	public static function lock(string $key, int $operation, int &$wouldblock=null):bool{
 		switch($operation){
 			case LOCK_SH:
+				$countSem = sem_get("c".$key);
+				$lockSem = sem_get("l".$key);
+				if(sem_acquire($countSem)){
+					if(apcu_exists("c".$key) && apcu_fetch("c".$key)==0){
+						
+					}
+				}
 				break;
 			case LOCK_EX:
 				break;
