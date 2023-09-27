@@ -1,8 +1,8 @@
 <?php
-use core\Controller;
 use core\Model;
-use core\Request;
 use core\User;
+use core\Request;
+use core\Controller;
 use model\Zeolite;
 use util\File;
 use util\Security;
@@ -39,7 +39,7 @@ class Parkjunwoo{
 		spl_autoload_register([$this,"autoload"]);
 		//APCU 메모리에서 서버 배열을 불러올 수 없으면 리셋합니다.
 		if(!apcu_exists($this->code["name"]."-server")){$this->reset();}
-		$this->server = apcu_fetch($this->code["name"]."-server");
+		else{$this->server = apcu_fetch($this->code["name"]."-server");}
 		//블랙리스트 접속차단
 		if(apcu_exists($this->code["name"]."-blacklist-".$_SERVER["REMOTE_ADDR"])){
 			File::append($this->path("blacklist").$_SERVER["REMOTE_ADDR"], date("Y-m-d H:i:s")."\t접속차단\n");
