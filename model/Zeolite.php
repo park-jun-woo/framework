@@ -6,7 +6,7 @@ use core\User;
 use core\Model;
 
 /**
- * Zeolite는 웹 어플리케이션에서 별도의 데이터베이스 없이 파일 기반으로 직접 데이터베이스를 구축합니다.
+ * Zeolite는 웹 어플리케이션에서 별도의 데이터베이스 없이 파일 기반으로 직접 데이터베이스를 구축합니다. 외부 데이터베이스와 연동하는 것도 가능합니다.
  * PHP Version 8.0
  * @name Zeolite Version 1.0
  * @package Parkjunwoo
@@ -19,31 +19,55 @@ use core\Model;
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 class Zeolite{
-	protected Parkjunwoo $man;
-	protected User $user;
+	protected static Parkjunwoo $man;
 	
-	public function __construct(Parkjunwoo $man){
-		$this->man = $man;
-		$this->user = $this->man->user();
+	public static function init(Parkjunwoo $man){
+		self::$man = $man;
 	}
 	
-	public function options():array{
-		return ["get","post","put","delete"];
+	public static function entity(string $entity):Zeolite{
+		
+		return new Zeolite($entity);
 	}
 	
-	public function get(string $entity, array $where){
+	protected string $entity;
+	protected int $key;
+	protected array $where;
+	protected array $data;
+	protected array $paginate;
+	
+	protected function __construct(string $entity){
 		
 	}
 	
-	public function post(string $entity, array $data){
+	public function where(array $where):Zeolite{
+		
+		return $this;
+	}
+	
+	public function data(array $data):Zeolite{
+		
+		return $this;
+	}
+	
+	public function paginate():Zeolite{
+		
+		return $this;
+	}
+	
+	public function get():array{
 		
 	}
 	
-	public function put(string $entity, array $data, array $where){
+	public function post():int{
 		
 	}
 	
-	public function delete(string $entity, array $where){
+	public function put():bool{
+		
+	}
+	
+	public function delete():bool{
 		
 	}
 	

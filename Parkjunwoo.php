@@ -22,7 +22,7 @@ use util\Security;
  */
 class Parkjunwoo{
 	protected static Parkjunwoo $man;
-	protected Zeolite $model;
+	//protected Zeolite $model;
 	protected User $user;
 	protected Request $request;
 	protected Controller $controller;
@@ -49,7 +49,7 @@ class Parkjunwoo{
 		//현재 접속한 앱
 		$this->thisApp = $this->code["app"][$this->code["domain-app"][$_SERVER["SERVER_NAME"]]];
 		//캐시형 데이터베이스
-		$this->model = new Zeolite($this);
+		Zeolite::init($this);
 		//사용자 세션
 		$this->user = new User($this);
 		//요청 분석
