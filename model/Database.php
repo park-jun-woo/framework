@@ -6,9 +6,9 @@ use core\User;
 use core\Model;
 
 /**
- * Zeolite는 웹 어플리케이션에서 별도의 데이터베이스 없이 파일 기반으로 직접 데이터베이스를 구축합니다. 외부 데이터베이스와 연동하는 것도 가능합니다.
+ * Database는 웹 어플리케이션에서 별도의 데이터베이스 없이 파일 기반으로 직접 데이터베이스를 구축합니다. 외부 데이터베이스와 연동하는 것도 가능합니다.
  * PHP Version 8.0
- * @name Zeolite Version 1.0
+ * @name Database Version 1.0
  * @package Parkjunwoo
  * @see https://github.com/park-jun-woo/framework The Parkjunwoo GitHub project
  * @author Park Jun woo <mail@parkjunwoo.com>
@@ -18,16 +18,16 @@ use core\Model;
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
-class Zeolite{
+class Database{
 	protected static Parkjunwoo $man;
 	
 	public static function init(Parkjunwoo $man){
 		self::$man = $man;
 	}
 	
-	public static function entity(string $entity):Zeolite{
+	public static function table(string $entity):Database{
 		
-		return new Zeolite($entity);
+		return new Database($entity);
 	}
 	
 	protected string $entity;
@@ -36,21 +36,21 @@ class Zeolite{
 	protected array $data;
 	protected array $paginate;
 	
-	protected function __construct(string $entity){
+	public function __construct(string $entity){
 		
 	}
 	
-	public function where(array $where):Zeolite{
-		
-		return $this;
-	}
-	
-	public function data(array $data):Zeolite{
+	public function where(array $where):Database{
 		
 		return $this;
 	}
 	
-	public function paginate():Zeolite{
+	public function data(array $data):Database{
+		
+		return $this;
+	}
+	
+	public function paginate():Database{
 		
 		return $this;
 	}
