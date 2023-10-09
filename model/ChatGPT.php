@@ -19,19 +19,19 @@ class ChatGPT{
 		self::$instance = new ChatGPT($cachePath, $api_key);
 	}
 	public static function chat(int $model, $system, string $user, array $examples=array()){
-		return self::$instance->gpt_chat($model, $system, $user, $examples);
+		return self::$instance->gptChat($model, $system, $user, $examples);
 	}
 	public static function chat35($system, string $user, array $examples=array()){
-		return self::$instance->gpt_chat(self::MODEL_GPT35_TURBO, $system, $user, $examples);
+		return self::$instance->gptChat(self::MODEL_GPT35_TURBO, $system, $user, $examples);
 	}
 	public static function chat35_16k($system, string $user, array $examples=array()){
-		return self::$instance->gpt_chat(self::MODEL_GPT35_TURBO_16K, $system, $user, $examples);
+		return self::$instance->gptChat(self::MODEL_GPT35_TURBO_16K, $system, $user, $examples);
 	}
 	public static function chat4($system, string $user, array $examples=array()){
-		return self::$instance->gpt_chat(self::MODEL_GPT4, $system, $user, $examples);
+		return self::$instance->gptChat(self::MODEL_GPT4, $system, $user, $examples);
 	}
 	public static function chat4_32k($system, string $user, array $examples=array()){
-		return self::$instance->gpt_chat(self::MODEL_GPT4_32K, $system, $user, $examples);
+		return self::$instance->gptChat(self::MODEL_GPT4_32K, $system, $user, $examples);
 	}
 	
 	protected string $path,$api_key;
@@ -90,7 +90,7 @@ class ChatGPT{
 		fclose($handle);
 	}
 	
-	protected function gpt_chat(int $model,$systemMessage,string $user,array $examples=array()){
+	protected function gptChat(int $model,$systemMessage,string $user,array $examples=array()){
 		Debug::trace("ChatGPT::chat(".self::$modelMap[$model].",{$systemMessage},{$user})","compile");
 		$system = $this->loadCache($systemMessage);
 		if(is_int($systemMessage)){$systemMessage = $this->systems[$system];}
