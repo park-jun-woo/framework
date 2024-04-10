@@ -57,6 +57,13 @@ class Parkjunwoo{
 		$this->controller = new Controller($this);
 	}
 	/**
+	 * Parkjunwoo Framework를 실행합니다.
+	 * @param array $code 실행할 어플리케이션 코드 배열
+	 */
+	public static function walk(array $code){
+		if(!isset(self::$man)){new Parkjunwoo($code);}
+	}
+	/**
 	 * Parkjunwoo 객체
 	 * @return Parkjunwoo 맨 객체
 	 */
