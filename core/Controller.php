@@ -17,7 +17,11 @@ class Controller{
         $this->man = $man;
         $this->user = $this->man->user();
         $this->request = $man->request();
-        
+        /*
+        foreach($this->request->route() as $sequence){
+            call_user_func_array([$this, $sequence["method"]], $sequence["params"]);
+        }
+        */
         $this->information();
     }
     
@@ -27,7 +31,7 @@ class Controller{
      * @param string $view 뷰 이름
      * @param mixed $data 뷰에 전달할 데이터
      */
-    protected function view(string $layout,string $view,$data=null){
+    protected function view(string $view,$data=null){
         
     }
     
@@ -59,12 +63,12 @@ agent{display: block;}
 agent::before{content: \"agent: \";}
 uri{display: block;}
 uri::before{content: \"uri: \";}
-route{display: block;}
-route::before{content: \"route: \";}
+routeKey{display: block;}
+routeKey::before{content: \"route-key: \";}
 method{display:block;}
 method::before{content: \"method: \";}
-type{display: block;}
-type::before{content: \"type: \";}
+contentType{display: block;}
+contentType::before{content: \"content-type: \";}
 locale{display: block;}
 locale::before{content: \"locale: \";}
 </style>
@@ -81,14 +85,14 @@ locale::before{content: \"locale: \";}
 <section>
 <h2>Request</h2>
 <uri>{$this->request->uri()}</uri>
-<route>{$this->request->route()}</route>
-<method>{$this->request->method()}</method>
-<type>{$this->request->type()}</type>
+<routeKey>{$this->request->routeKey()}</routeKey>
+<contentType>".["HTML","JSON"][$this->request->type()]."</contentType>
+<method>".["GET","POST","PUT","\DELETE"][$this->request->method()]."</method>
 <locale>{$this->request->locale()}</locale>
 </section>
 <section>
 <h2>Route</h2>
-<p>".Debug::print($this->request->sequences())."</p>
+<p>".Debug::print($this->request->route())."</p>
 </section>
 </body>
 </html>";

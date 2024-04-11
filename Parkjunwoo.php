@@ -133,8 +133,8 @@ class Parkjunwoo{
      * 세션 도메인
      * @return string 도메인
      */
-    public function serverName():string{
-        return $this->code["server-name"];
+    public function servername():string{
+        return $this->code["servername"];
     }
     /**
      * 어플리케이션 설정값

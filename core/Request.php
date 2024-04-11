@@ -6,8 +6,9 @@ use Parkjunwoo;
 class Request{
     protected Parkjunwoo $man;
     protected User $user;
-    protected string $uri, $route, $method, $type, $locale;
-    protected array $sequences;
+    protected string $uri, $routeKey, $locale;
+    protected int $method, $type;
+    protected array $route;
     /**
      * 요청 분석하는 생성자
      */
@@ -18,15 +19,19 @@ class Request{
         //URI 분석
         $this->uri = explode("?",$_SERVER["REQUEST_URI"])[0];
         //Method 분석
-        $this->method = strtolower($_SERVER["REQUEST_METHOD"]);
+        switch($_SERVER["REQUEST_METHOD"]){
+            case "GET":$this->method = Parkjunwoo::GET;break;
+            case "POST":$this->method = Parkjunwoo::POST;break;
+            case "PUT":$this->method = Parkjunwoo::PUT;break;
+            case "\DELETE":$this->method = Parkjunwoo::DELETE;break;
+        }
         //ContentType 분석
         if(array_key_exists("CONTENT_TYPE", $_SERVER)){
-            switch(strtolower($_SERVER["CONTENT_TYPE"])){
-                default:$this->type = "html";break;
-                case "json":case "application/json":$this->type = "json";break;
-                case "xml":case "application/xml":$this->type = "xml";break;
+            switch($_SERVER["CONTENT_TYPE"]){
+                default:$this->type = Parkjunwoo::HTML;break;
+                case "json":case "application/json":$this->type = Parkjunwoo::JSON;break;
             }
-        }else{$this->type = "html";}
+        }else{$this->type = Parkjunwoo::HTML;}
         //사용자 환경 언어 처리
         if(!array_key_exists("HTTP_ACCEPT_LANGUAGE",$_SERVER)){$_SERVER["HTTP_ACCEPT_LANGUAGE"] = "";}
         else{$languageList = explode("-",preg_split("[;,]",$_SERVER["HTTP_ACCEPT_LANGUAGE"])[0]);}
@@ -40,42 +45,23 @@ class Request{
         }else if($languageList[0]!=""){$language = $languageList[0];}
         else{$language = "ko";}
         $this->locale = strtolower($language);
-        /*
-        //구문 분석된 주소에 대한 컨트롤러를 생성하고 리소스 메서드를 호출
-        if($this->man->isRouter($this->method, $this->type)){
-            $router = $this->man->router($this->method, $this->type);
-            if(array_key_exists($this->uri, $router)){
-                //URI로 라우터 검색
-                $routeId = $this->uri;
-                $userRouter = $router[$this->uri];
-            }else{
-                //URI 패턴으로 라우터 검색
-                foreach($router as $pattern=>$sequences){
-                    if(substr($pattern, -1)!=="/"){$pattern .= "/";}$matches = null;
-                    $regex = "/^".preg_replace("/\[([^\/]+)\]/i", "(?P<$1>[^\/]+)", str_replace("/", "\/", $pattern))."$/i";
-                    if(preg_match($regex,$this->uri.(substr($this->uri, -1)!=="/"?"/":""),$matches)){
-                        foreach($matches as $key=>$value){if(is_string($key)){$_GET[$key] = $value;}}
-                        $routeId = $pattern;
-                        $userRouter = $sequences;
-                        break;
-                    }
-                }
-            }
-            //권한에 따른 라우터 최종 선택
-            if(isset($userRouter)){
-                foreach($userRouter as $permission=>$sequences){
-                    if($this->user->check($permission)){
-                        $this->route = $routeId;
-                        $this->sequences = $sequences;
-                    }
-                }
-            }
+        //URI 분석 후 라우트
+        $route = "";
+        $exploded = explode("/",$this->uri);
+        $len = count($exploded);
+        for($iu=1;$iu<$len;$iu++){
+            if($iu%2==1){$route .= "/".$exploded[$iu];}
+            else if(is_numeric($exploded[$iu])){$route .= "/[{$exploded[$iu-1]}]";}
+            else{$route .= "/".$exploded[$iu];}
         }
-        */
-        //라우터를 찾을 수 없다면 404
-        if(!isset($this->route)){
-            $this->route = "404";
-            $this->sequences = [["method"=>"view","layout"=>"none","view"=>"404"]];
+        $router = $this->man->router($this->type, $this->method);
+        if(array_key_exists($route, $router)){
+            $this->routeKey = $route;
+            $this->route = $router[$route];
+        }
+        if(!isset($this->routeKey)){
+            $this->routeKey = $route;//"404";
+            $this->route = [["method"=>"view","view"=>"404"]];
         }
     }
     /**
@@ -89,8 +75,8 @@ class Request{
      * 라우트 패턴
      * @return string 패턴
      */
-    public function route():string{
-        return $this->route;
+    public function routeKey():string{
+        return $this->routeKey;
     }
     /**
      * HTTP 메서드
@@ -117,8 +103,8 @@ class Request{
      * 시퀀스 배열
      * @return array 시퀀스 배열
      */
-    public function sequences():array{
-        return $this->sequences;
+    public function route():array{
+        return $this->route;
     }
 }
 ?>
