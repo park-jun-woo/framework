@@ -1,6 +1,7 @@
 <?php
 namespace util;
 
+use util\Debug;
 use Imagick;
 use ImagickPixel;
 use ImagickException;
@@ -32,7 +33,7 @@ class Image{
             //이미지를 파일에 쓰기
             $image->writeImage($resizePath);
         }catch(ImagickException $e) {
-            error($e->getMessage());
+            Debug::error($e->getMessage());
         }
     }
 }

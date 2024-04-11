@@ -73,7 +73,10 @@ class Request{
         }
         */
         //라우터를 찾을 수 없다면 404
-        if(!isset($this->route)){$this->route = "404";$this->sequences = [["method"=>"view","layout"=>"none","view"=>"404"]];}
+        if(!isset($this->route)){
+            $this->route = "404";
+            $this->sequences = [["method"=>"view","layout"=>"none","view"=>"404"]];
+        }
     }
     /**
      * URI
