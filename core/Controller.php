@@ -17,12 +17,22 @@ class Controller{
         $this->man = $man;
         $this->user = $this->man->user();
         $this->request = $man->request();
-        /*
+        
         foreach($this->request->route() as $sequence){
-            call_user_func_array([$this, $sequence["method"]], $sequence["params"]);
+            switch($sequence["method"]){
+            case "permission":
+                $this->permission($sequence["permission"]);
+                break;
+            }
         }
-        */
+
         $this->information();
+    }
+
+    protected function permission(int $permission){
+        if($this->user->permission($permission)){
+
+        }
     }
     
     /**
