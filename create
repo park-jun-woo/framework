@@ -1,6 +1,6 @@
 <?php
 switch(count($argv)){
-    default:Debug::error("사용법: php create sample");exit;
+    default:echo "사용법: php create sample";exit;
     case 2:
         $project = $argv[1];
         $path_root = realpath(getcwd().DIRECTORY_SEPARATOR."..");
