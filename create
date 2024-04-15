@@ -1,4 +1,7 @@
 <?php
+require "util/File.php";
+use util\File;
+
 switch(count($argv)){
     default:echo "사용법: php create sample\n";exit;
     case 2:
@@ -12,245 +15,64 @@ switch(count($argv)){
         break;
 }
 
-echo "CREATE PROJECT '$project' on ".$path;
-mkdir($path);
-mkdir($path.DIRECTORY_SEPARATOR."data");
-mkdir($path.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR."blacklist");
-mkdir($path.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR."cache");
-mkdir($path.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR."session");
-mkdir($path.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR."upload");
-mkdir($path.DIRECTORY_SEPARATOR."source");
-mkdir($path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."admin");
-mkdir($path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."public");
+echo "CREATE PROJECT '$project' on $path\n";
 
-write($path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."app.bson","{
-    \"entities\":[
-        {
-            \"name\":\"members\",\"title\":\"회원\",\"attributes\":[
-                {\"define\":\"text\",\"name\":\"id\",\"title\":\"아이디\",\"required\":\"yes\",\"options\":{
-                    \"required\":{\"ko\":\"아이디를 입력하세요.\"},
-                    \"min:3\":{\"ko\":\"아이디는 :min글자 이상만 가능합니다.\"},
-                    \"max:60\":{\"ko\":\"아이디는 :max글자까지만 가능합니다.\"},
-                    \"regex:/^{a-zA-Z0-9\\-_.}+$/\":{\"ko\":\"아이디는 영문, 숫자, 일부 특수문자(-_.)만 가능합니다.\"}
-                }},
-                {\"define\":\"password\",\"name\":\"password\",\"title\":\"비밀번호\",\"required\":\"yes\",\"encryption\":\"sha512\"},
-                {\"define\":\"text\",\"name\":\"name\",\"title\":\"이름\",\"required\":\"yes\",\"max\":60,\"regex\":\"\/^{a-zA-Z0-9\\-_.}+$/\"},
-                {\"define\":\"email\",\"name\":\"email\",\"title\":\"이메일\",\"required\":\"yes\"},
-                {\"define\":\"gender\",\"name\":\"gender\",\"title\":\"성별\",\"required\":\"no\"},
-                {\"define\":\"boolean\",\"name\":\"pause\",\"title\":\"정지\",\"default\":\"no\"},
-                {\"define\":\"boolean\",\"name\":\"removed\",\"title\":\"강퇴\",\"default\":\"no\"},
-                {\"define\":\"datetime\",\"name\":\"create_date\",\"title\":\"가입일\",\"datetype\":\"solar\",\"timezone\":\"Asia/Seoul\",\"format\":\"Y-m-d H:i:s\"},
-                {\"define\":\"latest\",\"name\":\"latest_login\",\"title\":\"최근 로그인\",\"entity\":\"logins\",\"attribute\":\"login_date\",\"condition\":\"succeeded='yes'\"},
-                {\"define\":\"latest\",\"name\":\"latest_logout\",\"title\":\"최근 로그아웃\",\"entity\":\"logins\",\"attribute\":\"logout_date\",\"condition\":\"succeeded='yes'\"},
-                {\"define\":\"latest\",\"name\":\"latest_password\",\"title\":\"최근 비밀번호 변경\",\"entity\":\"passwords\",\"attribute\":\"write_date\"}
-            ]
-        },
-        {
-            \"name\":\"devices\",\"title\":\"회원 접속기기\",\"attributes\":[
-                {\"define\":\"text\",\"name\":\"sessionid\",\"title\":\"세션아이디\",\"required\":\"yes\",\"max\":1023},
-                {\"define\":\"text\",\"name\":\"name\",\"title\":\"기기명\",\"required\":\"no\",\"max\":64},
-                {\"define\":\"text\",\"name\":\"modelname\",\"title\":\"모델명\",\"required\":\"no\",\"max\":64},
-                {\"define\":\"text\",\"name\":\"os\",\"title\":\"운영체제\",\"required\":\"no\",\"max\":64},
-                {\"define\":\"text\",\"name\":\"browser\",\"title\":\"브라우저\",\"required\":\"no\",\"max\":64},
-                {\"define\":\"parent\",\"name\":\"member\",\"title\":\"회원\",\"required\":\"no\",\"entity\":\"members\",\"attributes\":[\"id\",\"name\"]},
-                {\"define\":\"app\",\"name\":\"app\",\"title\":\"접속앱\",\"required\":\"yes\"},
-                {\"define\":\"ip\",\"name\":\"ip\",\"title\":\"접속아이피\",\"required\":\"yes\"},
-                {\"define\":\"geometry\",\"name\":\"location\",\"title\":\"접속위치\",\"required\":\"no\"},
-                {\"define\":\"referer\",\"name\":\"referer\",\"title\":\"리퍼러\",\"required\":\"yes\"},
-                {\"define\":\"datetime\",\"name\":\"create_date\",\"title\":\"등록일\",\"datetype\":\"solar\",\"timezone\":\"Asia/Seoul\",\"format\":\"Y-m-d H:i:s\"}
-            ]
-        },
-        {
-            \"name\":\"passwords\",\"title\":\"비밀번호 변경기록\",\"attributes\":[
-                {\"define\":\"password\",\"name\":\"password\",\"title\":\"비밀번호\",\"required\":\"yes\",\"encryption\":\"sha512\"},
-                {\"define\":\"parent\",\"name\":\"member\",\"title\":\"회원\",\"required\":\"yes\",\"entity\":\"members\",\"attributes\":[\"id\",\"name\"]},
-                {\"define\":\"parent\",\"name\":\"device\",\"title\":\"접속기기\",\"required\":\"yes\",\"entity\":\"devices\",\"attributes\":[\"sessionid\",\"name\"]},
-                {\"define\":\"ip\",\"name\":\"ip\",\"title\":\"접속아이피\",\"required\":\"yes\"},
-                {\"define\":\"geometry\",\"name\":\"location\",\"title\":\"접속위치\",\"required\":\"no\"},
-                {\"define\":\"referer\",\"name\":\"referer\",\"title\":\"리퍼러\",\"required\":\"yes\"},
-                {\"define\":\"datetime\",\"name\":\"create_date\",\"title\":\"등록일\",\"datetype\":\"solar\",\"timezone\":\"Asia/Seoul\",\"format\":\"Y-m-d H:i:s\"}
-            ]
-        },
-        {
-            \"name\":\"history\",\"title\":\"회원 기록\",\"attributes\":[
-                {\"define\":\"text\",\"name\":\"content\",\"title\":\"내용\",\"required\":\"yes\"},
-                {\"define\":\"parent\",\"name\":\"member\",\"title\":\"회원\",\"required\":\"yes\",\"entity\":\"members\",\"attributes\":[\"id\",\"name\"]},
-                {\"define\":\"parent\",\"name\":\"device\",\"title\":\"접속기기\",\"required\":\"yes\",\"entity\":\"devices\",\"attributes\":[\"sessionid\",\"name\"]},
-                {\"define\":\"parent\",\"name\":\"writer\",\"title\":\"작성자\",\"required\":\"yes\",\"entity\":\"members\",\"attributes\":[\"id\",\"name\"]},
-                {\"define\":\"ip\",\"name\":\"ip\",\"title\":\"접속아이피\",\"required\":\"yes\"},
-                {\"define\":\"geometry\",\"name\":\"location\",\"title\":\"접속위치\",\"required\":\"no\"},
-                {\"define\":\"referer\",\"name\":\"referer\",\"title\":\"리퍼러\",\"required\":\"yes\"},
-                {\"define\":\"datetime\",\"name\":\"create_date\",\"title\":\"등록일\",\"datetype\":\"solar\",\"timezone\":\"Asia/Seoul\",\"format\":\"Y-m-d H:i:s\"}
-            ]
-        }
-    ],
-    \"admin\":{
-        \"/\":{
-            \"get\":{
-                \"permission\":[\"guest\"],\"code\":[
-                    {\"method\":\"result\",\"html\":\"welcome\"}
-                ]
-            }
-        },
-        \"/login\":{
-            \"post\":{
-                \"permission\":[\"admin\"],\"code\":[
-                    {\"method\":\"validate\",\"exit\":\"yes\",\"value\":{
-                        \"id\":{
-                            \"required\":{\"ko\":\"아이디를 입력해주세요.\"},
-                            \"min:3\":{\"ko\":\"아이디는 적어도 :min글자 이상 가능합니다.\"},
-                            \"max:60\":{\"ko\":\"아이디는 :max글자까지만 가능합니다.\"},
-                            \"regex:/^{a-zA-Z0-9\\-_.}+$/\":{\"ko\":\"아이디는 영문, 숫자, 일부 특수문자(-_.)만 가능합니다.\"}
-                        },
-                        \"password\":{
-                            \"required\":{\"ko\":\"비밀번호를 입력해주세요.\"}
-                        }
-                    }},
-                    {\"method\":\"get\",\"entity\":\"members\",\"condition\":\"id=request.id\",\"result\":\"member\"},
-                    {\"method\":\"empty\",\"exit\":\"yes\",\"value\":{
-                        \"result.member\":{\"ko\":\"아이디가 없거나 비밀번호가 틀렸습니다.\"}
-                    }},
-                    {\"method\":\"post\",\"entity\":\"login\",\"value\":{
-                        \"member\":\"result.member\",
-                        \"succeeded\":\"no\",
-                        \"login_date\":\"now()\",
-                        \"logout\":\"no\",
-                        \"logout_date\":\"now()\",
-                        \"ip\":\"user.ip\",
-                        \"referer\":\"user.referer\",
-                        \"location\":\"user.location\"
-                    }},
-                    {\"method\":\"try\",\"count\":5,\"period\":3600,\"value\":{
-                        \"message\":{\"ko\":\"로그인 5회 틀렸습니다.\"}
-                    }},
-                    {\"method\":\"password\",\"exit\":\"yes\",\"value\":{
-                        \"result.member=password\":{\"ko\":\"아이디가 없거나 비밀번호가 틀렸습니다.\"}
-                    }},
-                    {\"method\":\"result\",\"redirect\":\"/home\"}
-                ]
-            }
-        },
-        \"/home\":{
-            \"get\":{
-                \"permission\":[\"admin\"],\"code\":[
-                    {\"method\":\"result\",\"html\":\"home\"}
-                ]
-            }
-        },
-    },
-    \"public\":{
-        \"/\":{
-            \"get\":{
-                \"permission\":[\"guest\"],\"code\":[
-                    {\"method\":\"result\",\"html\":\"welcome\"}
-                ]
-            }
-        },
-        \"/login\":{
-            \"post\":{
-                \"permission\":[\"admin\"],\"code\":[
-                    {\"method\":\"validate\",\"exit\":\"yes\",\"value\":{
-                        \"id\":{
-                            \"required\":{\"ko\":\"아이디를 입력해주세요.\"},
-                            \"min:3\":{\"ko\":\"아이디는 적어도 :min글자 이상 가능합니다.\"},
-                            \"max:60\":{\"ko\":\"아이디는 :max글자까지만 가능합니다.\"},
-                            \"regex:/^{a-zA-Z0-9\\-_.}+$/\":{\"ko\":\"아이디는 영문, 숫자, 일부 특수문자(-_.)만 가능합니다.\"}
-                        },
-                        \"password\":{
-                            \"required\":{\"ko\":\"비밀번호를 입력해주세요.\"}
-                        }
-                    }},
-                    {\"method\":\"get\",\"entity\":\"members\",\"condition\":\"id=request.id\",\"result\":\"member\"},
-                    {\"method\":\"empty\",\"exit\":\"yes\",\"value\":{
-                        \"result.member\":{\"ko\":\"아이디가 없거나 비밀번호가 틀렸습니다.\"}
-                    }},
-                    {\"method\":\"post\",\"entity\":\"login\",\"value\":{
-                        \"member\":\"result.member\",
-                        \"succeeded\":\"no\",
-                        \"login_date\":\"now()\",
-                        \"logout\":\"no\",
-                        \"logout_date\":\"now()\",
-                        \"ip\":\"user.ip\",
-                        \"referer\":\"user.referer\",
-                        \"location\":\"user.location\"
-                    }},
-                    {\"method\":\"try\",\"count\":5,\"period\":3600,\"value\":{
-                        \"message\":{\"ko\":\"로그인 5회 틀렸습니다.\"}
-                    }},
-                    {\"method\":\"password\",\"exit\":\"yes\",\"value\":{
-                        \"result.member=password\":{\"ko\":\"아이디가 없거나 비밀번호가 틀렸습니다.\"}
-                    }},
-                    {\"method\":\"result\",\"redirect\":\"/home\"}
-                ]
-            }
-        },
-        \"/home\":{
-            \"get\":{
-                \"permission\":[\"admin\"],\"code\":[
-                    {\"method\":\"result\",\"html\":\"home\"}
-                ]
-            }
-        },
-    }
-}");
+if(!is_dir($path)){mkdir($path);}
+if(!is_dir($path.DIRECTORY_SEPARATOR."admin")){mkdir($path.DIRECTORY_SEPARATOR."admin");}
+if(!is_dir($path.DIRECTORY_SEPARATOR."public")){mkdir($path.DIRECTORY_SEPARATOR."public");}
+if(!is_dir($path.DIRECTORY_SEPARATOR."data")){mkdir($path.DIRECTORY_SEPARATOR."data");}
+if(!is_dir($path.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR."blacklist"))
+{mkdir($path.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR."blacklist");}
+if(!is_dir($path.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR."cache"))
+{mkdir($path.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR."cache");}
+if(!is_dir($path.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR."session"))
+{mkdir($path.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR."session");}
+if(!is_dir($path.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR."upload"))
+{mkdir($path.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR."upload");}
+if(!is_dir($path.DIRECTORY_SEPARATOR."source")){mkdir($path.DIRECTORY_SEPARATOR."source");}
+if(!is_dir($path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."admin"))
+{mkdir($path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."admin");}
+if(!is_dir($path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."public"))
+{mkdir($path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."public");}
 
-write($path.DIRECTORY_SEPARATOR.".gitignore","/data/cache/*
-/data/upload/*
-/data/blacklist/*
-/data/session/*
-/.env");
+$createPath = $path.DIRECTORY_SEPARATOR.".env";
+if(!file_exists($createPath)){
+    $content = File::read("templates/env");
+    $content = str_replace([
+        "{{project}}","{{path.framework}}","{{path.root}}","{{path.source}}","{{path.data}}"
+    ],[
+        $project,getcwd(),$path,$path.DIRECTORY_SEPARATOR."source",$path.DIRECTORY_SEPARATOR."data"
+    ],$content);
+    File::write($createPath,$content);
+}
 
-write($path.DIRECTORY_SEPARATOR."setup","<?php
-\$env_path = \".env\";
-if(!file_exists(\$env_path)){echo \"Please make '.env'\\ncp .env.sample .env\";}
-\$env = parse_ini_file(\$env_path, TRUE);
+$createPath = $path.DIRECTORY_SEPARATOR.".gitignore";
+if(!file_exists($createPath)){
+    $content = File::read("templates/gitignore");
+    File::write($createPath,$content);
+}
 
-\$path = \$env[\"PATH_CORE\"].DIRECTORY_SEPARATOR;
-require \$path.\"core\".DIRECTORY_SEPARATOR.\"Setup.php\";
-require \$path.\"util\".DIRECTORY_SEPARATOR.\"Debug.php\";
-require \$path.\"util\".DIRECTORY_SEPARATOR.\"File.php\";
-require \$path.\"util\".DIRECTORY_SEPARATOR.\"Image.php\";
+$createPath = $path.DIRECTORY_SEPARATOR."make";
+if(!file_exists($createPath)){
+    $content = File::read("templates/make");
+    File::write($createPath,$content);
+}
 
-new core\Setup(\$env);
-?>");
+$createPath = $path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."app.bson";
+if(!file_exists($createPath)){
+    $content = File::read("templates/app.bson");
+    File::write($createPath,$content);
+}
 
-write($path.DIRECTORY_SEPARATOR.".env","PROJECT_NAME={$project}
-PROJECT_ENV=local
-PROJECT_DEBUG=true
+$createPath = $path.DIRECTORY_SEPARATOR."admin".DIRECTORY_SEPARATOR."index.php";
+if(!file_exists($createPath)){
+    $content = File::read("templates/index.php");
+    File::write($createPath,$content);
+}
 
-PATH_CORE=".$path_root.DIRECTORY_SEPARATOR."framework
-PATH_ROOT=".$path.DIRECTORY_SEPARATOR."
-PATH_SOURCE=".$path.DIRECTORY_SEPARATOR."source
-PATH_DATA=".$path.DIRECTORY_SEPARATOR."data
-
-[database]
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE={$project}
-DB_USERNAME={$project}
-DB_PASSWORD=1234
-
-[admin]
-TITLE=\"{$project} admin\"
-DOMAIN=localhost:8000
-SERVER_NAME=localhost
-TOKEN_EXPIRE=3600
-SESSION_EXPIRE=15552000
-
-[public]
-TITLE=\"{$project}\"
-DOMAIN=localhost
-SERVER_NAME=localhost
-TOKEN_EXPIRE=3600
-SESSION_EXPIRE=15552000
-");
-
-
-function write(string $path, string $content){
-    $handle = fopen($path, "wb+");
-    if(flock($handle, LOCK_EX)){fwrite($handle, $content);}
-    flock($handle, LOCK_UN);
-    fclose($handle);
+$createPath = $path.DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."index.php";
+if(!file_exists($createPath)){
+    $content = File::read("templates/index.php");
+    File::write($createPath,$content);
 }
 ?>
