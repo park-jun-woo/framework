@@ -1,4 +1,5 @@
 PROJECT_NAME={{project}}
+PROJECT_DESCRIPTION="This is {{project}}."
 PROJECT_ENV=local
 PROJECT_DEBUG=true
 

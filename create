@@ -37,42 +37,42 @@ if(!is_dir($path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."public"))
 
 $createPath = $path.DIRECTORY_SEPARATOR.".env";
 if(!file_exists($createPath)){
-    $content = File::read("templates/env");
-    $content = str_replace([
+    $template = File::read("template/env");
+    $template = str_replace([
         "{{project}}","{{path.framework}}","{{path.root}}","{{path.source}}","{{path.data}}"
     ],[
         $project,getcwd(),$path,$path.DIRECTORY_SEPARATOR."source",$path.DIRECTORY_SEPARATOR."data"
-    ],$content);
-    File::write($createPath,$content);
+    ],$template);
+    File::write($createPath,$template);
 }
 
 $createPath = $path.DIRECTORY_SEPARATOR.".gitignore";
 if(!file_exists($createPath)){
-    $content = File::read("templates/gitignore");
-    File::write($createPath,$content);
+    $template = File::read("template/gitignore");
+    File::write($createPath,$template);
 }
 
 $createPath = $path.DIRECTORY_SEPARATOR."make";
 if(!file_exists($createPath)){
-    $content = File::read("templates/make");
-    File::write($createPath,$content);
+    $template = File::read("template/make");
+    File::write($createPath,$template);
 }
 
-$createPath = $path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."app.bson";
+$createPath = $path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."code.php";
 if(!file_exists($createPath)){
-    $content = File::read("templates/app.bson");
-    File::write($createPath,$content);
+    $template = File::read("template/code.php");
+    File::write($createPath,$template);
 }
 
 $createPath = $path.DIRECTORY_SEPARATOR."admin".DIRECTORY_SEPARATOR."index.php";
 if(!file_exists($createPath)){
-    $content = File::read("templates/index.php");
-    File::write($createPath,$content);
+    $template = File::read("template/index.php");
+    File::write($createPath,$template);
 }
 
 $createPath = $path.DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."index.php";
 if(!file_exists($createPath)){
-    $content = File::read("templates/index.php");
-    File::write($createPath,$content);
+    $template = File::read("template/index.php");
+    File::write($createPath,$template);
 }
 ?>

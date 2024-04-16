@@ -47,11 +47,11 @@ class Debug{
      * @param int $icount 띄어쓰기 카운트
      * @return string 결과 문자열
      */
-    public static function print($array, string $indent="\t", string $eol=PHP_EOL, int $icount=1):string{
+    public static function print($array, string $indent="\t", string $eol=PHP_EOL, int $breakCols=140, int $icount=1):string{
         $result = "";$isSubArray = false;$isStringKey = false;$isOrderedKey = true;
         if($icount==1){$result .= (is_array($array)?"":get_class($array))."[";}
         $sortedArray = array();
-        $arrayCount = count($array);
+        $cols = self::countChars($array);
         foreach($array as $key=>$value){
             if(!is_array($value)){$sortedArray[$key] = $value;}
             if(is_string($key)){$isStringKey = true;$isOrderedKey = false;}
@@ -70,16 +70,35 @@ class Debug{
                 $result .= $isStringKey?"\"{$key}\"=>":($isOrderedKey?"":"{$key}=>");
                 $result .= is_array($value)?"":get_class($value);
                 $result .= "[";
-                $result .= self::print($value, $indent, $eol, $icount+1);
+                $result .= self::print($value, $indent, $eol, $breakCols, $icount+1);
                 $result .= "]";
             }else{
-                if(($isSubArray && $iu==0) || $arrayCount>4){$result .= $eol.str_repeat($indent,$icount);}
+                if(($isSubArray && $iu==0) || $cols>$breakCols){$result .= $eol.str_repeat($indent,$icount);}
                 $result .= $isStringKey?"\"{$key}\"=>":($isOrderedKey?"":"{$key}=>");
                 $result .= is_numeric($value)?$value:"\"{$value}\"";
             }
             $iu++;
         }
-        if($isSubArray || $arrayCount>4){$result .= $eol.str_repeat($indent,$icount-1);}
+        if($isSubArray || $cols>$breakCols){$result .= $eol.str_repeat($indent,$icount-1);}
         if($icount==1){$result .= "]";return $result;}else{return $result;}
+    }
+
+    /**
+     * 배열의 글자수를 구합니다.
+     * @param array $array 배열
+     * @return int 배열의 글자수
+     */
+    protected static function countChars($array){
+        $cols = 0;
+        foreach($array as $key=>$value){
+            if(is_array($value)){
+                $cols += self::countChars($value);
+            }else if(is_string($value)){
+                $cols += mb_strlen($key,"utf-8")+mb_strlen($value,"utf-8")+6;
+            }else{
+                $cols += mb_strlen($key,"utf-8")+mb_strlen(strval($value),"utf-8")+6;
+            }
+        }
+        return $cols;
     }
 }

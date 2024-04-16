@@ -1,0 +1,170 @@
+<?php
+$env_path = ".env";
+if(!file_exists($env_path)){echo "Please make '.env'\n";}
+$env = parse_ini_file($env_path, TRUE);
+
+$path_root = $env["PATH_ROOT"].DIRECTORY_SEPARATOR;
+$path_source = $env["PATH_SOURCE"].DIRECTORY_SEPARATOR;
+$path_core = $env["PATH_CORE"].DIRECTORY_SEPARATOR."core".DIRECTORY_SEPARATOR;
+$path_util = $env["PATH_CORE"].DIRECTORY_SEPARATOR."util".DIRECTORY_SEPARATOR;
+$path_template = $env["PATH_CORE"].DIRECTORY_SEPARATOR."template".DIRECTORY_SEPARATOR;
+$path_vendor = $env["PATH_CORE"].DIRECTORY_SEPARATOR."vendor".DIRECTORY_SEPARATOR;
+
+require_once $path_vendor."autoload.php";
+require_once $path_core."Setup.php";
+require_once $path_util."Debug.php";
+require_once $path_util."File.php";
+require_once $path_util."Image.php";
+
+use Doctrine\Inflector\InflectorFactory;
+use util\Debug;
+use util\File;
+
+if(file_exists($path_source."code.php")){include $path_source."code.php";}
+else{include $path_template."code.php";}
+
+switch($argv[1]){
+    default:
+        error("Invalid command!");
+        exit;
+    case "setup":
+        if(count($argv)!=2){error("Invalid arguments!\n'setup' must be 2 arvs.");}
+        require $env["PATH_CORE"].DIRECTORY_SEPARATOR."setup";
+        break;
+    case "user":
+        if(count($argv)!=3){error("Invalid arguments!\n'app' must be 3 arvs.");}
+        $userName = $argv[2];
+        if(array_key_exists($userName,$code["user"])){echo "The user code already has '{$userName}'.\n";exit;}
+        else{
+            $last = 0;
+            $users = [];
+            foreach($code["user"] as $user=>$permission){
+                switch($user){
+                    case "writer":case "admin":case "system":break;
+                    default:
+                        if($last<$permission){$last = $permission;}
+                        $users[$user] = $permission;
+                        break;
+                }
+            }
+            $users[$userName] = $last+1;
+            $users["writer"] = 2305843009213693952;
+            $users["admin"] = 4611686018427387904;
+            $users["system"] = -9223372036854775808;
+            $code["user"] = $users;
+        }
+        break;
+    case "app":
+        if(count($argv)!=3){error("Invalid arguments!\n'app' must be 3 arvs.");}
+        addApp($argv[2]);
+        break;
+    case "page":
+        switch(count($argv)){
+            default:error("Invalid arguments!\n'page' must be 3 or 4 arvs.");
+            case 3:addPage($argv[2]);break;
+            case 4:addPage($argv[3],$argv[2]);break;
+        }
+        break;
+    case "list":
+        if(count($argv)!=3){error("Invalid arguments!\n'page' must be 3 arvs.");}
+        addList($argv[2]);
+        break;
+}
+
+//code.php 저장하기
+$template = "<?php
+\$code = ".Debug::print($code,"    ").";
+?>";
+File::write($path_source."code.php",$template);
+
+//앱 추가
+function addApp($appName){
+    GLOBAL $env,$path_root,$path_source,$path_template,$code;
+    //앱 폴더 없으면 생성
+    if(!is_dir($path_root.$appName)){mkdir($path_root.$appName);}
+    if(!is_dir($path_root.$appName.DIRECTORY_SEPARATOR."images"))
+    {mkdir($path_root.$appName.DIRECTORY_SEPARATOR."images");}
+    if(!is_dir($path_source.$appName)){mkdir($path_source.$appName);}
+    if(!array_key_exists($appName,$code)){
+        include $path_template."app.php";
+        $code[$appName] = $appCode;
+    }
+    $template = File::read($path_template."index.php");
+    File::write($path_root.$appName.DIRECTORY_SEPARATOR."index.php",$template);
+}
+
+//페이지 추가
+function addPage($pageName,$appName=""){
+    GLOBAL $env,$path_root,$path_source,$path_template,$code;
+    $apps = [];
+    if($appName==""){
+        foreach($code as $key=>&$value){
+            switch($key){
+                case "user":case "entities":break;
+                default:array_push($apps,$key);break;
+            }
+        }
+    }else{
+        if(!array_key_exists($appName,$code)){addApp($appName);}
+        array_push($apps,$appName);
+    }
+
+    foreach($apps as $appName){
+        $path_app = $path_source.$appName.DIRECTORY_SEPARATOR;
+        $route = "/$pageName";
+        if(array_key_exists($route,$code[$appName])){echo "App code {$appName} already has '{$route}'.\n";}
+        else{
+            $code[$appName][$route] = [
+                "get"=>[
+                    "permission"=>[$appName=="admin"?"admin":"guest"],
+                    "code"=>[["method"=>"result","html"=>$pageName]]
+                ]
+            ];
+        }
+        //페이지 html 없으면 생성
+        $createPath = $path_app.$pageName.".html";
+        if(file_exists($createPath)){echo "{$createPath} already exists.\n";}
+        else{
+            $template = File::read($path_template."page.html");
+            $template = str_replace([
+                "{{title}}","{{description}}"
+            ],[
+                $env["PROJECT_NAME"],$env["PROJECT_DESCRIPTION"]
+            ],$template);
+            File::write($createPath,$template);
+        }
+    }
+}
+
+//목록 추가
+function addList($pageName){
+    GLOBAL $env,$path_root,$path_source,$path_template,$code;
+    $apps = [];
+    foreach($code as $key=>&$value){
+        switch($key){
+            case "user":case "entities":break;
+            default:array_push($apps,$key);break;
+        }
+    }
+    
+    $inflector = InflectorFactory::create()->build();
+    $singularizedName = $inflector->singularize($pageName)."\n";
+    $pluralizedName = $inflector->pluralize($pageName)."\n";
+
+    
+}
+
+function error(string $message){
+    if($message!=""){echo "Error: $message\n";}
+    echo "Usage: php make [command] [app] [page]\n";
+    echo "Ex: php make setup\n";
+    echo "Ex: php make page admin test\n";
+    echo "\n[Commands]\n";
+    echo "setup: Setup this application.\n";
+    echo "user: add user.\n";
+    echo "app: add application.\n";
+    echo "page: single page.\n";
+    echo "list: list pages.\n";
+    exit;
+}
+?>
