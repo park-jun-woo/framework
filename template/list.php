@@ -1,3 +1,60 @@
 <?php
-
+$listCode = [
+    "/$pName"=>[
+        "get"=>[
+            "permission"=>[$appName=="admin"?"admin":"guest"],
+            "code"=>[
+                ["method"=>"more","entity"=>"$pName","items"=>20,"result"=>"$pName"],
+                ["method"=>"get","entity"=>"$pName","result"=>"$pName"],
+                ["method"=>"result","html"=>"$pName","value"=>["result.$pName"]]
+            ]
+        ],
+        "post"=>[
+            "permission"=>[$appName=="admin"?"admin":"member"],
+            "code"=>[
+                ["method"=>"validate","exit"=>"yes","entity"=>"$pName","value"=>["name"]],
+                ["method"=>"post","entity"=>"$pName","value"=>["name"=>"request.name","create_date"=>"now()","update_date"=>"now()"]],
+                ["method"=>"result","redirect"=>"/$pName"]
+            ]
+        ]
+    ],
+    "/$pName/new"=>[
+        "get"=>[
+            "permission"=>[$appName=="admin"?"admin":"member"],
+            "code"=>[["method"=>"result","html"=>"new-$sName"]]
+        ]
+    ],
+    "/$pName/[$pName]"=>[
+        "get"=>[
+            "permission"=>[$appName=="admin"?"admin":"guest"],
+            "code"=>[
+                ["method"=>"validate","exit"=>"yes","entity"=>"$pName","value"=>["$pName"]],
+                ["method"=>"get","entity"=>"$pName","condition"=>"key=request.$pName","result"=>"$sName"],
+                ["method"=>"empty","exit"=>"yes","value"=>["result.$sName"=>["name"=>404]]],
+                ["method"=>"result","html"=>"detail-$sName","value"=>["result.$sName"]]
+            ]
+        ],
+        "put"=>[
+            "permission"=>[$appName=="admin"?"admin":"self"],
+            "code"=>[
+                ["method"=>"validate","exit"=>"yes","entity"=>"$pName","value"=>["$pName","name"]],
+                ["method"=>"get","entity"=>"$pName","condition"=>"key=request.$pName","result"=>"$sName"],
+                ["method"=>"empty","exit"=>"yes","value"=>["result.$sName"=>["name"=>404]]],
+                ["method"=>"put","entity"=>"$pName","condition"=>"key=request.$pName","value"=>["name"=>"request.name","update_date"=>"now()"]],
+                ["method"=>"result","redirect"=>"/$pName"]
+            ]
+        ]
+    ],
+    "/$pName/[$pName]/modify"=>[
+        "get"=>[
+            "permission"=>[$appName=="admin"?"admin":"self"],
+            "code"=>[
+                ["method"=>"validate","exit"=>"yes","entity"=>"$pName","value"=>["$pName"]],
+                ["method"=>"get","entity"=>"$pName","condition"=>"key=request.$pName","result"=>"$sName"],
+                ["method"=>"empty","exit"=>"yes","value"=>["result.$sName"=>["name"=>404]]],
+                ["method"=>"result","html"=>"modify-$sName","value"=>["result.$sName"]]
+            ]
+        ]
+    ]
+];
 ?>
