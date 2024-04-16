@@ -58,12 +58,6 @@ if(!file_exists($createPath)){
     File::write($createPath,$template);
 }
 
-$createPath = $path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."code.php";
-if(!file_exists($createPath)){
-    $template = File::read("template/code.php");
-    File::write($createPath,$template);
-}
-
 $createPath = $path.DIRECTORY_SEPARATOR."admin".DIRECTORY_SEPARATOR."index.php";
 if(!file_exists($createPath)){
     $template = File::read("template/index.php");
@@ -73,6 +67,52 @@ if(!file_exists($createPath)){
 $createPath = $path.DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."index.php";
 if(!file_exists($createPath)){
     $template = File::read("template/index.php");
+    File::write($createPath,$template);
+}
+
+$createPath = $path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."code.php";
+if(!file_exists($createPath)){
+    $template = File::read("template/code.php");
+    File::write($createPath,$template);
+}
+
+$createPath = $path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."admin".DIRECTORY_SEPARATOR."welcome.html";
+if(!file_exists($createPath)){
+    $template = File::read("template/html/page.html");
+    $template = str_replace(
+        ["{{title}}","{{description}}"],
+        [$project,"This is $project."]
+    ,$template);
+    File::write($createPath,$template);
+}
+
+$createPath = $path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."admin".DIRECTORY_SEPARATOR."home.html";
+if(!file_exists($createPath)){
+    $template = File::read("template/html/page.html");
+    $template = str_replace(
+        ["{{title}}","{{description}}"],
+        [$project,"This is $project."]
+    ,$template);
+    File::write($createPath,$template);
+}
+
+$createPath = $path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."welcome.html";
+if(!file_exists($createPath)){
+    $template = File::read("template/html/page.html");
+    $template = str_replace(
+        ["{{title}}","{{description}}"],
+        [$project,"This is $project."]
+    ,$template);
+    File::write($createPath,$template);
+}
+
+$createPath = $path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."home.html";
+if(!file_exists($createPath)){
+    $template = File::read("template/html/page.html");
+    $template = str_replace(
+        ["{{title}}","{{description}}"],
+        [$project,"This is $project."]
+    ,$template);
     File::write($createPath,$template);
 }
 ?>

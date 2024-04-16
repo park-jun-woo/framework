@@ -9,4 +9,6 @@ $attrCode = [
     ]
 ];
 $attrValue = "request.$attrName";
+$attrTag = "<$attrName></$attrName>";
+$attrFormTag = "<input type=\"text\" name=\"$attrName\" value=\"{{{$attrName}}}\">";
 ?>
