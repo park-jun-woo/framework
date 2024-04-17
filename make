@@ -11,7 +11,7 @@ use util\Debug;
 use util\File;
 
 if(!isset($env)){echo "Invalid access.\n";exit;}
-    
+
 $inflector = InflectorFactory::create()->build();
 
 $path_root = $env["PATH_ROOT"].DIRECTORY_SEPARATOR;
@@ -96,7 +96,7 @@ function addApp($appName){
     {mkdir($path_root.$appName.DIRECTORY_SEPARATOR."images");}
     if(!is_dir($path_source.$appName)){mkdir($path_source.$appName);}
     if(!array_key_exists($appName,$code)){
-        include $path_template."app.php";
+        include $path_template."add_app.php";
         $code[$appName] = $appCode;
     }
     $template = File::read($path_template."index.php");
@@ -123,7 +123,7 @@ function addPage($pageName,$appName=""){
         $route = "/$pageName";
         if(array_key_exists($route,$code[$appName])){echo "App code {$appName} already has '{$route}'.\n";}
         else{
-            include $path_template."page.php";
+            include $path_template."add_page.php";
             $code[$appName][$route] = $pageCode;
         }
         //페이지 html 없으면 생성
@@ -158,12 +158,12 @@ function addList($pageName,$appName=""){
     $entityName = $pName;
     if(array_key_exists($entityName,$code["entities"])){echo "Entity code already has '{$entityName}'.\n";}
     else{
-        include $path_template."entity.php";
+        include $path_template."add_entity.php";
         $code["entities"][$entityName] = $entityCode;
     }
     //코드 추가
     foreach($apps as $appName){
-        include $path_template."list.php";
+        include $path_template."add_list.php";
         foreach($listCode as $route=>&$pageCode){
             if(array_key_exists($route,$code[$appName])){echo "App code {$appName} already has '{$route}'.\n";}
             else{$code[$appName][$route] = $pageCode;}

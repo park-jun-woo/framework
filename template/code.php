@@ -1,6 +1,6 @@
 <?php
 $code = [
-    "user"=>["guest"=>0,"member"=>1,"staff"=>2,"writer"=>2305843009213693952,"admin"=>4611686018427387904,"system"=>-9.2233720368548E+18],
+    "user"=>["guest"=>0,"member"=>1,"staff"=>2,"self"=>2305843009213693952,"admin"=>4611686018427387904,"system"=>9223372036854751232],
     "entities"=>[
         "members"=>[
             "title"=>"회원",
@@ -114,7 +114,7 @@ $code = [
                     ["method"=>"empty","exit"=>"yes","value"=>["result.member"=>["ko"=>"아이디가 없거나 비밀번호가 틀렸습니다."]]],
                     [
                         "method"=>"post",
-                        "entity"=>"login",
+                        "entity"=>"logins",
                         "value"=>[
                             "member"=>"result.member",
                             "succeeded"=>"no",
@@ -159,7 +159,7 @@ $code = [
                     ["method"=>"empty","exit"=>"yes","value"=>["result.member"=>["ko"=>"아이디가 없거나 비밀번호가 틀렸습니다."]]],
                     [
                         "method"=>"post",
-                        "entity"=>"login",
+                        "entity"=>"logins",
                         "value"=>[
                             "member"=>"result.member",
                             "succeeded"=>"no",

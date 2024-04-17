@@ -28,7 +28,7 @@ $appCode = [
                     "value"=>["result.member"=>["ko"=>"아이디가 없거나 비밀번호가 틀렸습니다."]]
                 ],
                 [
-                    "method"=>"post","entity"=>"login",
+                    "method"=>"post","entity"=>"logins",
                     "value"=>[
                         "member"=>"result.member",
                         "succeeded"=>"no",

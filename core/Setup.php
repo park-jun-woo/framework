@@ -1,6 +1,7 @@
 <?php
 namespace core;
 
+use Doctrine\Inflector\InflectorFactory;
 use util\Debug;
 use util\File;
 use util\Image;
@@ -13,15 +14,18 @@ class Setup{
         //필수 설치 확인
         //$this->required();
         //소스 불러오기
-        $this->load($env["PATH_SOURCE"].DIRECTORY_SEPARATOR."code.php");
+        $this->load();
         //코드 골격
         $this->code();
-        //경로 설정
-        $this->path($source);
-        //권한 설정
-        $this->permission();
         //설정값 설정
         $this->config();
+        //앱 설정
+        $this->app();
+
+        //폴더 및 파일 생성
+        $this->generate();
+        //완료
+        $this->log("Setup Complete!");
     }
     /**
      * 필수 설치 확인
@@ -41,9 +45,10 @@ class Setup{
      * 소스파일 불러오기
      * @param string $source 소스 경로
      */
-    protected function load(string $source){
-        $this->log("소스 불러오기: {$source}");
-        include $source;
+    protected function load(){
+        $path_source = $this->env["PATH_SOURCE"].DIRECTORY_SEPARATOR."code.php";
+        $this->log("소스 불러오기: {$path_source}");
+        include $path_source;
         $this->source = $code;
     }
     /**
@@ -52,74 +57,114 @@ class Setup{
     protected function code(){
         //코드 기본 골격
         $this->code = [
+            "id"=>crc32($this->env["PROJECT_NAME"]),
+            "name"=>$this->env["PROJECT_NAME"],
             "user"=>$this->source["user"],
-            "permission"=>[]
+            "permission"=>[],
+            "path"=>[],
+            "domain"=>[],
+            "app"=>[],
+            "route"=>[],
+            "controllers"=>[]
         ];
-    }
-    /**
-     * 경로 설정
-     */
-    protected function path(string $source){
-        $this->log("경로 설정");
-        //루트 경로
-        $path = $this->bml->path->attributes();
-        $root = realpath(str_replace(basename($source),"",realpath($source))).DIRECTORY_SEPARATOR;
-        $this->root = isset($path->root)?(string)$path->root:"";
-        $this->root = realpath((substr($this->root,0,1)===DIRECTORY_SEPARATOR)?$this->root:$root.$this->root).DIRECTORY_SEPARATOR;
-        $this->log("Root: {$this->root}");
-        $this->code["path"]["root"] = $this->root;
-        $this->code["path"]["upload"] = $this->root.(isset($path->upload)?(string)$path->upload:"upload".DIRECTORY_SEPARATOR);
-        $this->code["path"]["data"] = $this->root.(isset($path->data)?(string)$path->data:"data".DIRECTORY_SEPARATOR);
-    }
-    /**
-     * 권한 설정
-     */
-    protected function permission(){
-        $this->log("권한 설정");
-        //권한-권한명 검증 및 등록
-        if(isset($this->bml->permission)){
-            foreach($this->bml->permission as $permission){
-                if((string)$permission==""){Debug::error("<permission> 태그 안에 권한 이름을 입력해 주세요. 예: <permission id=\"2\">sample</permission>");}
-                if(isset($permission->attributes()->id) && (string)$permission->attributes()->id!=""){
-                    $permissionId = (int)$permission->attributes()->id;
-                    if($permissionId<1 || $permissionId>60){Debug::error("<permission> 태그의 아이디는 1부터 60까지만 가능합니다.");}
-                }else{
-                    $permissionId = 1;
-                    while(array_key_exists($permissionId, $this->code["permission"]) && $permissionId<=60){$permissionId++;}
-                    if($permissionId>60){Debug::error("<permission> 태그가 너무 많습니다.");}
-                }
-                $this->code["permission"][$permissionId] = (string)$permission;
-            }
-        }
-        //권한명-권한 배열
-        $permission = [];
-        foreach($this->code["permission"] as $key=>$value){
-            $this->code["user"][$value] = 1<<$key;
-            $permission[1<<$key] = $value;
-        }
-        $this->code["permission"] = $permission;
     }
     /**
      * 설정값 설정
      */
     protected function config(){
-        $this->log("설정값 설정");
-        $config = $this->bml->config->attributes();
-        $this->code["config"]["token-expire"] = isset($config->{"token-expire"})?(int)$config->{"token-expire"}:3600;
-        $this->code["config"]["session-expire"] = isset($config->{"session-expire"})?(int)$config->{"session-expire"}:15552000;
+        $this->log("권한 설정");
+        foreach($this->source["user"] as $user=>$permission){
+            $this->code["permission"][$permission] = $user;
+        }
+
+        $this->log("경로 설정");
+        $this->code["path"] = [
+            "root"=>$this->env["PATH_ROOT"].(DIRECTORY_SEPARATOR=="\\"?"\\\\":"/"),
+            "source"=>$this->env["PATH_SOURCE"].(DIRECTORY_SEPARATOR=="\\"?"\\\\":"/"),
+            "data"=>$this->env["PATH_DATA"].(DIRECTORY_SEPARATOR=="\\"?"\\\\":"/"),
+            "blacklist"=>$this->env["PATH_DATA"].DIRECTORY_SEPARATOR."blacklist".(DIRECTORY_SEPARATOR=="\\"?"\\\\":"/"),
+            "cache"=>$this->env["PATH_DATA"].DIRECTORY_SEPARATOR."cache".(DIRECTORY_SEPARATOR=="\\"?"\\\\":"/"),
+            "session"=>$this->env["PATH_DATA"].DIRECTORY_SEPARATOR."session".(DIRECTORY_SEPARATOR=="\\"?"\\\\":"/"),
+            "upload"=>$this->env["PATH_DATA"].DIRECTORY_SEPARATOR."upload".(DIRECTORY_SEPARATOR=="\\"?"\\\\":"/"),
+        ];
+
+        //$this->log("설정값 설정");
     }
     /**
-     * 언어팩 설정
+     * 라우트 설정
      */
-    protected function language(){
-        $this->log("언어팩 설정");
-        //언어팩 검증 및 등록
-        foreach($this->bml->message as $message){
-            if(!isset($message->attributes()->id) || (string)$message->attributes()->id==""){Debug::error("<message> 태그에 id 속성을 입력해 주세요.");}
-            if(!isset($message->ko) || (string)$message->ko==""){Debug::error("<message> 태그에 <ko> 태그를 입력해 주세요.");}
-            $this->code["message"][$messageId = (string)$message->attributes()->id] = ["ko"=>(string)$message->ko];
-            if(isset($message->en) && (string)$message->en!=""){$this->code["message"][$messageId]["en"] = (string)$message->en;}
+    protected function app(){
+        $inflector = InflectorFactory::create()->build();
+        $controllers = [
+            "HomeController"=>[]
+        ];
+        $this->log("앱 설정");
+        $methodMap = ["get"=>0,"post"=>1,"put"=>2,"delete"=>3];
+        foreach($this->env as $appName=>&$appOptions){
+            if(is_array($appOptions) && array_key_exists("DOMAIN",$appOptions)){
+                $this->code["domain"][$appOptions["DOMAIN"]] = $appName;
+                $this->code["app"][$appName] = [];
+                foreach($appOptions as $key=>&$value){
+                    $this->code["app"][$appName][strtolower($key)] = $value;
+                }
+                $this->code["app"][$appName]["route"] = [[],[],[],[]];
+            }
         }
+        foreach($this->code["app"] as $appName=>&$app){
+            foreach($this->source[$appName] as $routeUri=>&$route){
+                foreach($route as $method=>$routeCode){
+                    $entityName = "";
+                    $appRoute = ["permission"=>0,"class"=>"","method"=>""];
+                    //권한 처리
+                    foreach($routeCode["permission"] as $user){$appRoute["permission"] |= $this->code["user"][$user];}
+                    //메서드 이름
+                    foreach($routeCode["code"] as &$sequence){
+                        switch($sequence["method"]){
+                            case "get":
+                            case "post":
+                            case "put":
+                                $entityName = $sequence["entity"];
+                                $controllerClass = $inflector->classify($inflector->singularize($entityName))."Controller";
+                                $appRoute["class"] = $controllerClass;
+                                break;
+                            case "result":
+                                if(array_key_exists("html",$sequence)){
+                                    $appRoute["method"] = $inflector->camelize($method."_".$sequence["html"]);
+                                }
+                                break;
+                        }
+                    }
+                    if($appRoute["class"]==""){
+                        if(strlen($appRoute["method"])>6 && substr($appRoute["method"],0,6)=="getNew"){
+                            $appRoute["class"] = $inflector->classify(substr($appRoute["method"],6)."_controller");
+                        }else{
+                            $appRoute["class"] = "HomeController";
+                        }
+                    }
+                    if($appRoute["method"]==""){$appRoute["method"] = $inflector->camelize($method."_".$inflector->singularize($entityName));}
+
+                    $app["route"][$methodMap[$method]][$routeUri] = $appRoute;
+
+                    if(!array_key_exists($appRoute["class"],$controllers)){$controllers[$appRoute["class"]] = [];}
+                    $controllers[$appRoute["class"]][$appRoute["method"]] = [];
+                    foreach($routeCode["code"] as &$sequence){
+                        array_push($controllers[$appRoute["class"]][$appRoute["method"]],$sequence);
+                    }
+                }
+            }
+        }
+        $this->code["controllers"] = $controllers;
+    }
+    /**
+     * 폴더 및 파일 생성
+     */
+    protected function generate(){
+        
+        //app.php 파일 생성
+        File::write($this->env["PATH_ROOT"].DIRECTORY_SEPARATOR."app.php", "<?PHP
+require \"".$this->env["PATH_CORE"].DIRECTORY_SEPARATOR."Parkjunwoo.php\";
+Parkjunwoo::walk(".Debug::print($this->code,"    ").");
+?>");
     }
     
     protected function log(string $message){
