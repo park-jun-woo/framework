@@ -17,6 +17,7 @@ $inflector = InflectorFactory::create()->build();
 $path_root = $env["PATH_ROOT"].DIRECTORY_SEPARATOR;
 $path_source = $env["PATH_SOURCE"].DIRECTORY_SEPARATOR;
 $path_core = $env["PATH_CORE"].DIRECTORY_SEPARATOR."core".DIRECTORY_SEPARATOR;
+$path_define = $env["PATH_CORE"].DIRECTORY_SEPARATOR."define".DIRECTORY_SEPARATOR;
 $path_util = $env["PATH_CORE"].DIRECTORY_SEPARATOR."util".DIRECTORY_SEPARATOR;
 $path_template = $env["PATH_CORE"].DIRECTORY_SEPARATOR."template".DIRECTORY_SEPARATOR;
 $path_vendor = $env["PATH_CORE"].DIRECTORY_SEPARATOR."vendor".DIRECTORY_SEPARATOR;
@@ -30,30 +31,7 @@ switch($argv[1]){
         new Setup($env);
         break;
     case "exec":
-        /*
-        $list = File::read($path_template."sample.json");
-        $list = json_decode($list,true);
-        $template = "<?php
-\$listCode = ".Debug::print($list,"    ").";
-?>";
-        File::write($path_template."list.php",$template);
-        //*/
-        /*
-        foreach($code["entities"] as $entityId=>&$entity){
-            $attributes = [];
-            unset($entity["name"]);
-            foreach($entity["attributes"] as &$attribute){
-                $name = $attribute["name"];
-                unset($attribute["name"]);
-                $attributes[$name] = $attribute;
-            }
-            $entity["attributes"] = $attributes;
-        }
-$template = "<?php
-\$code = ".Debug::print($code,"    ").";
-?>";
-File::write($path_template."code.php",$template);
-        //*/
+        include "exec";
         exit;
     case "user":
         if(count($argv)!=3){error("Invalid arguments!\n'app' must be 3 arvs.");}
