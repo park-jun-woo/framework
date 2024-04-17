@@ -17,23 +17,34 @@ switch(count($argv)){
 
 echo "CREATE PROJECT '$project' on $path\n";
 
+$path_data = $path.DIRECTORY_SEPARATOR."data";
+$path_blacklist = $path_data.DIRECTORY_SEPARATOR."blacklist";
+$path_cache = $path_data.DIRECTORY_SEPARATOR."cache";
+$path_session = $path_data.DIRECTORY_SEPARATOR."session";
+$path_upload = $path_data.DIRECTORY_SEPARATOR."upload";
+
+$path_source = $path.DIRECTORY_SEPARATOR."source";
+$path_admin = $path_source.DIRECTORY_SEPARATOR."admin";
+$path_public = $path_source.DIRECTORY_SEPARATOR."public";
+
 if(!is_dir($path)){mkdir($path);}
+if(!is_dir($path_data)){mkdir($path_data);}
+if(!is_dir($path_blacklist)){mkdir($path_blacklist);}
+if(!is_dir($path_cache)){mkdir($path_cache);}
+if(!is_dir($path_session)){mkdir($path_session);}
+if(!is_dir($path_upload)){mkdir($path_upload);}
+
+if(!is_dir($path_source)){mkdir($path_source);}
+
 if(!is_dir($path.DIRECTORY_SEPARATOR."admin")){mkdir($path.DIRECTORY_SEPARATOR."admin");}
+if(!is_dir($path_admin)){mkdir($path_admin);}
+if(!is_dir($path_admin.DIRECTORY_SEPARATOR."views")){mkdir($path_admin.DIRECTORY_SEPARATOR."views");}
+if(!is_dir($path_admin.DIRECTORY_SEPARATOR."controllers")){mkdir($path_admin.DIRECTORY_SEPARATOR."controllers");}
+
 if(!is_dir($path.DIRECTORY_SEPARATOR."public")){mkdir($path.DIRECTORY_SEPARATOR."public");}
-if(!is_dir($path.DIRECTORY_SEPARATOR."data")){mkdir($path.DIRECTORY_SEPARATOR."data");}
-if(!is_dir($path.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR."blacklist"))
-{mkdir($path.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR."blacklist");}
-if(!is_dir($path.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR."cache"))
-{mkdir($path.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR."cache");}
-if(!is_dir($path.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR."session"))
-{mkdir($path.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR."session");}
-if(!is_dir($path.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR."upload"))
-{mkdir($path.DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR."upload");}
-if(!is_dir($path.DIRECTORY_SEPARATOR."source")){mkdir($path.DIRECTORY_SEPARATOR."source");}
-if(!is_dir($path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."admin"))
-{mkdir($path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."admin");}
-if(!is_dir($path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."public"))
-{mkdir($path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."public");}
+if(!is_dir($path_admin)){mkdir($path_admin);}
+if(!is_dir($path_admin.DIRECTORY_SEPARATOR."views")){mkdir($path_admin.DIRECTORY_SEPARATOR."views");}
+if(!is_dir($path_admin.DIRECTORY_SEPARATOR."controllers")){mkdir($path_admin.DIRECTORY_SEPARATOR."controllers");}
 
 $createPath = $path.DIRECTORY_SEPARATOR.".env";
 if(!file_exists($createPath)){
@@ -41,7 +52,7 @@ if(!file_exists($createPath)){
     $template = str_replace([
         "{{project}}","{{path.framework}}","{{path.root}}","{{path.source}}","{{path.data}}"
     ],[
-        $project,getcwd(),$path,$path.DIRECTORY_SEPARATOR."source",$path.DIRECTORY_SEPARATOR."data"
+        $project,getcwd(),$path,$path_source,$path.DIRECTORY_SEPARATOR."data"
     ],$template);
     File::write($createPath,$template);
 }
@@ -70,49 +81,37 @@ if(!file_exists($createPath)){
     File::write($createPath,$template);
 }
 
-$createPath = $path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."code.php";
+$createPath = $path_source.DIRECTORY_SEPARATOR."code.php";
 if(!file_exists($createPath)){
     $template = File::read("template/code.php");
     File::write($createPath,$template);
 }
 
-$createPath = $path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."admin".DIRECTORY_SEPARATOR."welcome.html";
+$createPath = $path_admin.DIRECTORY_SEPARATOR."welcome.html";
 if(!file_exists($createPath)){
     $template = File::read("template/html/page.html");
-    $template = str_replace(
-        ["{{title}}","{{description}}"],
-        [$project,"This is $project."]
-    ,$template);
+    $template = str_replace(["{{title}}","{{description}}"],[$project,"This is $project."],$template);
     File::write($createPath,$template);
 }
 
-$createPath = $path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."admin".DIRECTORY_SEPARATOR."home.html";
+$createPath = $path_admin.DIRECTORY_SEPARATOR."home.html";
 if(!file_exists($createPath)){
     $template = File::read("template/html/page.html");
-    $template = str_replace(
-        ["{{title}}","{{description}}"],
-        [$project,"This is $project."]
-    ,$template);
+    $template = str_replace(["{{title}}","{{description}}"],[$project,"This is $project."],$template);
     File::write($createPath,$template);
 }
 
-$createPath = $path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."welcome.html";
+$createPath = $path_admin.DIRECTORY_SEPARATOR."welcome.html";
 if(!file_exists($createPath)){
     $template = File::read("template/html/page.html");
-    $template = str_replace(
-        ["{{title}}","{{description}}"],
-        [$project,"This is $project."]
-    ,$template);
+    $template = str_replace(["{{title}}","{{description}}"],[$project,"This is $project."],$template);
     File::write($createPath,$template);
 }
 
-$createPath = $path.DIRECTORY_SEPARATOR."source".DIRECTORY_SEPARATOR."public".DIRECTORY_SEPARATOR."home.html";
+$createPath = $path_admin.DIRECTORY_SEPARATOR."home.html";
 if(!file_exists($createPath)){
     $template = File::read("template/html/page.html");
-    $template = str_replace(
-        ["{{title}}","{{description}}"],
-        [$project,"This is $project."]
-    ,$template);
+    $template = str_replace(["{{title}}","{{description}}"],[$project,"This is $project."],$template);
     File::write($createPath,$template);
 }
 ?>

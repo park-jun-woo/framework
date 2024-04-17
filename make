@@ -120,6 +120,7 @@ function addPage($pageName,$appName=""){
     }
     foreach($apps as $appName){
         $path_app = $path_source.$appName.DIRECTORY_SEPARATOR;
+        $path_view = $path_app.DIRECTORY_SEPARATOR."views".DIRECTORY_SEPARATOR;
         $route = "/$pageName";
         if(array_key_exists($route,$code[$appName])){echo "App code {$appName} already has '{$route}'.\n";}
         else{
@@ -127,7 +128,7 @@ function addPage($pageName,$appName=""){
             $code[$appName][$route] = $pageCode;
         }
         //페이지 html 없으면 생성
-        $createPath = $path_app.$pageName.".html";
+        $createPath = $path_view.$pageName.".html";
         if(file_exists($createPath)){echo "{$createPath} already exists.\n";}
         else{
             $template = File::read($path_template."html".DIRECTORY_SEPARATOR."page.html");
@@ -170,7 +171,9 @@ function addList($pageName,$appName=""){
         }
 
         $path_app = $path_source.$appName.DIRECTORY_SEPARATOR;
-        $createPath = $path_app.$pName.".html";
+        $path_view = $path_app.DIRECTORY_SEPARATOR."views".DIRECTORY_SEPARATOR;
+
+        $createPath = $path_view.$pName.".html";
         if(file_exists($createPath)){echo "{$createPath} already exists.\n";}
         else{
             $template = File::read($path_template."html".DIRECTORY_SEPARATOR."list.html");
@@ -178,7 +181,7 @@ function addList($pageName,$appName=""){
             File::write($createPath,$template);
         }
 
-        $createPath = $path_app."detail-".$sName.".html";
+        $createPath = $path_view."detail-".$sName.".html";
         if(file_exists($createPath)){echo "{$createPath} already exists.\n";}
         else{
             $template = File::read($path_template."html".DIRECTORY_SEPARATOR."detail.html");
@@ -186,7 +189,7 @@ function addList($pageName,$appName=""){
             File::write($createPath,$template);
         }
 
-        $createPath = $path_app."new-".$sName.".html";
+        $createPath = $path_view."new-".$sName.".html";
         if(file_exists($createPath)){echo "{$createPath} already exists.\n";}
         else{
             $template = File::read($path_template."html".DIRECTORY_SEPARATOR."create.html");
@@ -194,7 +197,7 @@ function addList($pageName,$appName=""){
             File::write($createPath,$template);
         }
 
-        $createPath = $path_app."modify-".$sName.".html";
+        $createPath = $path_view."modify-".$sName.".html";
         if(file_exists($createPath)){echo "{$createPath} already exists.\n";}
         else{
             $template = File::read($path_template."html".DIRECTORY_SEPARATOR."modify.html");
@@ -257,29 +260,30 @@ function addAttr(string $define, string $pageName, string $attrName, string $att
             }
         }
         $path_app = $path_source.$appName.DIRECTORY_SEPARATOR;
+        $path_view = $path_app.DIRECTORY_SEPARATOR."views".DIRECTORY_SEPARATOR;
 
-        $path_html = $path_app.$pName.".html";
+        $path_html = $path_view.$pName.".html";
         if(file_exists($path_html)){
             $template = File::read($path_html);
             $template = str_replace("            </li>","                $attrTag\n            </li>",$template);
             File::write($path_html,$template);
         }
 
-        $path_html = $path_app."detail-".$sName.".html";
+        $path_html = $path_view."detail-".$sName.".html";
         if(file_exists($path_html)){
             $template = File::read($path_html);
             $template = str_replace("        </section>","            $attrTag\n        </section>",$template);
             File::write($path_html,$template);
         }
         
-        $path_html = $path_app."new-".$sName.".html";
+        $path_html = $path_view."new-".$sName.".html";
         if(file_exists($path_html)){
             $template = File::read($path_html);
             $template = str_replace("            <button","            $attrFormTag\n            <button",$template);
             File::write($path_html,$template);
         }
         
-        $path_html = $path_app."modify-".$sName.".html";
+        $path_html = $path_view."modify-".$sName.".html";
         if(file_exists($path_html)){
             $template = File::read($path_html);
             $template = str_replace("            <button","            $attrFormTag\n            <button",$template);

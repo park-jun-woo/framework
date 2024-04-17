@@ -16,7 +16,11 @@ $code = [
                         "regex:/^{a-zA-Z0-9\-_.}+$/"=>["ko"=>"아이디는 영문, 숫자, 일부 특수문자(-_.)만 가능합니다."]
                     ]
                 ],
-                "password"=>["define"=>"password","title"=>"비밀번호","required"=>"yes","encryption"=>"sha512"],
+                "password"=>[
+                    "define"=>"password","title"=>"비밀번호","required"=>"yes","encryption"=>"sha512","options"=>[
+                        "required"=>["ko"=>"비밀번호를 입력하세요."],
+                    ]
+                ],
                 "name"=>["define"=>"text","title"=>"이름","required"=>"yes","max"=>60,"regex"=>"/^{a-zA-Z0-9\-_.}+$/"],
                 "email"=>["define"=>"email","title"=>"이메일","required"=>"yes"],
                 "gender"=>["define"=>"gender","title"=>"성별","required"=>"no"],
@@ -50,7 +54,11 @@ $code = [
         "passwords"=>[
             "title"=>"비밀번호 변경기록",
             "attributes"=>[
-                "password"=>["define"=>"password","title"=>"비밀번호","required"=>"yes","encryption"=>"sha512"],
+                "password"=>[
+                    "define"=>"password","title"=>"비밀번호","required"=>"yes","encryption"=>"sha512","options"=>[
+                        "required"=>["ko"=>"비밀번호를 입력하세요."],
+                    ]
+                ],
                 "member"=>[
                     "define"=>"parent","title"=>"회원","required"=>"yes","entity"=>"members",
                     "attributes"=>["id","name"]

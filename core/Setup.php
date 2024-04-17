@@ -7,7 +7,11 @@ use util\File;
 use util\Image;
 
 class Setup{
-    protected array $env,$source,$code;
+    const PERMISSION = 0;
+    const CLASSNAME = 1;
+    const METHOD = 2;
+
+    protected array $env,$source,$code,$controllers;
 
     public function __construct(array $env){
         $this->env = $env;
@@ -64,8 +68,7 @@ class Setup{
             "path"=>[],
             "domain"=>[],
             "app"=>[],
-            "route"=>[],
-            "controllers"=>[]
+            "route"=>[[],[],[],[],[],[],[],[]]
         ];
     }
     /**
@@ -95,28 +98,36 @@ class Setup{
      */
     protected function app(){
         $inflector = InflectorFactory::create()->build();
-        $controllers = [
-            "HomeController"=>[]
-        ];
+        $this->controllers = [];
         $this->log("앱 설정");
+        $iu = 0;
         $methodMap = ["get"=>0,"post"=>1,"put"=>2,"delete"=>3];
         foreach($this->env as $appName=>&$appOptions){
             if(is_array($appOptions) && array_key_exists("DOMAIN",$appOptions)){
                 $this->code["domain"][$appOptions["DOMAIN"]] = $appName;
-                $this->code["app"][$appName] = [];
+                $this->code["app"][$appName] = ["key"=>$iu++];
                 foreach($appOptions as $key=>&$value){
                     $this->code["app"][$appName][strtolower($key)] = $value;
                 }
-                $this->code["app"][$appName]["route"] = [[],[],[],[]];
+                $this->code["app"][$appName]["path"] = [
+                    "source"=>$this->env["PATH_SOURCE"].DIRECTORY_SEPARATOR.$appName.(DIRECTORY_SEPARATOR=="\\"?"\\\\":"/"),
+                    "view"=>$this->env["PATH_SOURCE"].DIRECTORY_SEPARATOR.$appName.DIRECTORY_SEPARATOR."views".(DIRECTORY_SEPARATOR=="\\"?"\\\\":"/"),
+                    "controller"=>$this->env["PATH_SOURCE"].DIRECTORY_SEPARATOR.$appName.DIRECTORY_SEPARATOR."controllers".(DIRECTORY_SEPARATOR=="\\"?"\\\\":"/"),
+                ];
+                if(!is_dir($this->code["app"][$appName]["path"]["view"]))
+                {mkdir($this->code["app"][$appName]["path"]["view"]);}
+                if(!is_dir($this->code["app"][$appName]["path"]["controller"]))
+                {mkdir($this->code["app"][$appName]["path"]["controller"]);}
             }
         }
         foreach($this->code["app"] as $appName=>&$app){
+            $this->controllers[$appName] = ["HomeController"=>[]];
             foreach($this->source[$appName] as $routeUri=>&$route){
                 foreach($route as $method=>$routeCode){
                     $entityName = "";
-                    $appRoute = ["permission"=>0,"class"=>"","method"=>""];
+                    $appRoute = [0,"",""];
                     //권한 처리
-                    foreach($routeCode["permission"] as $user){$appRoute["permission"] |= $this->code["user"][$user];}
+                    foreach($routeCode["permission"] as $user){$appRoute[self::PERMISSION] |= $this->code["user"][$user];}
                     //메서드 이름
                     foreach($routeCode["code"] as &$sequence){
                         switch($sequence["method"]){
@@ -125,41 +136,74 @@ class Setup{
                             case "put":
                                 $entityName = $sequence["entity"];
                                 $controllerClass = $inflector->classify($inflector->singularize($entityName))."Controller";
-                                $appRoute["class"] = $controllerClass;
+                                $appRoute[self::CLASSNAME] = $controllerClass;
                                 break;
                             case "result":
                                 if(array_key_exists("html",$sequence)){
-                                    $appRoute["method"] = $inflector->camelize($method."_".$sequence["html"]);
+                                    $appRoute[2] = $inflector->camelize($method."_".$sequence["html"]);
                                 }
                                 break;
                         }
                     }
-                    if($appRoute["class"]==""){
-                        if(strlen($appRoute["method"])>6 && substr($appRoute["method"],0,6)=="getNew"){
-                            $appRoute["class"] = $inflector->classify(substr($appRoute["method"],6)."_controller");
+                    if($appRoute[self::CLASSNAME]==""){
+                        if(strlen($appRoute[self::METHOD])>6 && substr($appRoute[self::METHOD],0,6)=="getNew"){
+                            $appRoute[self::CLASSNAME] = $inflector->classify(substr($appRoute[self::METHOD],6)."_controller");
                         }else{
-                            $appRoute["class"] = "HomeController";
+                            $appRoute[self::CLASSNAME] = "HomeController";
                         }
                     }
-                    if($appRoute["method"]==""){$appRoute["method"] = $inflector->camelize($method."_".$inflector->singularize($entityName));}
-
-                    $app["route"][$methodMap[$method]][$routeUri] = $appRoute;
-
-                    if(!array_key_exists($appRoute["class"],$controllers)){$controllers[$appRoute["class"]] = [];}
-                    $controllers[$appRoute["class"]][$appRoute["method"]] = [];
+                    if($appRoute[self::METHOD]==""){$appRoute[self::METHOD] = $inflector->camelize($method."_".$inflector->singularize($entityName));}
+                    $this->code["route"][$app["key"]<<2|$methodMap[$method]][$routeUri] = $appRoute;
+                    if(!array_key_exists($appRoute[self::CLASSNAME],$this->controllers[$appName])){$this->controllers[$appName][$appRoute[self::CLASSNAME]] = [];}
+                    $this->controllers[$appName][$appRoute[self::CLASSNAME]][$appRoute[self::METHOD]] = [];
                     foreach($routeCode["code"] as &$sequence){
-                        array_push($controllers[$appRoute["class"]][$appRoute["method"]],$sequence);
+                        array_push($this->controllers[$appName][$appRoute[self::CLASSNAME]][$appRoute[self::METHOD]],$sequence);
                     }
                 }
             }
         }
-        $this->code["controllers"] = $controllers;
+        //$this->code["controllers"] = $this->controllers;
     }
     /**
      * 폴더 및 파일 생성
      */
     protected function generate(){
-        
+        $path_template = $this->env["PATH_CORE"].DIRECTORY_SEPARATOR."template".DIRECTORY_SEPARATOR."sequence".DIRECTORY_SEPARATOR;
+        //콘트롤러 생성
+        foreach($this->controllers as $appName=>&$app){
+            foreach($app as $controllerName=>&$controller){
+                $controllerCode = "<?php
+use core\Controller;
+
+class {$controllerName} extends Controller{";
+    
+                foreach($controller as $methodName=>&$method){
+                    $controllerCode .= "
+    /**
+     * {$methodName}
+     */
+    public function {$methodName}(){";
+                    foreach($method as &$sequence){
+                        $path_sequence = $path_template.$sequence["method"].".php";
+                        if(file_exists($path_sequence)){
+                            $controllerCode .= "\n";
+                            include $path_sequence;
+                        }else{
+                            echo "{$path_sequence} is not exixts.\n";
+                        }
+                    }
+                    $controllerCode .= "
+    }";
+                }
+                $controllerCode .= "
+}
+?>";
+                $path_controller = $this->env["PATH_SOURCE"].DIRECTORY_SEPARATOR.$appName.DIRECTORY_SEPARATOR;
+                $path_controller .= "controllers".DIRECTORY_SEPARATOR.$controllerName.".php";
+                File::write($path_controller,$controllerCode);
+            }
+
+        }
         //app.php 파일 생성
         File::write($this->env["PATH_ROOT"].DIRECTORY_SEPARATOR."app.php", "<?PHP
 require \"".$this->env["PATH_CORE"].DIRECTORY_SEPARATOR."Parkjunwoo.php\";
@@ -169,6 +213,9 @@ Parkjunwoo::walk(".Debug::print($this->code,"    ").");
     
     protected function log(string $message){
         echo $message.PHP_EOL;
+    }
+    protected function print($array, string $indent="\t", string $eol=PHP_EOL, int $breakCols=140, int $icount=1):string{
+        return Debug::print($array, $indent, $eol, $breakCols, $icount);
     }
 }
 
