@@ -1,5 +1,0 @@
-/data/cache/*
-/data/upload/*
-/data/blacklist/*
-/data/session/*
-/.env

@@ -28,7 +28,7 @@ class Controller{
             }
         }
 
-        $this->information();
+        $this->info();
     }
 
     protected function permission(int $permission){
@@ -55,7 +55,7 @@ class Controller{
         
     }
     
-    protected function information(){
+    protected function info(){
         echo "<!DOCTYPE html>
 <html>
 <head>

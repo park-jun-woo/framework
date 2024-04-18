@@ -1,0 +1,28 @@
+<?php
+require "util/Debug.php";
+require "util/File.php";
+use util\Debug;
+use util\File;
+
+define('DS', DIRECTORY_SEPARATOR);
+
+switch(count($argv)){
+  default:echo "사용법: php project sample\n";exit;
+  case 2:
+      $project = $argv[1];
+      $path_root = realpath(getcwd().DS."..");
+      $path = $path_root.DS.$project;
+      break;
+  case 3:
+      $project = $argv[1];
+      $path = realpath($argv[2]);
+      break;
+}
+
+$path_data = $path.DS."data";
+$path_blacklist = $path_data.DS."blacklist";
+$path_cache = $path_data.DS."cache";
+$path_session = $path_data.DS."session";
+$path_upload = $path_data.DS."upload";
+
+?>

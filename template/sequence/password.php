@@ -1,3 +1,0 @@
-<?php
-$controllerCode .= "        //password\n";
-?>

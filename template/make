@@ -1,5 +1,0 @@
-<?php
-if(!file_exists(".env")){echo "Please make '.env'\n";}
-$env = parse_ini_file(".env", TRUE);
-include $env["PATH_CORE"].DIRECTORY_SEPARATOR."make";
-?>
