@@ -68,7 +68,8 @@ class Setup{
             "path"=>[],
             "domain"=>[],
             "app"=>[],
-            "route"=>[[],[],[],[],[],[],[],[]]
+            "route"=>[[],[],[],[],[],[],[],[]],
+            "message"=>[]
         ];
     }
     /**
@@ -99,6 +100,7 @@ class Setup{
     protected function app(){
         $inflector = InflectorFactory::create()->build();
         $this->controllers = [];
+        $this->messages = [];
         $this->log("앱 설정");
         $iu = 0;
         $methodMap = ["get"=>0,"post"=>1,"put"=>2,"delete"=>3];
@@ -182,11 +184,19 @@ class {$controllerName} extends Controller{";
     /**
      * {$methodName}
      */
-    public function {$methodName}(){";
+    public function {$methodName}(){
+";
+                    $needResult = false;
+                    foreach($method as &$sequence){
+                        switch($sequence["method"]){
+                            case "get":$needResult = true;break;
+                        }
+                    }
+                    if($needResult){$controllerCode .= "        \$result = [];\n";}
                     foreach($method as &$sequence){
                         $path_sequence = $path_template.$sequence["method"].".php";
                         if(file_exists($path_sequence)){
-                            $controllerCode .= "\n";
+                            //$controllerCode .= "\n";
                             include $path_sequence;
                         }else{
                             echo "{$path_sequence} is not exixts.\n";
@@ -211,6 +221,22 @@ Parkjunwoo::walk(".Debug::print($this->code,"    ").");
 ?>");
     }
     
+    protected function addMessage(array $message):int{
+        $sameMessage = false;
+        $messageId = "";
+        foreach($this->code["message"] as $key=>&$value){
+            if($message["ko"]==$value["ko"]){
+                $sameMessage = true;
+                $messageId = $key;
+            }
+        }
+        if($sameMessage){
+            return $messageId;
+        }else{
+            array_push($this->code["message"],$message);
+            return count($this->code["message"])-1;
+        }
+    }
     protected function log(string $message){
         echo $message.PHP_EOL;
     }

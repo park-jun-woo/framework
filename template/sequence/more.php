@@ -1,3 +1,3 @@
 <?php
-
+$controllerCode .= "        //more\n";
 ?>
