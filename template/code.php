@@ -51,6 +51,29 @@ $code = [
                 "create_date"=>["define"=>"datetime","title"=>"등록일","datetype"=>"solar","timezone"=>"Asia/Seoul","format"=>"Y-m-d H:i:s"]
             ]
         ],
+        "logins"=>[
+            "title"=>"로그인 기록",
+            "attributes"=>[
+                "member"=>[
+                    "define"=>"parent","title"=>"회원","required"=>"yes","entity"=>"members",
+                    "attributes"=>["id","name"]
+                ],
+                "device"=>[
+                    "define"=>"parent","title"=>"접속기기","required"=>"yes","entity"=>"devices",
+                    "attributes"=>["sessionid","name"]
+                ],
+                "succeeded"=>[
+                    "define"=>"boolean","title"=>"로그인 성공","required"=>"yes","default"=>"no",
+                    "items"=>["no"=>["ko"=>"실패"],"no"=>["yes"=>"성공"]]
+                ],
+                "logout"=>[
+                    "define"=>"boolean","title"=>"로그아웃","required"=>"yes","default"=>"no",
+                    "items"=>["no"=>["ko"=>"로그인중"],"no"=>["yes"=>"로그아웃"]]
+                ],
+                "login_date"=>["define"=>"datetime","title"=>"로그인 일시","datetype"=>"solar","timezone"=>"Asia/Seoul","format"=>"Y-m-d H:i:s"],
+                "logout_date"=>["define"=>"datetime","title"=>"로그아웃 일시","datetype"=>"solar","timezone"=>"Asia/Seoul","format"=>"Y-m-d H:i:s"]
+            ]
+        ],
         "passwords"=>[
             "title"=>"비밀번호 변경기록",
             "attributes"=>[

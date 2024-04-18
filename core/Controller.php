@@ -7,16 +7,18 @@ use util\Image;
 
 class Controller{
     protected Parkjunwoo $man;
-    protected Request $request;
     protected User $user;
+    protected Request $request;
+    protected array $result;
     /**
      * 컨트롤러 실행
-     * @param Request $request 분석한 요청 객체
+     * @param Parkjunwoo $man 프레임워크 객체
      */
     public function __construct(Parkjunwoo $man){
         $this->man = $man;
         $this->user = $this->man->user();
         $this->request = $man->request();
+        $this->result = [];
         
         foreach($this->request->route() as $sequence){
             switch($sequence["method"]){

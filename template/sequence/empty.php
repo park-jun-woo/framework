@@ -7,7 +7,7 @@ foreach($sequence["value"] as $attrName=>$attrMessage){
     case 2:
         switch($keys[0]){
         case "result":
-            $controllerCode .= "        \$this->empty(\$result,\"{$keys[1]}\",{$messageCode});\n";
+            $controllerCode .= "        \$this->empty(\$this->result,\"{$keys[1]}\",{$messageCode});\n";
             break;
         }
         break;

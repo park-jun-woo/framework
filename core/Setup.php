@@ -136,9 +136,13 @@ class Setup{
                             case "get":
                             case "post":
                             case "put":
-                                $entityName = $sequence["entity"];
+                                $entityName = $this->getControllerName($sequence["entity"]);
                                 $controllerClass = $inflector->classify($inflector->singularize($entityName))."Controller";
                                 $appRoute[self::CLASSNAME] = $controllerClass;
+                                if(!array_key_exists($appRoute[self::CLASSNAME],$this->controllers[$appName])){
+                                    $this->controllers[$appName][$appRoute[self::CLASSNAME]] = ["list-of-entities"=>[]];
+                                }
+                                $this->controllers[$appName][$appRoute[self::CLASSNAME]]["list-of-entities"][$sequence["entity"]] = "";
                                 break;
                             case "result":
                                 if(array_key_exists("html",$sequence)){
@@ -149,14 +153,23 @@ class Setup{
                     }
                     if($appRoute[self::CLASSNAME]==""){
                         if(strlen($appRoute[self::METHOD])>6 && substr($appRoute[self::METHOD],0,6)=="getNew"){
-                            $appRoute[self::CLASSNAME] = $inflector->classify(substr($appRoute[self::METHOD],6)."_controller");
+                            $entityName = $inflector->pluralize(substr($appRoute[self::METHOD],6));
+                            $entityName = $this->getControllerName($entityName);
+                            $appRoute[self::CLASSNAME] = $inflector->classify($inflector->singularize($entityName)."_controller");
+                            if(!array_key_exists($appRoute[self::CLASSNAME],$this->controllers[$appName])){
+                                $this->controllers[$appName][$appRoute[self::CLASSNAME]] = ["list-of-entities"=>[]];
+                            }
+                            $entity = strtolower($inflector->pluralize(substr($appRoute[self::METHOD],6)));
+                            $this->controllers[$appName][$appRoute[self::CLASSNAME]]["list-of-entities"][$entity] = "";
                         }else{
                             $appRoute[self::CLASSNAME] = "HomeController";
                         }
                     }
-                    if($appRoute[self::METHOD]==""){$appRoute[self::METHOD] = $inflector->camelize($method."_".$inflector->singularize($entityName));}
+                    if($appRoute[self::METHOD]==""){
+                        $appRoute[self::METHOD] = $inflector->camelize($method."_".$inflector->singularize($entityName));
+                    }
                     $this->code["route"][$app["key"]<<2|$methodMap[$method]][$routeUri] = $appRoute;
-                    if(!array_key_exists($appRoute[self::CLASSNAME],$this->controllers[$appName])){$this->controllers[$appName][$appRoute[self::CLASSNAME]] = [];}
+                    
                     $this->controllers[$appName][$appRoute[self::CLASSNAME]][$appRoute[self::METHOD]] = [];
                     foreach($routeCode["code"] as &$sequence){
                         array_push($this->controllers[$appName][$appRoute[self::CLASSNAME]][$appRoute[self::METHOD]],$sequence);
@@ -170,6 +183,7 @@ class Setup{
      * 폴더 및 파일 생성
      */
     protected function generate(){
+        $inflector = InflectorFactory::create()->build();
         $path_template = $this->env["PATH_CORE"].DIRECTORY_SEPARATOR."template".DIRECTORY_SEPARATOR."sequence".DIRECTORY_SEPARATOR;
         //콘트롤러 생성
         foreach($this->controllers as $appName=>&$app){
@@ -177,22 +191,36 @@ class Setup{
                 $controllerCode = "<?php
 use core\Controller;
 
-class {$controllerName} extends Controller{";
-    
+class {$controllerName} extends Controller{\n";
+                if(array_key_exists("list-of-entities",$controller)){
+                    foreach($controller["list-of-entities"] as $entityName=>$temp){
+                        $singleName = $inflector->singularize($entityName);
+                        $modelName = $inflector->classify("{$singleName}_model");
+                        $controllerCode .= "    protected {$modelName} \${$singleName};\n";
+                    }
+                    $controllerCode .= "    /**
+     * 컨트롤러 실행
+     * @param Parkjunwoo \$man 프레임워크 객체
+     */
+    public function __construct(Parkjunwoo \$man){
+        parent::__construct(\$man);
+";
+                    foreach($controller["list-of-entities"] as $entityName=>$temp){
+                        $singleName = $inflector->singularize($entityName);
+                        $modelName = $inflector->classify("{$singleName}_model");
+                        $controllerCode .= "        \$this->{$singleName} = new {$modelName}();\n";
+                    }
+                    
+                    $controllerCode .= "    }";
+                }
                 foreach($controller as $methodName=>&$method){
+                    if($methodName=="list-of-entities"){continue;}
                     $controllerCode .= "
     /**
      * {$methodName}
      */
     public function {$methodName}(){
 ";
-                    $needResult = false;
-                    foreach($method as &$sequence){
-                        switch($sequence["method"]){
-                            case "get":$needResult = true;break;
-                        }
-                    }
-                    if($needResult){$controllerCode .= "        \$result = [];\n";}
                     foreach($method as &$sequence){
                         $path_sequence = $path_template.$sequence["method"].".php";
                         if(file_exists($path_sequence)){
@@ -242,6 +270,16 @@ Parkjunwoo::walk(".Debug::print($this->code,"    ").");
     }
     protected function print($array, string $indent="\t", string $eol=PHP_EOL, int $breakCols=140, int $icount=1):string{
         return Debug::print($array, $indent, $eol, $breakCols, $icount);
+    }
+    protected function getControllerName(string $entityName){
+        $parentEntity = $entityName = strtolower($entityName);
+        foreach($this->source["entities"][$entityName]["attributes"] as $attributeId=>&$attribute){
+            if($attribute["define"]=="parent"){
+                $parentEntity = $attribute["entity"];
+                break;
+            }
+        }
+        return $parentEntity;
     }
 }
 
