@@ -1,5 +1,5 @@
 <?php
-namespace core;
+namespace Framework\Core;
 
 abstract class Model{
     abstract public function options():array;

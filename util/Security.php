@@ -1,5 +1,5 @@
 <?php
-namespace util;
+namespace Framework\Util;
 
 use DOMDocument;
 use DOMXPath;

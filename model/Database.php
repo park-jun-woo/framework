@@ -1,9 +1,9 @@
 <?php
-namespace model;
+namespace Framework\Model;
 
-use Parkjunwoo;
-use core\User;
-use core\Model;
+use Framework\Parkjunwoo;
+use Framework\Core\User;
+use Framework\Core\Model;
 
 /**
  * Database는 웹 어플리케이션에서 별도의 데이터베이스 없이 파일 기반으로 직접 데이터베이스를 구축합니다. 외부 데이터베이스와 연동하는 것도 가능합니다.

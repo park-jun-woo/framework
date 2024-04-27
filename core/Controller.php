@@ -1,9 +1,9 @@
 <?php
-namespace core;
+namespace Framework\Core;
 
-use Parkjunwoo;
-use util\Debug;
-use util\Image;
+use Framework\Parkjunwoo;
+use Framework\Util\Debug;
+use Framework\Util\Image;
 
 class Controller{
     protected Parkjunwoo $man;

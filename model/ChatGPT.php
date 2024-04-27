@@ -1,7 +1,7 @@
 <?php
-namespace model;
+namespace Framework\Model;
 
-use util\Debug;
+use Framework\Util\Debug;
 
 class ChatGPT{
     const MODEL_GPT35_TURBO = 0;

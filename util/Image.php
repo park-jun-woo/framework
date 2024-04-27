@@ -1,7 +1,7 @@
 <?php
-namespace util;
+namespace Framework\Util;
 
-use util\Debug;
+use Framework\Util\Debug;
 use Imagick;
 use ImagickPixel;
 use ImagickException;

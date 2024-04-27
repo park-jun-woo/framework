@@ -1,5 +1,5 @@
 <?php
-namespace util;
+namespace Framework\Util;
 
 class File{
     protected const MAP = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_";

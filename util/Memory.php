@@ -1,7 +1,7 @@
 <?php
-namespace util;
+namespace Framework\Util;
 
-use Parkjunwoo;
+use Framework\Parkjunwoo;
 
 class Memory{
     protected string $serverKey;

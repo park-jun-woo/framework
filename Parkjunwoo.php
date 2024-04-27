@@ -1,11 +1,13 @@
 <?php
-use core\Model;
-use core\User;
-use core\Request;
-use core\Controller;
-use model\Database;
-use util\File;
-use util\Security;
+namespace Framework;
+
+use Framework\Core\Model;
+use Framework\Core\User;
+use Framework\Core\Request;
+use Framework\Core\Controller;
+use Framework\Model\Database;
+use Framework\Util\File;
+use Framework\Util\Security;
 
 /**
  * Parkjunwoo Framework는 간결하고 강력한 구문을 가진 웹 어플리케이션 프레임워크입니다.
