@@ -14,7 +14,6 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
-        "php": "^8.0",
-        "doctrine/inflector": "^2.0"
+        "php": "^8.0"
     }
 }

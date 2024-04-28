@@ -1,5 +1,5 @@
 <?php
-namespace Parkjunwoo;
+namespace Parkjunwoo\Framework;
 
 use Parkjunwoo\Core\Model;
 use Parkjunwoo\Core\User;
@@ -23,18 +23,20 @@ use Parkjunwoo\Util\Security;
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
 class Parkjunwoo{
+    public const HTML = 0;
+    public const JSON = 1;
+    
+    public const GET = 0;
+    public const POST = 1;
+    public const PUT = 2;
+    public const DELETE = 3;
+
     protected static Parkjunwoo $man;
     protected User $user;
     protected Request $request;
     protected Controller $controller;
     protected string $path;
     protected array $code, $server, $thisApp;
-    public const HTML = 0;
-    public const JSON = 1;
-    public const GET = 0;
-    public const POST = 1;
-    public const PUT = 2;
-    public const DELETE = 3;
     /**
      * Parkjunwoo Parkjunwoo 생성자
      * @param array $app 실행할 어플리케이션 코드 배열

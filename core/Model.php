@@ -1,5 +1,5 @@
 <?php
-namespace Parkjunwoo\Core;
+namespace Parkjunwoo\Framework\Core;
 
 abstract class Model{
     abstract public function options():array;

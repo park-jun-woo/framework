@@ -1,5 +1,5 @@
 <?php
-namespace Parkjunwoo\Util;
+namespace Parkjunwoo\Framework\Util;
 
 class Debug{
     public static bool $debug = true;

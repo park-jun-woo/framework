@@ -1,5 +1,5 @@
 <?php
-namespace Parkjunwoo\Core;
+namespace Parkjunwoo\Framework\Core;
 
 use Parkjunwoo\Parkjunwoo;
 use Parkjunwoo\Util\Debug;

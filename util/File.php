@@ -1,5 +1,5 @@
 <?php
-namespace Parkjunwoo\Util;
+namespace Parkjunwoo\Framework\Util;
 
 class File{
     protected const MAP = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_";

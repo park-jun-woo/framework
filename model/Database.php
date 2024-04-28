@@ -1,5 +1,5 @@
 <?php
-namespace Parkjunwoo\Model;
+namespace Parkjunwoo\Framework\Model;
 
 use Parkjunwoo\Parkjunwoo;
 use Parkjunwoo\Core\User;
