@@ -1,8 +1,9 @@
 {
     "name": "parkjunwoo/framework",
-    "description": "The Parkjunwoo framework is a web application framework with a concise and powerful syntax.",
     "type": "library",
-    "license": "bsd-2-clause",
+    "description": "The Parkjunwoo framework is a web application framework with a concise and powerful syntax.",
+    "keywords": ["php", "framework"],
+    "license": "MIT",
     "version": "1.0.0",
     "authors": [
         {
@@ -11,7 +12,9 @@
         }
     ],
     "minimum-stability": "stable",
+    "prefer-stable": true,
     "require": {
+        "php": "^8.0",
         "doctrine/inflector": "^2.0"
     }
 }
