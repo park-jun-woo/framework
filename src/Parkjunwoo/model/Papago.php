@@ -1,7 +1,7 @@
 <?php
-namespace Parkjunwoo\Framework\Model;
+namespace Parkjunwoo\Model;
 
-use Parkjunwoo\Framework\Util\Debug;
+use Parkjunwoo\Util\Debug;
 
 class Papago{
     protected static Papago $instance;
