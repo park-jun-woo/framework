@@ -75,7 +75,7 @@ class Debug{
             }else{
                 if(($isSubArray && $iu==0) || $cols>$breakCols){$result .= $eol.str_repeat($indent,$icount);}
                 $result .= $isStringKey?"\"{$key}\"=>":($isOrderedKey?"":"{$key}=>");
-                $result .= is_numeric($value)?$value:"\"{$value}\"";
+                $result .= (is_numeric($value) && strpos($value,"-")===false)?$value:"\"{$value}\"";
             }
             $iu++;
         }
