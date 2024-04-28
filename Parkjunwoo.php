@@ -1,13 +1,13 @@
 <?php
 namespace Parkjunwoo\Framework;
 
-use Parkjunwoo\Core\Model;
-use Parkjunwoo\Core\User;
-use Parkjunwoo\Core\Request;
-use Parkjunwoo\Core\Controller;
-use Parkjunwoo\Model\Database;
-use Parkjunwoo\Util\File;
-use Parkjunwoo\Util\Security;
+use Parkjunwoo\Framework\Core\Model;
+use Parkjunwoo\Framework\Core\User;
+use Parkjunwoo\Framework\Core\Request;
+use Parkjunwoo\Framework\Core\Controller;
+use Parkjunwoo\Framework\Model\Database;
+use Parkjunwoo\Framework\Util\File;
+use Parkjunwoo\Framework\Util\Security;
 
 /**
  * The Parkjunwoo framework is a web application framework with a concise and powerful syntax.

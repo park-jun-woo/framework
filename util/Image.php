@@ -1,7 +1,7 @@
 <?php
 namespace Parkjunwoo\Framework\Util;
 
-use Parkjunwoo\Util\Debug;
+use Parkjunwoo\Framework\Util\Debug;
 use Imagick;
 use ImagickPixel;
 use ImagickException;

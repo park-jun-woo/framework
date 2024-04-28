@@ -1,9 +1,9 @@
 <?php
 namespace Parkjunwoo\Framework\Model;
 
-use Parkjunwoo\Parkjunwoo;
-use Parkjunwoo\Core\User;
-use Parkjunwoo\Core\Model;
+use Parkjunwoo\Framework\Parkjunwoo;
+use Parkjunwoo\Framework\Core\User;
+use Parkjunwoo\Framework\Core\Model;
 
 /**
  * Database는 웹 어플리케이션에서 별도의 데이터베이스 없이 파일 기반으로 직접 데이터베이스를 구축합니다. 외부 데이터베이스와 연동하는 것도 가능합니다.
