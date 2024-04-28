@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Util;
+namespace Parkjunwoo\Util;
 
 use DOMDocument;
 use DOMXPath;

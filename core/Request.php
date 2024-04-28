@@ -1,5 +1,5 @@
 <?php
-namespace Framework\Core;
+namespace Parkjunwoo\Core;
 
 use Parkjunwoo;
 

@@ -1,20 +1,20 @@
 <?php
-namespace Framework;
+namespace Parkjunwoo;
 
-use Framework\Core\Model;
-use Framework\Core\User;
-use Framework\Core\Request;
-use Framework\Core\Controller;
-use Framework\Model\Database;
-use Framework\Util\File;
-use Framework\Util\Security;
+use Parkjunwoo\Core\Model;
+use Parkjunwoo\Core\User;
+use Parkjunwoo\Core\Request;
+use Parkjunwoo\Core\Controller;
+use Parkjunwoo\Model\Database;
+use Parkjunwoo\Util\File;
+use Parkjunwoo\Util\Security;
 
 /**
- * Parkjunwoo Framework는 간결하고 강력한 구문을 가진 웹 어플리케이션 프레임워크입니다.
+ * The Parkjunwoo framework is a web application framework with a concise and powerful syntax.
  * PHP Version 8.0
- * @name Parkjunwoo Framework Version 1.0 zeolite
+ * @name Parkjunwoo Parkjunwoo Version 1.0 zeolite
  * @package Parkjunwoo
- * @see https://github.com/park-jun-woo/framework The Parkjunwoo GitHub project
+ * @see https://github.com/park-jun-woo/parkjunwoo The Parkjunwoo GitHub project
  * @author Park Jun woo <mail@parkjunwoo.com>
  * @copyright 2023 parkJunwoo.com
  * @license https://opensource.org/license/bsd-2-clause/ The BSD 2-Clause License
@@ -36,7 +36,7 @@ class Parkjunwoo{
     public const PUT = 2;
     public const DELETE = 3;
     /**
-     * Parkjunwoo Framework 생성자
+     * Parkjunwoo Parkjunwoo 생성자
      * @param array $app 실행할 어플리케이션 코드 배열
      */
     protected function __construct(array &$code){
@@ -65,7 +65,7 @@ class Parkjunwoo{
         $this->controller = new Controller($this);
     }
     /**
-     * Parkjunwoo Framework를 실행합니다.
+     * Parkjunwoo Parkjunwoo를 실행합니다.
      * @param array $code 실행할 어플리케이션 코드 배열
      */
     public static function walk(array $code){

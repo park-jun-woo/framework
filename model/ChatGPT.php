@@ -1,7 +1,7 @@
 <?php
-namespace Framework\Model;
+namespace Parkjunwoo\Model;
 
-use Framework\Util\Debug;
+use Parkjunwoo\Util\Debug;
 
 class ChatGPT{
     const MODEL_GPT35_TURBO = 0;

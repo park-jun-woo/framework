@@ -1,8 +1,8 @@
 <?php
-namespace Framework\Core;
+namespace Parkjunwoo\Core;
 
-use Framework\Parkjunwoo;
-use Framework\Util\File;
+use Parkjunwoo\Parkjunwoo;
+use Parkjunwoo\Util\File;
 
 class User{
     const GUEST = 0;
