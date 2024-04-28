@@ -3,6 +3,7 @@
     "description": "The Parkjunwoo framework is a web application framework with a concise and powerful syntax.",
     "type": "library",
     "license": "bsd-2-clause",
+    "version": "1.0.0",
     "authors": [
         {
             "name": "PARK JUN WOO",
