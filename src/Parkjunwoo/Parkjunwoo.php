@@ -68,10 +68,10 @@ class Parkjunwoo{
     }
     /**
      * Parkjunwoo Parkjunwoo를 실행합니다.
-     * @param array $code 실행할 어플리케이션 코드 배열
+     * @param array $env 실행할 어플리케이션 설정
      */
-    public static function walk(array $code){
-        if(!isset(self::$man)){new Parkjunwoo($code);}
+    public static function walk(array $env){
+        if(!isset(self::$man)){new Parkjunwoo($env);}
     }
     /**
      * Parkjunwoo 객체
