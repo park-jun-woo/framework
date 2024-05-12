@@ -47,7 +47,7 @@ class Debug{
      * @param int $icount 띄어쓰기 카운트
      * @return string 결과 문자열
      */
-    public static function print($array, array $oneline=[], string $indent="\t", string $eol=PHP_EOL, int $breakCols=140, int $icount=1):string{
+    public static function print($array, array $oneline=[], string $indent="    ", string $eol=PHP_EOL, int $breakCols=140, int $icount=1):string{
         $result = "";$isSubArray = false;$isStringKey = false;$isOrderedKey = true;
         if($icount==1){$result .= (is_array($array)?"":get_class($array))."[";}
         $sortedArray = array();
