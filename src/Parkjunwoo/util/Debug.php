@@ -47,7 +47,7 @@ class Debug{
      * @param int $icount 띄어쓰기 카운트
      * @return string 결과 문자열
      */
-    public static function print($array, string $indent="\t", string $eol=PHP_EOL, int $breakCols=140, int $icount=1):string{
+    public static function print($array, string $indent="\t", string $eol=PHP_EOL, int $breakCols=140, int $icount=1, array $oneline=[]):string{
         $result = "";$isSubArray = false;$isStringKey = false;$isOrderedKey = true;
         if($icount==1){$result .= (is_array($array)?"":get_class($array))."[";}
         $sortedArray = array();
@@ -70,7 +70,7 @@ class Debug{
                 $result .= $isStringKey?"\"{$key}\"=>":($isOrderedKey?"":"{$key}=>");
                 $result .= is_array($value)?"":get_class($value);
                 $result .= "[";
-                $result .= self::print($value, $indent, $eol, $breakCols, $icount+1);
+                $result .= self::print($value, $indent, in_array($key,$oneline)?"":$eol, $breakCols, $icount+1, $oneline);
                 $result .= "]";
             }else{
                 if(($isSubArray && $iu==0) || $cols>$breakCols){$result .= $eol.str_repeat($indent,$icount);}
