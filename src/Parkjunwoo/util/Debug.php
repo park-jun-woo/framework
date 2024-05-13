@@ -70,7 +70,7 @@ class Debug{
                 $result .= $isStringKey?"\"{$key}\"=>":($isOrderedKey?"":"{$key}=>");
                 $result .= is_array($value)?"":get_class($value);
                 $result .= "[";
-                $result .= self::print($value, $oneline, $indent, in_array($key,$oneline)?"":$eol, $breakCols, $icount+1);
+                $result .= self::print($value, $oneline, in_array($key,$oneline)?"":$indent, in_array($key,$oneline)?"":$eol, $breakCols, $icount+1);
                 $result .= "]";
             }else{
                 if(($isSubArray && $iu==0) || $cols>$breakCols){$result .= $eol.str_repeat($indent,$icount);}
