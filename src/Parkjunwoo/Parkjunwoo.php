@@ -138,7 +138,12 @@ class Parkjunwoo{
      * @return string 도메인
      */
     public function servername():string{
-        return $this->code["servername"];
+        $app = $this->app();
+        if(array_key_exists("session-name",$app) && $app["session-name"]!=""){
+            return $app["session-name"];
+        }else{
+            return $_SERVER["REMOTE_ADDR"];
+        }
     }
     /**
      * 어플리케이션 설정값
