@@ -9,7 +9,6 @@ class Controller{
     protected Parkjunwoo $man;
     protected User $user;
     protected Request $request;
-    protected array $result;
     /**
      * 컨트롤러 실행
      * @param Parkjunwoo $man 프레임워크 객체
@@ -18,18 +17,6 @@ class Controller{
         $this->man = $man;
         $this->user = $this->man->user();
         $this->request = $man->request();
-        $this->result = [];
-        print_r($this->request->route());
-        exit;
-        foreach($this->request->route() as $sequence){
-            switch($sequence["method"]){
-            case "permission":
-                $this->permission($sequence["permission"]);
-                break;
-            }
-        }
-
-        $this->info();
     }
 
     protected function permission(int $permission){

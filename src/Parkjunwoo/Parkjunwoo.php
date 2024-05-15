@@ -31,6 +31,10 @@ class Parkjunwoo{
     public const PUT = 2;
     public const DELETE = 3;
 
+    public const PERMISSION = 0;
+    public const CLASSNAME = 1;
+    public const METHODNAME = 2;
+
     protected static Parkjunwoo $man;
     protected User $user;
     protected Request $request;
@@ -63,9 +67,11 @@ class Parkjunwoo{
         $this->user = new User($this);
         //요청 분석
         $this->request = new Request($this);
-        
-        print_r($this->request->route());
         //요청 실행
+        $route = $this->request->route();
+        $route[self::PERMISSION];
+        $controller = new $route[self::CLASSNAME]($this);
+        $controller->$route[self::METHODNAME]();
         //$this->controller = new Controller($this);
     }
     /**
