@@ -19,7 +19,8 @@ class Controller{
         $this->user = $this->man->user();
         $this->request = $man->request();
         $this->result = [];
-        
+        print_r($this->request->route());
+        exit;
         foreach($this->request->route() as $sequence){
             switch($sequence["method"]){
             case "permission":
