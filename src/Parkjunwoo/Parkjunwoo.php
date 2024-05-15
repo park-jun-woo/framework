@@ -75,8 +75,9 @@ class Parkjunwoo{
         if(class_exists($route[self::CLASSNAME])){
             echo $route[self::CLASSNAME]." is exists.";
             $controller = new $route[self::CLASSNAME]($this);
-            if(method_exists($controller,$route[self::METHODNAME])){$controller->$route[self::METHODNAME]();}
-            else{echo $route[self::METHODNAME]." is not found.";}
+            if(method_exists($controller,$route[self::METHODNAME])){
+                $controller->$route[self::METHODNAME]();
+            }else{echo $route[self::METHODNAME]." is not found.";}
         }else{
             echo $route[self::CLASSNAME]." is not found.";
         }
