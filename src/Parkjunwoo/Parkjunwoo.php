@@ -107,7 +107,7 @@ class Parkjunwoo{
      * @return bool 존재여부
      */
     public function isRouter(int $type,int $method):bool{
-        return array_key_exists(($this->thisApp["key"]<<3)|($type<<2)|$method, $this->code["route"]);
+        return array_key_exists(($this->thisApp["key"]<<2)|$method, $this->code["route"]);
     }
     /**
      * 접속한 도메인의 앱 코드에서 라우터 배열 조회
@@ -116,7 +116,7 @@ class Parkjunwoo{
      * @return array 라우터 배열
      */
     public function router(int $type,int $method):array{
-        return $this->code["route"][($this->thisApp["key"]<<3)|($type<<2)|$method];
+        return $this->code["route"][($this->thisApp["key"]<<2)|$method];
     }
     /**
      * 앱 코드 조회
