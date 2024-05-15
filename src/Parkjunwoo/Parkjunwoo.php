@@ -71,7 +71,7 @@ class Parkjunwoo{
         $route = $this->request->route();
         $route[self::PERMISSION];
         $controller = new $route[self::CLASSNAME]($this);
-        $controller->$route[self::METHODNAME]();
+        //$controller->$route[self::METHODNAME]();
         //$this->controller = new Controller($this);
     }
     /**
