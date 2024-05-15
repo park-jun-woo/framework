@@ -61,7 +61,7 @@ class Request{
         }
         if(!isset($this->routeKey)){
             $this->routeKey = $route;//"404";
-            $this->route = [["method"=>"view","view"=>"404"]];
+            $this->route = [0,"Parkjunwoo\\core\\Controller","getNotFound"];
         }
     }
     /**
