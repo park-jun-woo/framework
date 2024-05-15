@@ -73,6 +73,7 @@ class Parkjunwoo{
         //$route[self::PERMISSION];
         print_r($route);
         if(class_exists($route[self::CLASSNAME])){
+            echo $route[self::CLASSNAME]." is exists.";
             $controller = new $route[self::CLASSNAME]($this);
             $controller->$route[self::METHODNAME]();
         }else{
