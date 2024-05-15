@@ -69,8 +69,9 @@ class Parkjunwoo{
         $this->request = new Request($this);
         //요청 실행
         $route = $this->request->route();
-        $route[self::PERMISSION];
-        $controller = new $route[self::CLASSNAME]($this);
+        print_r($route);
+        //$route[self::PERMISSION];
+        //$controller = new $route[self::CLASSNAME]($this);
         //$controller->$route[self::METHODNAME]();
         //$this->controller = new Controller($this);
     }
