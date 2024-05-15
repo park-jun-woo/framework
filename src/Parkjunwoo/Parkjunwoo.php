@@ -71,16 +71,14 @@ class Parkjunwoo{
         //요청 실행
         $route = $this->request->route();
         //$route[self::PERMISSION];
-        print_r($route);
         if(class_exists($route[self::CLASSNAME])){
-            echo $route[self::CLASSNAME]." is exists.";
             $controller = new $route[self::CLASSNAME]($this);
             if(method_exists($controller,$route[self::METHODNAME])){
                 $controller->{$route[self::METHODNAME]}();
-            }else{echo $route[self::METHODNAME]." is not found.";}
-        }else{
-            echo $route[self::CLASSNAME]." is not found.";
+            }
+            //else{echo $route[self::METHODNAME]." is not found.";}
         }
+        //else{echo $route[self::CLASSNAME]." is not found.";}
     }
     /**
      * Parkjunwoo Parkjunwoo를 실행합니다.
