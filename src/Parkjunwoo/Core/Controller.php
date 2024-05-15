@@ -19,6 +19,10 @@ class Controller{
         $this->request = $man->request();
     }
 
+    public function getNotFound(){
+        echo "404 NOT FOUND";
+    }
+
     protected function permission(int $permission){
         if($this->user->permission($permission)){
 
@@ -32,7 +36,10 @@ class Controller{
      * @param mixed $data 뷰에 전달할 데이터
      */
     protected function view(string $view,$data=null){
-        
+        $path = $this->man->app()["path"].DS."views".DS."{$view}.html";
+        if(file_exists($path)){
+            include $path;
+        }
     }
     
     /**

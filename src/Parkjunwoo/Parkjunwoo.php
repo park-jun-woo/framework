@@ -46,6 +46,7 @@ class Parkjunwoo{
      * @param array $app 실행할 어플리케이션 코드 배열
      */
     protected function __construct(array &$code){
+        define("DS",DIRECTORY_SEPARATOR);
         self::$man = $this;
         $this->code = $code;
         //클래스 자동 로더 등록
@@ -69,11 +70,9 @@ class Parkjunwoo{
         $this->request = new Request($this);
         //요청 실행
         $route = $this->request->route();
-        print_r($route);
         //$route[self::PERMISSION];
-        //$controller = new $route[self::CLASSNAME]($this);
-        //$controller->$route[self::METHODNAME]();
-        //$this->controller = new Controller($this);
+        $controller = new $route[self::CLASSNAME]($this);
+        $controller->$route[self::METHODNAME]();
     }
     /**
      * Parkjunwoo Parkjunwoo를 실행합니다.
