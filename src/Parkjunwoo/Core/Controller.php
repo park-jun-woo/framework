@@ -17,7 +17,6 @@ class Controller{
         $this->man = $man;
         $this->user = $this->man->user();
         $this->request = $man->request();
-        echo "<br>Controller create!<br>";
     }
 
     public function getNotFound(){
@@ -38,7 +37,6 @@ class Controller{
      */
     protected function view(string $view,$data=null){
         $path = $this->man->app()["path"].DS."views".DS."{$view}.html";
-        echo "<br>view: {$path}<br>";
         if(file_exists($path)){
             include $path;
         }
