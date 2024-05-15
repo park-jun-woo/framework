@@ -49,8 +49,6 @@ class Parkjunwoo{
         define("DS",DIRECTORY_SEPARATOR);
         self::$man = $this;
         $this->code = $code;
-        //클래스 자동 로더 등록
-        spl_autoload_register([$this,"autoload"]);
         //APCU 메모리에서 서버 배열을 불러올 수 없으면 리셋합니다.
         if(!apcu_exists($this->code["name"]."-server")){$this->reset();}
         else{$this->server = apcu_fetch($this->code["name"]."-server");}
@@ -223,21 +221,5 @@ class Parkjunwoo{
      */
     protected function error(string $message){
         echo $message;exit;
-    }
-    /**
-     * 클래스 파일 자동 로더
-     * @param string $className 클래스명
-     */
-    protected function autoload(string $className){
-        $className = ltrim($className, "\\");
-        $fileName = "";
-        $namespace = "";
-        if($lastNsPos = strpos($className, "\\")) {
-            $namespace = substr($className, 0, $lastNsPos);
-            $className = str_replace("\\", DIRECTORY_SEPARATOR, substr($className, $lastNsPos+1));
-            $fileName = str_replace("\\", DIRECTORY_SEPARATOR, $namespace).DIRECTORY_SEPARATOR;
-        }
-        $fileName .= str_replace("_",DIRECTORY_SEPARATOR,$className).".php";
-        require str_replace(basename(__FILE__),"",realpath(__FILE__)).$fileName;
     }
 }
