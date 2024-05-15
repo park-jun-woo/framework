@@ -36,7 +36,7 @@ class Controller{
      * @param mixed $data 뷰에 전달할 데이터
      */
     protected function view(string $view, array $result=[]){
-        $path = $this->man->app()["path"].DS."views".DS."{$view}.html";
+        $path = $this->man->app()["view"]."{$view}.html";
         if(file_exists($path)){
             include $path;
         }
