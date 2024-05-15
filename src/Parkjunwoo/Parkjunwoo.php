@@ -63,8 +63,10 @@ class Parkjunwoo{
         $this->user = new User($this);
         //요청 분석
         $this->request = new Request($this);
+        
+        print_r($this->request->route());
         //요청 실행
-        $this->controller = new Controller($this);
+        //$this->controller = new Controller($this);
     }
     /**
      * Parkjunwoo Parkjunwoo를 실행합니다.
