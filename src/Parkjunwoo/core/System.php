@@ -1,7 +1,7 @@
 <?php
 namespace Parkjunwoo\Core;
 
-use Parkjunwoo;
+use Parkjunwoo\Parkjunwoo;
 
 class System{
     protected Parkjunwoo $man;
