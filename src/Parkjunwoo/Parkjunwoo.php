@@ -68,7 +68,7 @@ class Parkjunwoo{
         $this->request = new Request($this);
         $route = $this->request->route();
         //권한 확인
-        if($this->user->permission($route[self::PERMISSION])){
+        if(!$this->user->permission($route[self::PERMISSION])){
             print_r($route);
             $route = [0,"Parkjunwoo\\Core\\Controller","getDenied"];
         }
