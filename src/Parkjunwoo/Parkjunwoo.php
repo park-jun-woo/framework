@@ -70,7 +70,7 @@ class Parkjunwoo{
         //권한 확인
         if(!$this->user->permission($route[self::PERMISSION])){
             print_r($route);
-            $route = [0,"Parkjunwoo\\Core\\Controller","getDenied"];
+            $route = [0,"Parkjunwoo\\Core\\Controller","getNotFound"];
         }
         //클래스 존재 확인
         if(!class_exists($route[self::CLASSNAME])){

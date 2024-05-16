@@ -19,10 +19,6 @@ class Controller{
         $this->request = $man->request();
     }
 
-    public function getDenied(){
-        echo "403 PERMISSION DENIED";
-    }
-
     public function getNotFound(){
         echo "404 NOT FOUND";
     }
