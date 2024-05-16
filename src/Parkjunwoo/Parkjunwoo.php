@@ -66,17 +66,23 @@ class Parkjunwoo{
         $this->user = new User($this);
         //요청 분석
         $this->request = new Request($this);
-        //요청 실행
         $route = $this->request->route();
-        //$route[self::PERMISSION];
-        if(class_exists($route[self::CLASSNAME])){
-            $controller = new $route[self::CLASSNAME]($this);
-            if(method_exists($controller,$route[self::METHODNAME])){
-                $controller->{$route[self::METHODNAME]}();
-            }
-            //else{echo $route[self::METHODNAME]." is not found.";}
+        //권한 확인
+        if($this->user->permission($route[self::PERMISSION])){
+            $route = [0,"Parkjunwoo\\Core\\Controller","getNotFound"];
         }
-        //else{echo $route[self::CLASSNAME]." is not found.";}
+        //클래스 존재 확인
+        if(!class_exists($route[self::CLASSNAME])){
+            $route = [0,"Parkjunwoo\\Core\\Controller","getNotFound"];
+        }
+        //클래스 인스턴스 생성
+        $controller = new $route[self::CLASSNAME]($this);
+        //메서드 존재 확인
+        if(!method_exists($controller,$route[self::METHODNAME])){
+            $route = [0,"Parkjunwoo\\Core\\Controller","getNotFound"];
+            $controller = new $route[self::CLASSNAME]($this);
+        }
+        $controller->{$route[self::METHODNAME]}();
     }
     /**
      * Parkjunwoo Parkjunwoo를 실행합니다.

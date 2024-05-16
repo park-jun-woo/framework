@@ -22,13 +22,6 @@ class Controller{
     public function getNotFound(){
         echo "404 NOT FOUND";
     }
-
-    protected function permission(int $permission){
-        if($this->user->permission($permission)){
-
-        }
-    }
-    
     /**
      * 지정한 컨텐트 타입에 맞춰 뷰 출력
      * @param string $layout 레이아웃 이름
@@ -41,7 +34,13 @@ class Controller{
             include $path;
         }
     }
-    
+    /**
+     * 리데이렉트
+     * @param string $uri 주소
+     */
+    protected function redirect(string $uri){
+
+    }
     /**
      * 지정한 컨텐트 타입에 맞춰 메세지 출력
      * @param string $message
@@ -49,7 +48,9 @@ class Controller{
     protected function message(string $message){
         
     }
-    
+    /**
+     * 페이지 정보 출력
+     */
     protected function info(){
         echo "<!DOCTYPE html>
 <html>
