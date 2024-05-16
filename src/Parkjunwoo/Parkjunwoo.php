@@ -69,6 +69,7 @@ class Parkjunwoo{
         $route = $this->request->route();
         //권한 확인
         if($this->user->permission($route[self::PERMISSION])){
+            print_r($route);
             $route = [0,"Parkjunwoo\\Core\\Controller","getDenied"];
         }
         //클래스 존재 확인
