@@ -8,12 +8,13 @@ class Request{
     protected User $user;
     protected string $uri, $routeKey, $locale;
     protected int $method, $type;
-    protected array $route;
+    protected array $route,$parameters;
     /**
      * 요청 분석하는 생성자
      */
     public function __construct(Parkjunwoo $man){
         $this->man = $man;
+        $this->parameters = [];
         //세션 설정
         $this->user = $this->man->user();
         //URI 분석
@@ -51,8 +52,10 @@ class Request{
         $len = count($exploded);
         for($iu=1;$iu<$len;$iu++){
             if($iu%2==1){$route .= "/".$exploded[$iu];}
-            else if(is_numeric($exploded[$iu])){$route .= "/[{$exploded[$iu-1]}]";}
-            else{$route .= "/".$exploded[$iu];}
+            else if(is_numeric($exploded[$iu])){
+                $route .= "/[{$exploded[$iu-1]}]";
+                $this->parameters[$exploded[$iu-1]] = intval($exploded[$iu]);
+            }else{$route .= "/".$exploded[$iu];}
         }
         $router = $this->man->router($this->type, $this->method);
         if(array_key_exists($route, $router)){
@@ -61,7 +64,7 @@ class Request{
         }
         if(!isset($this->routeKey)){
             $this->routeKey = $route;//"404";
-            $this->route = [0,"Parkjunwoo\\core\\Controller","getNotFound"];
+            $this->route = [0,"Parkjunwoo\\Core\\Controller","getNotFound"];
         }
     }
     /**
@@ -105,6 +108,28 @@ class Request{
      */
     public function route():array{
         return $this->route;
+    }
+    /**
+     * 파라미터값 조회
+     * @param string $key 조회할 값의 키 
+     */
+    public function parameter(string $key){
+        if(array_key_exists($key,$this->parameters)){
+            return $this->parameters[$key];
+        }else{
+            switch($this->method){
+            case Parkjunwoo::GET:
+                if(array_key_exists($key,$_GET)){return $_GET[$key];}
+                break;
+            case Parkjunwoo::POST:
+                if(array_key_exists($key,$_POST)){return $_POST[$key];}
+                break;
+            case Parkjunwoo::PUT:
+                if(array_key_exists($key,$_PUT)){return $_PUT[$key];}
+                break;
+            }
+        }
+        return false;
     }
 }
 ?>
