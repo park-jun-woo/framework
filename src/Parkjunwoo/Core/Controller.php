@@ -43,13 +43,6 @@ class Controller{
         header("Location: ".$uri);
     }
     /**
-     * 지정한 컨텐트 타입에 맞춰 메세지 출력
-     * @param string $message
-     */
-    protected function message(string $message){
-        
-    }
-    /**
      * 페이지 정보 출력
      */
     protected function info(){

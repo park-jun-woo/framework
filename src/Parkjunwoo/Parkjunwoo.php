@@ -184,6 +184,19 @@ class Parkjunwoo{
         return $this->code["permission"];
     }
     /**
+     * 메세지 얻기
+     * @param int $code 메세지 코드
+     * @return string 메세지
+     */
+    public function message(int $code):string{
+        if(array_key_exists($code,$this->code["message"])){
+            $message = $this->code["message"][$code];
+            $locale = $this->request->locale();
+            if(array_key_exists($locale, $message)){return $message[$locale];}
+            else{return $message[array_keys($message)[0]];}
+        }
+    }
+    /**
      * 개인키
      * @return string 루트 경로
      */
