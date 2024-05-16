@@ -20,7 +20,7 @@ class Controller{
     }
 
     public function getNotFound(){
-        echo "404 NOT FOUND";
+        if($this->request->uri()=="/"){echo "404";}else{$this->redirect("/");}
     }
     /**
      * 지정한 컨텐트 타입에 맞춰 뷰 출력
@@ -39,7 +39,7 @@ class Controller{
      * @param string $uri 주소
      */
     protected function redirect(string $uri){
-
+        header('Location: {$uri}');
     }
     /**
      * 지정한 컨텐트 타입에 맞춰 메세지 출력
