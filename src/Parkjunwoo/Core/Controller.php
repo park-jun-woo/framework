@@ -40,7 +40,7 @@ class Controller{
      * @param string $uri 주소
      */
     protected function redirect(string $uri){
-        header('Location: {$uri}');
+        header("Location: ".$uri);
     }
     /**
      * 지정한 컨텐트 타입에 맞춰 메세지 출력
