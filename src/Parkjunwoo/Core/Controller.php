@@ -20,7 +20,8 @@ class Controller{
     }
 
     public function getNotFound(){
-        if($this->request->uri()=="/"){header("HTTP/1.1 404 Not Found");}else{$this->redirect("/");}
+        header("HTTP/1.1 404 Not Found");
+        if($this->request->uri()!="/"){$this->redirect("/");}
     }
     /**
      * 지정한 컨텐트 타입에 맞춰 뷰 출력
