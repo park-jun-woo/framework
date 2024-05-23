@@ -44,10 +44,10 @@ class File{
     /**
      * 지정한 경로의 파일을 읽는다.
      * @param string $path 경로
-     * @return string|boolean 읽은 텍스트, 파일이 없는 경우 false 반환
+     * @return string|null 읽은 텍스트, 파일이 없는 경우 null 반환
      */
-    public static function read(string $path){
-        if(!file_exists($path)){return false;}
+    public static function read(string $path):?string{
+        if(!file_exists($path)){return null;}
         $handle = fopen($path, "r");
         if(flock($handle, LOCK_SH)){
             $result = fread($handle, filesize($path));
@@ -61,9 +61,9 @@ class File{
      * 지정한 경로에 파일이 없을 경우 0을 반환하고 파일을 새로 만들어 $amount만큼 증가시켜서 저장한다.
      * @param string $path 경로
      * @param int $amount 증가할 숫자, 기본값은 1
-     * @return number 조회한 숫자
+     * @return int 조회한 숫자
      */
-    public static function increase(string $path, int $amount=1){
+    public static function increase(string $path, int $amount=1):int{
         //파일을 읽는다.
         if(file_exists($path)){
             if(flock($handle = fopen($path, "r"), LOCK_EX)){$key = unpack("J", fread($handle, 8))[1];}

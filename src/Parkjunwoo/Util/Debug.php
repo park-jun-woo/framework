@@ -6,17 +6,20 @@ class Debug{
     protected static array $category = array();
     /**
      * Enable debug output for the specified category.
+     * 
      * @param string $category category
      */
     public static function active(string $category){self::$category[$category] = true;}
     /**
      * Disable debug output for the specified category.
+     * 
      * @param string $category category
      */
     public static function disable(string $category){self::$category[$category] = false;}
     
     /**
      * Print debug messages for the specified category.
+     * 
      * @param string $message Debugging message
      * @param string $category category
      * @param bool $trace tracing
@@ -37,11 +40,13 @@ class Debug{
     }
     /**
      * 에러 메세지 출력 후 종료
+     * 
      * @param string $message 에러 메세지
      */
     public static function error($message){echo $message.PHP_EOL;exit;}
     /**
      * 배열을 출력합니다.
+     * 
      * @param array $array 배열
      * @param string $indent 띄어쓰기
      * @param int $icount 띄어쓰기 카운트
@@ -76,7 +81,11 @@ class Debug{
                 if(($isSubArray && $iu==0) || $cols>$breakCols){$result .= $eol.str_repeat($indent,$icount);}
                 $result .= $isStringKey?"\"{$key}\"=>":($isOrderedKey?"":"{$key}=>");
                 if(is_numeric($value) && strpos($value,"-")===false){$result .= $value;}
-                else{$result .= "\"".addslashes($value)."\"";}
+                else{
+                    $value = addslashes($value);
+                    $value = str_replace(["\'"],["'"],$value);
+                    $result .= "\"".$value."\"";
+                }
             }
             $iu++;
         }
@@ -86,6 +95,7 @@ class Debug{
 
     /**
      * 배열의 글자수를 구합니다.
+     * 
      * @param array $array 배열
      * @return int 배열의 글자수
      */
