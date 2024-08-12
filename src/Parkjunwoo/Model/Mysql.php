@@ -20,8 +20,8 @@ use Parkjunwoo\Interface\Model;
  */
 class Mysql implements Singleton, Model{
     protected static Mysql $instance;
-    public static function getInstance(Parkjunwoo $man):self{
-        if(!isset(self::$instance)){self::$instance = new self($man);}
+    public static function getInstance(...$params):self{
+        if(!isset(self::$instance)){self::$instance = new self(...$params);}
         return self::$instance;
     }
 
