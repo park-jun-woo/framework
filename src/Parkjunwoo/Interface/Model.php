@@ -1,5 +1,5 @@
 <?php
-namespace Parkjunwoo\Core;
+namespace Parkjunwoo\Interface;
 
 use Parkjunwoo\Parkjunwoo;
 
