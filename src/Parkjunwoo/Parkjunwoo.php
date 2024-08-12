@@ -1,13 +1,14 @@
 <?php
 namespace Parkjunwoo;
 
-use Parkjunwoo\Core\Model;
 use Parkjunwoo\Core\User;
 use Parkjunwoo\Core\Request;
 use Parkjunwoo\Core\Controller;
 use Parkjunwoo\Model\Database;
 use Parkjunwoo\Util\File;
 use Parkjunwoo\Util\Security;
+use Parkjunwoo\Interface\Singleton;
+use Parkjunwoo\Interface\Model;
 
 /**
  * The Parkjunwoo framework is a web application framework with a concise and powerful syntax.
@@ -22,7 +23,7 @@ use Parkjunwoo\Util\Security;
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
-class Parkjunwoo{
+class Parkjunwoo implements Singleton{
     public const HTML = 0;
     public const JSON = 1;
     
@@ -35,7 +36,12 @@ class Parkjunwoo{
     public const CLASSNAME = 1;
     public const METHODNAME = 2;
 
-    protected static Parkjunwoo $man;
+    protected static Parkjunwoo $instance;
+    public static function getInstance(array &$env):self{
+        if(!isset(self::$instance)){self::$instance = new self($env);}
+        return self::$instance;
+    }
+
     protected User $user;
     protected Request $request;
     protected Controller $controller;
@@ -82,23 +88,6 @@ class Parkjunwoo{
         }
         $controller->{$route[self::METHODNAME]}();
     }
-    /**
-     * Parkjunwoo Parkjunwoo를 실행합니다.
-     * @param array $env 실행할 어플리케이션 설정
-     */
-    public static function walk(array $env){
-        if(!isset(self::$man)){new Parkjunwoo($env);}
-    }
-    /**
-     * Parkjunwoo 객체
-     * @return Parkjunwoo 맨 객체
-     */
-    public static function man():Parkjunwoo{return self::$man;}
-    /**
-     * 사용자 세션 정보
-     * @return User 사용자 객체
-     */
-    public function model():Model{return $this->model;}
     /**
      * 사용자 세션 정보
      * @return User 사용자 객체
@@ -163,18 +152,26 @@ class Parkjunwoo{
     }
     /**
      * 어플리케이션 설정값
-     * @return string 루트 경로
+     * @return string 키값
      */
     public function config(string $key){
         if(!array_key_exists($key, $this->code["config"])){$this->error("config[\"{$key}\"]이 입력되어 있지 않습니다.");}
         return $this->code["config"][$key];
     }
     /**
-     * 어플리케이션 루트 경로
-     * @return string 루트 경로
+     * 어플리케이션 경로
+     * @return string 키값
      */
     public function path(string $key="root"):string{
         if(array_key_exists($key, $this->code["path"])){return $this->code["path"][$key];}else{return "";}
+    }
+    /**
+     * 어플리케이션 데이터베이스 설정값
+     * @return string 키값
+     */
+    public function database(string $key){
+        if(!array_key_exists($key, $this->code["database"])){$this->error("database[\"{$key}\"]이 입력되어 있지 않습니다.");}
+        return $this->code["database"][$key];
     }
     /**
      * 어플리케이션 권한 배열
