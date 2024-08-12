@@ -38,7 +38,7 @@ class Parkjunwoo implements Singleton{
 
     protected static Parkjunwoo $instance;
     public static function getInstance(...$params):self{
-        if(!isset(self::$instance)){self::$instance = new self($env);}
+        if(!isset(self::$instance)){self::$instance = new self(...$params);}
         return self::$instance;
     }
 
