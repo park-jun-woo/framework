@@ -83,7 +83,7 @@ class Debug{
                 if(is_numeric($value) && strpos($value,"-")===false){$result .= $value;}
                 else{
                     $value = addslashes($value);
-                    $value = str_replace(["\'"],["'"],$value);
+                    $value = str_replace(["\\\\","\'"],["\\","'"],$value);
                     $result .= "\"".$value."\"";
                 }
             }

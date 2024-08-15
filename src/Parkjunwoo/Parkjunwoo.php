@@ -66,8 +66,6 @@ class Parkjunwoo implements Singleton{
         }
         //현재 접속한 앱
         $this->thisApp = $this->code["app"][$this->code["domain"][$_SERVER["SERVER_NAME"]]];
-        //캐시형 데이터베이스
-        Database::init($this);
         //사용자 세션
         $this->user = new User($this);
         //요청 분석
@@ -110,7 +108,7 @@ class Parkjunwoo implements Singleton{
      * @return bool 존재여부
      */
     public function isRouter(int $type,int $method):bool{
-        return array_key_exists(($this->thisApp["key"]<<2)|$method, $this->code["route"]);
+        return array_key_exists($method, $this->code["route"]);
     }
     /**
      * 접속한 도메인의 앱 코드에서 라우터 배열 조회
@@ -119,17 +117,7 @@ class Parkjunwoo implements Singleton{
      * @return array 라우터 배열
      */
     public function router(int $type,int $method):array{
-        return $this->code["route"][($this->thisApp["key"]<<2)|$method];
-    }
-    /**
-     * 앱 코드 조회
-     * @param string $name 키 또는 도메인
-     * @return array|bool 앱 코드 배열
-     */
-    public function app(string $name=""){
-        if($name==""){return $this->thisApp;}
-        if(array_key_exists($name,$this->code["app"])){return $this->code["app"][$name];}
-        return false;
+        return $this->code["route"][$method];
     }
     /**
      * 어플리케이션 이름
@@ -143,12 +131,7 @@ class Parkjunwoo implements Singleton{
      * @return string 도메인
      */
     public function servername():string{
-        $app = $this->app();
-        if(array_key_exists("session-name",$app) && $app["session-name"]!=""){
-            return $app["session-name"];
-        }else{
-            return $_SERVER["REMOTE_ADDR"];
-        }
+        return $this->code["name"];
     }
     /**
      * 어플리케이션 설정값
