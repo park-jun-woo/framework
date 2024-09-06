@@ -8,7 +8,7 @@ class Request{
     protected User $user;
     protected string $uri, $routeKey, $locale;
     protected int $method, $type;
-    protected array $route,$parameters;
+    protected array $route,$parameters,$put;
     /**
      * 요청 분석하는 생성자
      */
@@ -23,7 +23,7 @@ class Request{
         switch($_SERVER["REQUEST_METHOD"]){
             case "GET":$this->method = Parkjunwoo::GET;break;
             case "POST":$this->method = Parkjunwoo::POST;break;
-            case "PUT":$this->method = Parkjunwoo::PUT;break;
+            case "PUT":$this->method = Parkjunwoo::PUT;parse_str(file_get_contents('php://input'), $this->put);break;
             case "\DELETE":$this->method = Parkjunwoo::DELETE;break;
         }
         //ContentType 분석
@@ -125,7 +125,7 @@ class Request{
                 if(array_key_exists($key,$_POST)){return $_POST[$key];}
                 break;
             case Parkjunwoo::PUT:
-                if(array_key_exists($key,$_PUT)){return $_PUT[$key];}
+                if(array_key_exists($key,$this->put)){return $this->put[$key];}
                 break;
             }
         }

@@ -127,6 +127,20 @@ class Parkjunwoo implements Singleton{
         return $this->code["name"];
     }
     /**
+     * 어플리케이션 타이틀
+     * @return string 어플리케이션 타이틀
+     */
+    public function title():string{
+        return $this->code["title"];
+    }
+    /**
+     * 어플리케이션 설명
+     * @return string 어플리케이션 설명
+     */
+    public function description():string{
+        return $this->code["description"];
+    }
+    /**
      * 세션 도메인
      * @return string 도메인
      */
@@ -168,13 +182,14 @@ class Parkjunwoo implements Singleton{
      * @param int $code 메세지 코드
      * @return string 메세지
      */
-    public function message(int $code):string{
+    public function message(int $code):?string{
         if(array_key_exists($code,$this->code["message"])){
             $message = $this->code["message"][$code];
             $locale = $this->request->locale();
             if(array_key_exists($locale, $message)){return $message[$locale];}
             else{return $message[array_keys($message)[0]];}
         }
+        return null;
     }
     /**
      * 개인키
