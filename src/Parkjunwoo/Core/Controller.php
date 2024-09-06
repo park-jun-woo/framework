@@ -26,20 +26,13 @@ class Controller{
     /**
      * 뷰 출력
      * @param string $view 뷰 이름
-     * @param mixed $data 뷰에 전달할 데이터
+     * @param mixed $result 뷰에 전달할 데이터
      */
     protected function view(string $view, array $result=[]){
         $path = $this->man->path("view")."{$view}.html";
         if(file_exists($path)){
             include $path;
         }
-    }
-    /**
-     * JSON 출력
-     * @param mixed $data 뷰에 전달할 데이터
-     */
-    protected function json(array $result=[]){
-        return $result;
     }
     /**
      * 리데이렉트
@@ -50,10 +43,18 @@ class Controller{
     }
     /**
      * 지정한 컨텐트 타입에 맞춰 메세지 출력
-     * @param string $message
+     * @param int $code
+     * @param mixed $result 전달할 데이터
      */
-    protected function message(string $message){
-        echo $this->man->message($message);
+    protected function message(int $code, array $result=[]){
+        $result["code"] = $code;
+        $result["message"] = $this->man->message($code);
+        switch($this->request->type()){
+            case Parkjunwoo::JSON:echo json_encode($result);break;
+            case Parkjunwoo::HTML:
+                
+                break;
+        }
     }
 }
 ?>

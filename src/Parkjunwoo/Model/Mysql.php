@@ -1,6 +1,7 @@
 <?php
 namespace Parkjunwoo\Model;
 
+use mysqli;
 use Parkjunwoo\Parkjunwoo;
 use Parkjunwoo\Interface\Singleton;
 use Parkjunwoo\Interface\Model;
@@ -48,10 +49,7 @@ class Mysql implements Singleton, Model{
      * DB 연결 해제
      */
     public function __destruct(){
-        if (isset($this->connection)){
-            $this->connection->close();
-            $this->connection = null;
-        }
+        if (isset($this->connection)){$this->connection->close();}
     }
     /**
      * 쿼리 실행
@@ -77,7 +75,7 @@ class Mysql implements Singleton, Model{
      * @return mixed 잠금 실행 성공 여부를 반환합니다.
      */
     public function lock(string $tableName):bool{
-        return $mysqli->query("LOCK TABLES {$tableName} WRITE");
+        return $this->connection->query("LOCK TABLES {$tableName} WRITE");
     }
     /**
      * 잠금을 해제합니다.
@@ -85,7 +83,7 @@ class Mysql implements Singleton, Model{
      * @return mixed 잠금 해제 성공 여부를 반환합니다.
      */
     public function unlock():bool{
-        return $mysqli->query("UNLOCK TABLES");
+        return $this->connection->query("UNLOCK TABLES");
     }
     /**
      * 트랜잭션을 실행합니다.

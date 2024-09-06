@@ -48,7 +48,7 @@ class Parkjunwoo implements Singleton{
     protected string $path;
     protected array $code, $server, $thisApp;
     /**
-     * Parkjunwoo Parkjunwoo 생성자
+     * Parkjunwoo 생성자
      * @param array $app 실행할 어플리케이션 코드 배열
      */
     protected function __construct(array &$code){

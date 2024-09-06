@@ -90,9 +90,9 @@ class Request{
     }
     /**
      * 컨텐트 타입
-     * @return string 컨텐트 타입
+     * @return int 컨텐트 타입
      */
-    public function type():string{
+    public function type():int{
         return $this->type;
     }
     /**
