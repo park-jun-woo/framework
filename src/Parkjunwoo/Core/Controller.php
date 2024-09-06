@@ -44,7 +44,7 @@ class Controller{
     /**
      * 지정한 컨텐트 타입에 맞춰 메세지 출력
      * @param int $code
-     * @param mixed $result 전달할 데이터
+     * @param array $result 전달할 데이터
      */
     protected function message(int $code, array $result=[]){
         $result["code"] = $code;

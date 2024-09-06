@@ -183,9 +183,70 @@ class Parkjunwoo implements Singleton{
      * @return string 메세지
      */
     public function message(int $code):?string{
-        if(array_key_exists($code,$this->code["message"])){
+        $message = null;
+        $locale = $this->request->locale();
+        if($code<1000){
+            $default = [
+                "100"=> ["ko"=>"계속","en"=>"Continue"],
+                "101"=> ["ko"=>"프로토콜 전환","en"=>"Switching Protocols"],
+                "102"=> ["ko"=>"처리중","en"=>"Processing"],
+                "200"=> ["ko"=>"성공하였습니다.","en"=>"OK"],
+                "201"=> ["ko"=>"생성하였습니다.","en"=>"Created"],
+                "202"=> ["ko"=>"허용하였습니다.","en"=>"Accepted"],
+                "203"=> ["ko"=>"신뢰할 수 없습니다.","en"=>"Non-Authoritative Information"],
+                "204"=> ["ko"=>"콘텐츠가 없습니다.","en"=>"No Content"],
+                "205"=> ["ko"=>"콘텐츠를 재설정합니다.","en"=>"Reset Content"],
+                "206"=> ["ko"=>"콘텐츠 일부입니다.","en"=>"Partial Content"],
+                "207"=> ["ko"=>"다중 상태입니다.","en"=>"Multi-Status"],
+                "300"=> ["ko"=>"컨텐츠 유형이 여러 개 있습니다.","en"=>"Multiple Choices"],
+                "301"=> ["ko"=>"다른 URI로 바뀌었습니다.","en"=>"Moved Permanently"],
+                "302"=> ["ko"=>"다른 URI를 찾았습니다.","en"=>"Found"],
+                "303"=> ["ko"=>"다른 URI로 요청하세요.","en"=>"See Other"],
+                "304"=> ["ko"=>"갱신되지 않았습니다.","en"=>"Not Modified"],
+                "305"=> ["ko"=>"프록시를 사용해 접속하세요.","en"=>"Use Proxy"],
+                "307"=> ["ko"=>"임시 리다이렉션","en"=>"Temporary Redirect"],
+                "400"=> ["ko"=>"요청을 잘못 하였습니다.","en"=>"Bad Request"],
+                "401"=> ["ko"=>"권한이 없습니다.","en"=>"Unauthorized	"],
+                "402"=> ["ko"=>"결제가 필요합니다.","en"=>"Payment Required"],
+                "403"=> ["ko"=>"금지된 URI입니다.","en"=>"Forbidden"],
+                "404"=> ["ko"=>"찾을 수 없습니다.","en"=>"Not Found"],
+                "405"=> ["ko"=>"허용되지 않은 메소드입니다.","en"=>"Method Not Allowed"],
+                "406"=> ["ko"=>"수용할 수 없습니다.","en"=>"Not Acceptable"],
+                "407"=> ["ko"=>"프록시 인증 필요합니다.","en"=>"Proxy Authentication Required"],
+                "408"=> ["ko"=>"요청 시간초과하였습니다.","en"=>"Request Timeout"],
+                "409"=> ["ko"=>"충돌","en"=>"Conflict"],
+                "410"=> ["ko"=>"없어졌습니다.","en"=>"Gone"],
+                "411"=> ["ko"=>"길이를 지정하세요.","en"=>"Length Required"],
+                "412"=> ["ko"=>"사전 조건 실패하였습니다.","en"=>"Precondition Failed"],
+                "413"=> ["ko"=>"요청이 너무 큽니다.","en"=>"Request Entity Too Large"],
+                "414"=> ["ko"=>"요청 URI가 너무 깁니다.","en"=>"Request-URI Too Large"],
+                "415"=> ["ko"=>"지원하지 않는 미디어 유형입니다.","en"=>"Unsupported Media Type"],
+                "416"=> ["ko"=>"처리할 수 없는 요청 범위입니다.","en"=>"Range Not Satisfiable"],
+                "417"=> ["ko"=>"예상 실패하였습니다.","en"=>"Expectation Failed"],
+                "422"=> ["ko"=>"처리할 수 없습니다.","en"=>"Unprocessable Entity"],
+                "423"=> ["ko"=>"잠겼습니다.","en"=>"Locked"],
+                "424"=> ["ko"=>"의존 실패하였습니다.","en"=>"Failed Dependency"],
+                "426"=> ["ko"=>"업그레이드가 필요합니다.","en"=>"Upgraded Required"],
+                "428"=> ["ko"=>"사전 조건 필요합니다.","en"=>"Precondition Required"],
+                "429"=> ["ko"=>"너무 많은 요청입니다.","en"=>"Too Many Requests"],
+                "431"=> ["ko"=>"헤더가 너무 큽니다.","en"=>"Request Header Fields Too Large"],
+                "444"=> ["ko"=>"응답 없이 연결을 닫습니다.","en"=>"Connection Closed Without Response"],
+                "451"=> ["ko"=>"법적 사유로 불가합니다.","en"=>"Unavailable For Legal Reasons"],
+                "500"=> ["ko"=>"내부 서버 오류입니다.","en"=>"Internal Server Error"],
+                "501"=> ["ko"=>"구현되지 않았습니다.","en"=>"Not Implemented	"],
+                "502"=> ["ko"=>"게이트웨이 오류가 있습니다.","en"=>"Bad Gateway"],
+                "503"=> ["ko"=>"서비스 제공이 불가능합니다.","en"=>"Service Unavailable	"],
+                "504"=> ["ko"=>"게이트웨이 시간초과하였습니다.","en"=>"Gateway Timeout"],
+                "505"=> ["ko"=>"지원하지 않는 HTTP 버전입니다.","en"=>"HTTP Version Not Supported"],
+                "507"=> ["ko"=>"용량이 부족합니다.","en"=>"Insufficient Storage"],
+            ];
+            if(array_key_exists($code,$default)){
+                $message = $default[$code];
+            }
+        }else if(array_key_exists($code,$this->code["message"])){
             $message = $this->code["message"][$code];
-            $locale = $this->request->locale();
+        }
+        if($message!=null){
             if(array_key_exists($locale, $message)){return $message[$locale];}
             else{return $message[array_keys($message)[0]];}
         }
