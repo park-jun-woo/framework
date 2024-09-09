@@ -111,9 +111,10 @@ class Request{
     }
     /**
      * 파라미터값 조회
-     * @param string $key 조회할 값의 키 
+     * @param string $key 조회할 값의 키
+     * @param string $default 키값이 없으면 출력할 기본값
      */
-    public function parameter(string $key){
+    public function parameter(string $key, string $default=null){
         if(array_key_exists($key,$this->parameters)){
             return $this->parameters[$key];
         }else{
@@ -129,7 +130,8 @@ class Request{
                 break;
             }
         }
-        return false;
+        if($default==null){return false;}
+        else{return $default;}
     }
 }
 ?>
