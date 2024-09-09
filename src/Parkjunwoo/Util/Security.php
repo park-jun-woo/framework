@@ -47,27 +47,28 @@ class Security{
         $xpath = new DOMXPath($dom);
         $allowed = array_merge(["html"=>[],"head"=>[],"body"=>[]],$allowed);
         $query ="//*[not(self::".implode(" or self::",array_keys($allowed)).")]";
-        foreach($xpath->query($query) as $node){$node->parentNode->removeChild($node);}
+        foreach($xpath->query($query) as $node){
+            return false;//$node->parentNode->removeChild($node);
+        }
         foreach($xpath->query("//@*") as $attribute) {
             if(!in_array($attribute->nodeName,$allowed[$attribute->ownerElement->nodeName] ?? [])) {
-                $attribute->ownerElement->removeAttributeNode($attribute);
+                return false;//$attribute->ownerElement->removeAttributeNode($attribute);
             }
         }
-        $body = $dom->getElementsByTagName("body")->item(0);$result = "";
-        foreach($body->childNodes as $child){$result .= $dom->saveHTML($child);}
-        return $result;
+        //$body = $dom->getElementsByTagName("body")->item(0);$result = "";
+        //foreach($body->childNodes as $child){$result .= $dom->saveHTML($child);}
+        return true;//$result;
     }
     /**
      * XSS 공격 필터링 for articles
      * @param string $html 필터링할 입력 값
      */
     public static function purifyArticle(string $html){
-        $allowed = [
+        return self::purifyHTML($html,[
             "article"=>["class"],"p"=>["id"],"ul"=>["class"],"ol"=>["class"],"li"=>["class"],"caption"=>["class"]
             ,"img"=>["src","alt","width","height","ismap","loading"],"figure"=>["class"],"figcaption"=>["class"]
             ,"h1"=>["class"],"h2"=>["class"],"h3"=>["class"],"h4"=>["class"],"h5"=>["class"],"h6"=>["class"]
             ,"table"=>["class"],"tr"=>["class"],"th"=>["class","scope"],"td"=>["class"],"colgroup"=>["class"],"col"=>["class"]
-        ];
-        return self::purifyHTML($html,$allowed);
+        ]);
     }
 }
