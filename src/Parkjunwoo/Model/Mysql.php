@@ -61,6 +61,15 @@ class Mysql implements Singleton, Model{
         return $this->connection->query($query);
     }
     /**
+     * 입력 결과 키값
+     *
+     * @param string $query 쿼리문
+     * @return int 결과 키값
+     */
+    public function insertId():int{
+        return $this->connection->insert_id;
+    }
+    /**
      * 쿼리 결과 배열로 반환
      *
      * @param mixed $result 쿼리결과
