@@ -4,6 +4,7 @@ namespace Parkjunwoo\Core;
 use Parkjunwoo\Parkjunwoo;
 use Parkjunwoo\Util\Debug;
 use Parkjunwoo\Util\Image;
+use Parkjunwoo\Util\Security;
 
 class Controller{
     protected Parkjunwoo $man;
