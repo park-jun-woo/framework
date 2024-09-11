@@ -82,7 +82,7 @@ class Parkjunwoo implements Singleton{
             $route = [0,"Parkjunwoo\\Core\\Controller","getNotFound"];
             $controller = new $route[self::CLASSNAME]($this);
         }
-        $controller->{$route[self::METHODNAME]}();
+        $controller->{$route[self::METHODNAME]}($this->request);
     }
     /**
      * 사용자 세션 정보
