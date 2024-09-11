@@ -9,7 +9,7 @@ interface Model{
      * DB 연결
      * @param array $app 실행할 어플리케이션 코드 배열
      */
-    public function __construct(Parkjunwoo $man, string $entityName);
+    public function __construct(Parkjunwoo $man);
     /**
      * Model 파괴자
      * DB 연결 해제
@@ -22,6 +22,13 @@ interface Model{
      * @return mixed 결과
      */
     public function query(string $query);
+    /**
+     * 입력 결과 키값
+     *
+     * @param string $query 쿼리문
+     * @return int 결과 키값
+     */
+    public function insertId():int;
     /**
      * 쿼리 결과 배열로 반환
      *
