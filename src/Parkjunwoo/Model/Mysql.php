@@ -35,21 +35,13 @@ class Mysql implements Singleton, Model{
      */
     public function __construct(Parkjunwoo $man){
         $this->man = $man;
-        $host = $this->man->database("host");
-        $username = $this->man->database("username");
-        $password = $this->man->database("password");
-        $database = $this->man->database("database");
-        $this->connection = new mysqli($host, $username, $password, $database);
-        if($this->connection->connect_error){
-            die('Connection failed: '.$this->connection->connect_error);
-        }
     }
     /**
      * Mysql 파괴자
      * DB 연결 해제
      */
     public function __destruct(){
-        if (isset($this->connection)){$this->connection->close();}
+        if(isset($this->connection)){$this->connection->close();}
     }
     /**
      * 쿼리 실행
@@ -58,6 +50,7 @@ class Mysql implements Singleton, Model{
      * @return mixed 결과
      */
     public function query(string $query){
+        $this->connect();
         return $this->connection->query($query);
     }
     /**
@@ -84,6 +77,7 @@ class Mysql implements Singleton, Model{
      * @return mixed 잠금 실행 성공 여부를 반환합니다.
      */
     public function lock(string $tableName):bool{
+        $this->connect();
         return $this->connection->query("LOCK TABLES {$tableName} WRITE");
     }
     /**
@@ -100,6 +94,7 @@ class Mysql implements Singleton, Model{
      * @return boolean 트랜잭션 실행 성공 여부를 반환합니다.
      */
     public function beginTransaction():bool{
+        $this->connect();
         return $this->connection->begin_transaction();
     }
     /**
@@ -117,5 +112,22 @@ class Mysql implements Singleton, Model{
      */
     public function rollback():bool{
         return $this->connection->commit();
+    }
+    /**
+     * 접속을 하지 않았다면 데이터베이스에 접속합니다.
+     * 
+     * @return void
+     */
+    protected function connect(){
+        if(isset($this->connection)===false){
+            $host = $this->man->database("host");
+            $username = $this->man->database("username");
+            $password = $this->man->database("password");
+            $database = $this->man->database("database");
+            $this->connection = new mysqli($host, $username, $password, $database);
+            if($this->connection->connect_error){
+                die('Connection failed: '.$this->connection->connect_error);
+            }
+        }
     }
 }
