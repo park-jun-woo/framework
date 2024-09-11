@@ -53,7 +53,7 @@ class Parkjunwoo implements Singleton{
      */
     protected function __construct(array &$code){
         define("DS",DIRECTORY_SEPARATOR);
-        self::$man = $this;
+        self::$instance = $this;
         $this->code = $code;
         //APCU 메모리에서 서버 배열을 불러올 수 없으면 리셋합니다.
         if(!apcu_exists($this->code["name"]."-server")){$this->reset();}
