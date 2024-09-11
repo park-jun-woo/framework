@@ -150,8 +150,8 @@ class Parkjunwoo implements Singleton{
      * @return string 키값
      */
     public function config(string $key){
-        if(!array_key_exists($key, $this->code["config"])){$this->error("config[\"{$key}\"]이 입력되어 있지 않습니다.");}
-        return $this->code["config"][$key];
+        if(!array_key_exists($key, $this->code)){$this->error("[\"{$key}\"]이 입력되어 있지 않습니다.");}
+        return $this->code[$key];
     }
     /**
      * 어플리케이션 경로

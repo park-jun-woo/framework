@@ -226,9 +226,9 @@ class User{
      */
     protected function save(){
         //APCU 메모리에 토큰으로 세션 데이터 저장
-        apcu_store($this->man->name()."s".$this->token, $this->data, $this->man->app()["token-expire"]);
+        apcu_store($this->man->name()."s".$this->token, $this->data, $this->man->config("token-expire"));
         //쿠키에 토큰 등록
-        setcookie("t", $this->token, time()+$this->man->app()["token-expire"], "/", $this->man->servername(), true, true);
+        setcookie("t", $this->token, time()+$this->man->config("token-expire"), "/", $this->man->servername(), true, true);
         //쿠키에 세션 등록
         $data = pack("J", $this->session["permission"]);
         $data .= pack("J", $this->session["session"]);
@@ -237,7 +237,7 @@ class User{
         $data .= pack("C", $this->session["app"]);
         $crypted = "";
         openssl_public_encrypt($data, $crypted, $this->man->publicKey());
-        setcookie("s", base64_encode($crypted), time()+$this->man->app()["session-expire"], "/", $this->man->servername(), true, true);
+        setcookie("s", base64_encode($crypted), time()+$this->man->config("session-expire"), "/", $this->man->servername(), true, true);
         //세션 파일에 정보 저장
         $data = "";
         foreach($this->data as $key=>$value){$data .= "{$key}\t{$value}\n";}
