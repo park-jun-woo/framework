@@ -150,8 +150,30 @@ class Parkjunwoo implements Singleton{
      * @return string 키값
      */
     public function config(string $key){
-        if(!array_key_exists($key, $this->code)){$this->error("[\"{$key}\"]이 입력되어 있지 않습니다.");}
+        if(!array_key_exists($key, $this->code)){
+            $this->error("[\"{$key}\"]이 입력되어 있지 않습니다.");
+        }
         return $this->code[$key];
+    }
+    /**
+     * 토큰 유효기간
+     * @return integer 유효기간
+     */
+    public function tokenExpire():int{
+        if(!array_key_exists("token-expire", $this->code)){
+            $this->error("token-expire가 입력되어 있지 않습니다.");
+        }
+        return $this->code["token-expire"];
+    }
+    /**
+     * 세션 유효기간
+     * @return integer 유효기간
+     */
+    public function sessionExpire():int{
+        if(!array_key_exists("session-expire", $this->code)){
+            $this->error("session-expire가 입력되어 있지 않습니다.");
+        }
+        return $this->code["session-expire"];
     }
     /**
      * 어플리케이션 경로
