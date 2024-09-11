@@ -46,7 +46,7 @@ class Parkjunwoo implements Singleton{
     protected Request $request;
     protected Controller $controller;
     protected string $path;
-    protected array $code, $server, $thisApp;
+    protected array $code, $server;
     /**
      * Parkjunwoo 생성자
      * @param array $app 실행할 어플리케이션 코드 배열
@@ -64,8 +64,6 @@ class Parkjunwoo implements Singleton{
             http_response_code(404);
             exit;
         }
-        //현재 접속한 앱
-        $this->thisApp = $this->code["app"][$this->code["domain"][$_SERVER["SERVER_NAME"]]];
         //사용자 세션
         $this->user = new User($this);
         //요청 분석
