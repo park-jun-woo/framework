@@ -30,6 +30,7 @@ class Controller{
      * @param mixed $result 뷰에 전달할 데이터
      */
     protected function view(string $view, array $result=[]){
+        $this->user->save();
         $path = $this->man->path("view")."{$view}.php";
         if(file_exists($path)){
             include $path;
@@ -40,6 +41,7 @@ class Controller{
      * @param string $uri 주소
      */
     protected function redirect(string $uri){
+        $this->user->save();
         header("Location: $uri");
     }
     /**
@@ -48,13 +50,12 @@ class Controller{
      * @param array $result 전달할 데이터
      */
     protected function message(int $code, array $result=[]){
+        $this->user->save();
         $result["code"] = $code;
         $result["message"] = $this->man->message($code);
         switch($this->request->type()){
             case Parkjunwoo::JSON:echo json_encode($result);break;
-            case Parkjunwoo::HTML:
-                
-                break;
+            case Parkjunwoo::HTML:echo $result["message"];break;
         }
     }
 }

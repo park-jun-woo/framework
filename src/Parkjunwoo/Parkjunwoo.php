@@ -143,7 +143,7 @@ class Parkjunwoo implements Singleton{
      * @return string 도메인
      */
     public function servername():string{
-        return $this->code["name"];
+        return explode(",",$this->code["server-name"])[0];
     }
     /**
      * 어플리케이션 설정값

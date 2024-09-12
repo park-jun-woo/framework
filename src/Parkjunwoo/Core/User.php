@@ -49,12 +49,6 @@ class User{
         $this->data = $data;
     }
     /**
-     * 사용자 객체 소멸
-     */
-    public function __destruct(){
-        if($this->change){$this->save();}
-    }
-    /**
      * 사용자 접속한 IP
      * @return string IP;
      */
@@ -224,23 +218,26 @@ class User{
     /**
      * 세션 파일에 저장
      */
-    protected function save(){
-        //APCU 메모리에 토큰으로 세션 데이터 저장
-        apcu_store($this->man->name()."s".$this->token, $this->data, $this->man->tokenExpire());
-        //쿠키에 토큰 등록
-        setcookie("t", $this->token, time()+$this->man->tokenExpire(), "/", $this->man->servername(), true, true);
-        //쿠키에 세션 등록
-        $data = pack("J", $this->session["permission"]);
-        $data .= pack("J", $this->session["session"]);
-        $data .= pack("J", $this->session["session-time"]);
-        $data .= pack("N", $this->session["server"]);
-        $data .= pack("C", $this->session["app"]);
-        $crypted = "";
-        openssl_public_encrypt($data, $crypted, $this->man->publicKey());
-        setcookie("s", base64_encode($crypted), time()+$this->man->sessionExpire(), "/", $this->man->servername(), true, true);
-        //세션 파일에 정보 저장
-        $data = "";
-        foreach($this->data as $key=>$value){$data .= "{$key}\t{$value}\n";}
-        File::write($this->man->path("session").base64_encode(pack("J", $this->session["session"])),$data);
+    public function save(){
+        if($this->change){
+            //APCU 메모리에 토큰으로 세션 데이터 저장
+            apcu_store($this->man->name()."s".$this->token, $this->data, $this->man->tokenExpire());
+            //쿠키에 토큰 등록
+            setcookie("t", $this->token, time()+$this->man->tokenExpire(), "/", $this->man->servername(), true, true);
+            //쿠키에 세션 등록
+            $data = pack("J", $this->session["permission"]);
+            $data .= pack("J", $this->session["session"]);
+            $data .= pack("J", $this->session["session-time"]);
+            $data .= pack("N", $this->session["server"]);
+            $data .= pack("C", $this->session["app"]);
+            $crypted = "";
+            openssl_public_encrypt($data, $crypted, $this->man->publicKey());
+            setcookie("s", base64_encode($crypted), time()+$this->man->sessionExpire(), "/", $this->man->servername(), true, true);
+            //세션 파일에 정보 저장
+            $data = "";
+            foreach($this->data as $key=>$value){$data .= "{$key}\t{$value}\n";}
+            File::write($this->man->path("session").base64_encode(pack("J", $this->session["session"])),$data);
+            $this->change = false;
+        }
     }
 }
