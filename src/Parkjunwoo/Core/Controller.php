@@ -30,7 +30,7 @@ class Controller{
      * @param mixed $result 뷰에 전달할 데이터
      */
     protected function view(string $view, array $result=[]){
-        $path = $this->man->path("view")."{$view}.html";
+        $path = $this->man->path("view")."{$view}.php";
         if(file_exists($path)){
             include $path;
         }

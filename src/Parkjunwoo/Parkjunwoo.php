@@ -192,6 +192,16 @@ class Parkjunwoo implements Singleton{
     }
     /**
      * 어플리케이션 권한 배열
+     * @param string $user 사용자
+     * @return integer|null 권한 아이디
+     */
+    public function permission(string $user):?int{
+        if(array_key_exists($user, $this->code["users"])){
+            return $this->code["users"][$user]["id"];
+        }
+    }
+    /**
+     * 어플리케이션 권한 배열
      * @return array 권한 배열
      */
     public function permissions():array{
