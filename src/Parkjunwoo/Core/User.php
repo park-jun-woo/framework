@@ -46,6 +46,7 @@ class User{
             $this->load();
             return;
         }
+        $this->token = $_COOKIE["t"];
         $this->data = $data;
     }
     /**
