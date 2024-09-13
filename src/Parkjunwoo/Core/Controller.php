@@ -33,6 +33,7 @@ class Controller{
         $this->user->save();
         $path = $this->man->path("view")."{$view}.php";
         if(file_exists($path)){
+            extract($result);
             include $path;
         }
     }
