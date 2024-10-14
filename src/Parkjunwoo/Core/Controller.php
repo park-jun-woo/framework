@@ -62,9 +62,10 @@ class Controller{
     /**
      * XSS 공격 필터링 for articles
      * @param string $html 필터링할 입력 값
+     * @return bool 유효한지 여부
      */
-    protected function purify(string $html){
-        Security::purifyArticle($html);
+    protected function purify(string $html):bool{
+        return Security::purifyArticle($html);
     }
 }
 ?>
