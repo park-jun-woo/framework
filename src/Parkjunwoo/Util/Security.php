@@ -66,7 +66,7 @@ class Security{
     public static function purifyArticle(string $html){
         return self::purifyHTML($html,[
             "article"=>["class","style"],"p"=>["id","style"],"ul"=>["class","style"],"ol"=>["class","style"],"li"=>["class","style"],"caption"=>["class","style"]
-            ,"img"=>["src","alt","width","height","ismap","loading","style"],"figure"=>["class","style"],"figcaption"=>["class","style"]
+            ,"img"=>["src","alt","width","height","ismap","loading","style","data-filename"],"figure"=>["class","style"],"figcaption"=>["class","style"]
             ,"h1"=>["class","style"],"h2"=>["class","style"],"h3"=>["class","style"],"h4"=>["class","style"],"h5"=>["class","style"],"h6"=>["class","style"]
             ,"table"=>["class","style"],"tr"=>["class","style"],"th"=>["class","scope","style"],"td"=>["class","style"],"colgroup"=>["class","style"],"col"=>["class","style"]
         ]);
