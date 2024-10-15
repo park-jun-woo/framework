@@ -65,10 +65,10 @@ class Security{
      */
     public static function purifyArticle(string $html){
         return self::purifyHTML($html,[
-            "article"=>["class"],"p"=>["id"],"ul"=>["class"],"ol"=>["class"],"li"=>["class"],"caption"=>["class"]
-            ,"img"=>["src","alt","width","height","ismap","loading"],"figure"=>["class"],"figcaption"=>["class"]
-            ,"h1"=>["class"],"h2"=>["class"],"h3"=>["class"],"h4"=>["class"],"h5"=>["class"],"h6"=>["class"]
-            ,"table"=>["class"],"tr"=>["class"],"th"=>["class","scope"],"td"=>["class"],"colgroup"=>["class"],"col"=>["class"]
+            "article"=>["class","style"],"p"=>["id","style"],"ul"=>["class","style"],"ol"=>["class","style"],"li"=>["class","style"],"caption"=>["class","style"]
+            ,"img"=>["src","alt","width","height","ismap","loading","style"],"figure"=>["class","style"],"figcaption"=>["class","style"]
+            ,"h1"=>["class","style"],"h2"=>["class","style"],"h3"=>["class","style"],"h4"=>["class","style"],"h5"=>["class","style"],"h6"=>["class","style"]
+            ,"table"=>["class","style"],"tr"=>["class","style"],"th"=>["class","scope","style"],"td"=>["class","style"],"colgroup"=>["class","style"],"col"=>["class","style"]
         ]);
     }
 }
