@@ -3,7 +3,7 @@ namespace Parkjunwoo\Interface;
 
 use Parkjunwoo\Parkjunwoo;
 
-interface Model{
+interface SQL{
     /**
      * Model 생성자
      * DB 연결

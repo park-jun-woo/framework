@@ -4,7 +4,7 @@ namespace Parkjunwoo\Model;
 use mysqli;
 use Parkjunwoo\Parkjunwoo;
 use Parkjunwoo\Interface\Singleton;
-use Parkjunwoo\Interface\Model;
+use Parkjunwoo\Interface\SQL;
 
 /**
  * Mysql은 웹 어플리케이션에서 외부 Mysql 데이터베이스에 접근하는 클래스입니다.
@@ -19,7 +19,7 @@ use Parkjunwoo\Interface\Model;
  * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
  * FITNESS FOR A PARTICULAR PURPOSE.
  */
-class Mysql implements Singleton, Model{
+class Mysql implements Singleton, SQL{
     protected static Mysql $instance;
     public static function getInstance(...$params):self{
         if(!isset(self::$instance)){self::$instance = new self(...$params);}

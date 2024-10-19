@@ -2,6 +2,7 @@
 namespace Parkjunwoo\Util;
 
 use DOMDocument;
+use DOMAttr;
 use DOMXPath;
 
 class Security{
@@ -23,7 +24,7 @@ class Security{
      */
     public static function sqlInjectionClean(array &$param){
         foreach($param as &$value){
-            if(is_array($value)){sqlInjectionClean($value);}
+            if(is_array($value)){self::sqlInjectionClean($value);}
             else{$value = addSlashes($value);}
         }
     }
@@ -40,30 +41,31 @@ class Security{
      * XSS 공격 필터링
      * @param string $html 필터링할 입력 값
      * @param array $allowed 필터링하거나 허용할 태그 및 속성
+     * @return string 필터링한 HTML 문자열
      */
-    public static function purifyHTML(string $html,array $allowed) {
+    public static function purifyHTML(string $html,array $allowed):string {
         $dom = new DOMDocument();
         @$dom->loadHTML($html);
         $xpath = new DOMXPath($dom);
-        $allowed = array_merge(["html"=>[],"head"=>[],"body"=>[]],$allowed);
         $query ="//*[not(self::".implode(" or self::",array_keys($allowed)).")]";
         foreach($xpath->query($query) as $node){
-            return false;//$node->parentNode->removeChild($node);
+            $node->parentNode->removeChild($node);
         }
+        /** @var DOMAttr $attribute */
         foreach($xpath->query("//@*") as $attribute) {
             if(!in_array($attribute->nodeName,$allowed[$attribute->ownerElement->nodeName] ?? [])) {
-                return false;//$attribute->ownerElement->removeAttributeNode($attribute);
+                $attribute->ownerElement->removeAttributeNode($attribute);
             }
         }
-        //$body = $dom->getElementsByTagName("body")->item(0);$result = "";
-        //foreach($body->childNodes as $child){$result .= $dom->saveHTML($child);}
-        return true;//$result;
+        $result = $dom->saveHTML();
+        return $result;
     }
     /**
      * XSS 공격 필터링 for articles
      * @param string $html 필터링할 입력 값
+     * @return string 필터링한 HTML 문자열
      */
-    public static function purifyArticle(string $html){
+    public static function purifyArticle(string $html):string {
         return self::purifyHTML($html,[
             "article"=>["class","style"],"p"=>["id","style"],"ul"=>["class","style"],"ol"=>["class","style"],"li"=>["class","style"],"caption"=>["class","style"]
             ,"img"=>["src","alt","width","height","ismap","loading","style","data-filename"],"figure"=>["class","style"],"figcaption"=>["class","style"]
