@@ -22,9 +22,7 @@ class Request{
         //Method 분석
         switch($_SERVER["REQUEST_METHOD"]){
             case "GET":$this->method = Parkjunwoo::GET;break;
-            case "POST":
-                $this->method = Parkjunwoo::POST;
-                break;
+            case "POST":$this->method = Parkjunwoo::POST;break;
         }
         // Content-Type 분석
         if(array_key_exists("CONTENT_TYPE", $_SERVER)){
