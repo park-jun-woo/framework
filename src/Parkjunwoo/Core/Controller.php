@@ -95,7 +95,7 @@ class Controller{
         //서버에 업로드할 파일명
         $file['path'] = md5($this->man->id().date("YmdHis").$file['name']);
         //지정한 폴더에 파일 업로드
-        if(move_uploaded_file($_FILES[$key]['tmp_name'], $upload.$file['path'])) {return ["error"=>"move_uploaded_file fail. name:".$upload.$file['path']];}
+        if(!move_uploaded_file($_FILES[$key]['tmp_name'], $upload.$file['path'])) {return ["error"=>"move_uploaded_file fail. name:".$upload.$file['path']];}
         //모델을 통해 데이터베이스에 정보 등록
         $file['no'] = $this->fileModel->postFile($file['writer'], $file['name'], $file['ext'], $file['path']);
         //결과 반환
