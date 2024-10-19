@@ -32,13 +32,15 @@ class Request{
                 break;
             case "\DELETE":$this->method = Parkjunwoo::DELETE;break;
         }
-        //ContentType 분석
+        // Content-Type 분석
         if(array_key_exists("CONTENT_TYPE", $_SERVER)){
-            switch($_SERVER["CONTENT_TYPE"]){
-                default:$this->type = Parkjunwoo::HTML;break;
-                case "json":case "application/json":$this->type = Parkjunwoo::JSON;break;
-            }
-        }else{$this->type = Parkjunwoo::HTML;}
+            $contentType = $_SERVER["CONTENT_TYPE"];
+            if(strpos($contentType, "multipart/form-data") !== false){$this->type = Parkjunwoo::JSON;}
+            elseif($contentType === "application/json" || $contentType === "json"){$this->type = Parkjunwoo::JSON;}
+            else{$this->type = Parkjunwoo::HTML;}
+        } else {
+            $this->type = Parkjunwoo::HTML;
+        }
         //사용자 환경 언어 처리
         if(!array_key_exists("HTTP_ACCEPT_LANGUAGE",$_SERVER)){$_SERVER["HTTP_ACCEPT_LANGUAGE"] = "";}
         else{$languageList = explode("-",preg_split("[;,]",$_SERVER["HTTP_ACCEPT_LANGUAGE"])[0]);}
