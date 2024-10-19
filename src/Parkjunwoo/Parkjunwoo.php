@@ -118,22 +118,29 @@ class Parkjunwoo implements Singleton{
         return $this->code["route"][$method];
     }
     /**
-     * 어플리케이션 이름
-     * @return string 어플리케이션 이름
+     * 프로젝트 아이디
+     * @return string 프로젝트 아이디
+     */
+    public function id():string{
+        return $this->code["id"];
+    }
+    /**
+     * 프로젝트 이름
+     * @return string 프로젝트 이름
      */
     public function name():string{
         return $this->code["name"];
     }
     /**
-     * 어플리케이션 타이틀
-     * @return string 어플리케이션 타이틀
+     * 프로젝트 타이틀
+     * @return string 프로젝트 타이틀
      */
     public function title():string{
         return $this->code["title"];
     }
     /**
-     * 어플리케이션 설명
-     * @return string 어플리케이션 설명
+     * 프로젝트 설명
+     * @return string 프로젝트 설명
      */
     public function description():string{
         return $this->code["description"];
