@@ -24,13 +24,7 @@ class Request{
             case "GET":$this->method = Parkjunwoo::GET;break;
             case "POST":
                 $this->method = Parkjunwoo::POST;
-                parse_str(file_get_contents('php://input'), $this->parameters);
                 break;
-            case "PUT":
-                $this->method = Parkjunwoo::PUT;
-                parse_str(file_get_contents('php://input'), $this->parameters);
-                break;
-            case "\DELETE":$this->method = Parkjunwoo::DELETE;break;
         }
         // Content-Type 분석
         if(array_key_exists("CONTENT_TYPE", $_SERVER)){
