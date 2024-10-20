@@ -35,19 +35,11 @@ class Image{
             $newHeight = (int)($originalHeight * $scale);
             // 이미지 리사이즈
             $image->resizeImage($newWidth, $newHeight, Imagick::FILTER_LANCZOS, 1);
-            // 새 캔버스 생성 (투명 배경)
-            $canvas = new Imagick();
-            $canvas->newImage($width, $height, new ImagickPixel('transparent'));
-            $canvas->setImageFormat($format);
-            // 중앙에 리사이즈된 이미지 합성
-            $x = (int)(($width - $newWidth) / 2);
-            $y = (int)(($height - $newHeight) / 2);
-            $canvas->compositeImage($image, Imagick::COMPOSITE_OVER, $x, $y);
+            $image->setImageFormat($format);
             // 이미지 저장
-            $canvas->writeImage($resizePath);
+            $image->writeImage($resizePath);
             // 메모리 해제
             $image->clear();
-            $canvas->clear();
         } catch (ImagickException $e) {
             Debug::error($e->getMessage());
         }
