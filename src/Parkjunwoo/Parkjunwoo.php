@@ -307,13 +307,13 @@ class Parkjunwoo implements Singleton{
     public function reset(){
         //RSA 키 쌍 생성
         list($this->server["privateKey"], $this->server["publicKey"]) = Security::generateRSA();
+        apcu_store($this->code["name"]."-server", $this->server);
         //분산서버 목록 확인 및 초기 통신
         /*
         $this->server["servers"] = [];
         foreach($this->code["servers"] as $key=>$value){
             
         }
-        apcu_store($this->code["name"]."-server", $this->server);
         */
     }
     /**
