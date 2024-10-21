@@ -234,7 +234,7 @@ class User{
             $data .= pack("C", $this->session["app"]);
             $crypted = "";
             openssl_public_encrypt($data, $crypted, $this->man->publicKey());
-            setcookie("s", base64_encode($crypted), $this->session["session-time"]+$this->man->sessionExpire(), "/", $this->man->servername(), true, true);
+            setcookie("s", base64_encode($crypted), time()+$this->man->sessionExpire(), "/", $this->man->servername(), true, true);
             //세션 파일에 정보 저장
             $data = "";
             foreach($this->data as $key=>$value){$data .= "{$key}\t{$value}\n";}
