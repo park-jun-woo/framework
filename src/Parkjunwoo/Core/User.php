@@ -176,11 +176,11 @@ class User{
         }
         //사용자 인증 배열에 복호화한 데이터 입력
         $session = [
-            "permission"=>unpack("J", substr($decrypted, 0, 8))[1],
-            "session"=>unpack("J", substr($decrypted, 8, 16))[1],
-            "session-time"=>unpack("J", substr($decrypted, 16, 8))[1],
-            "server"=>unpack("N", substr($decrypted, 24, 4))[1],
-            "app"=>unpack("C", substr($decrypted, 28))[1],
+            "permission"=>unpack("J", substr($decrypted, 8, 8))[1],
+            "session"=>unpack("J", substr($decrypted, 16, 8))[1],
+            "session-time"=>unpack("J", substr($decrypted, 24, 8))[1],
+            "server"=>unpack("N", substr($decrypted, 32, 4))[1],
+            "app"=>unpack("C", substr($decrypted, 36))[1],
         ];
         //세션 파일이 존재하지 않는다면 RSA 키 탈취 가능성 있으므로 리셋.
         if(!file_exists($sessionPath = $this->man->path("session").base64_encode(pack("J", $session["session"])))){
@@ -226,14 +226,15 @@ class User{
             //쿠키에 토큰 등록
             setcookie("t", $this->token, time()+$this->man->tokenExpire(), "/", $this->man->servername(), true, true);
             //쿠키에 세션 등록
-            $data = pack("J", $this->session["permission"]);
+            $data = pack("J", time());
+            $data .= pack("J", $this->session["permission"]);
             $data .= pack("J", $this->session["session"]);
             $data .= pack("J", $this->session["session-time"]);
             $data .= pack("N", $this->session["server"]);
             $data .= pack("C", $this->session["app"]);
             $crypted = "";
             openssl_public_encrypt($data, $crypted, $this->man->publicKey());
-            setcookie("s", base64_encode($crypted), time()+$this->man->sessionExpire(), "/", $this->man->servername(), true, true);
+            setcookie("s", base64_encode($crypted), $this->session["session-time"]+$this->man->sessionExpire(), "/", $this->man->servername(), true, true);
             //세션 파일에 정보 저장
             $data = "";
             foreach($this->data as $key=>$value){$data .= "{$key}\t{$value}\n";}
