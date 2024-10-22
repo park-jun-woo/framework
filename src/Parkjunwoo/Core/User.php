@@ -218,7 +218,6 @@ class User{
             "server"=>unpack("N", substr($decrypted, 32, 4))[1],
             "app"=>substr($decrypted, 36)
         ];
-        File::append($this->man->path("cache")."log","복호화:".json_encode($session).PHP_EOL);
         //세션 파일이 존재하지 않는다면 RSA 키 탈취 가능성 있으므로 리셋.
         if(!file_exists($sessionPath = $this->man->path("session").base_convert($session["session"], 10, 36))){
             $this->man->reset();
