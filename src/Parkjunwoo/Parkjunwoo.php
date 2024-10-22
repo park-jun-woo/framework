@@ -161,6 +161,16 @@ class Parkjunwoo implements Singleton{
         return $this->code[$key];
     }
     /**
+     * 언어 기본값, 예:ko
+     * @return integer 유효기간
+     */
+    public function language():string{
+        if(!array_key_exists("language", $this->code)){
+            $this->error("language가 입력되어 있지 않습니다.");
+        }
+        return $this->code["language"];
+    }
+    /**
      * 토큰 유효기간
      * @return integer 유효기간
      */

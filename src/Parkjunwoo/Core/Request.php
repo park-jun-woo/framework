@@ -36,15 +36,16 @@ class Request{
         //사용자 환경 언어 처리
         if(!array_key_exists("HTTP_ACCEPT_LANGUAGE",$_SERVER)){$_SERVER["HTTP_ACCEPT_LANGUAGE"] = "";}
         else{$languageList = explode("-",preg_split("[;,]",$_SERVER["HTTP_ACCEPT_LANGUAGE"])[0]);}
-        if($_SERVER["HTTP_ACCEPT_LANGUAGE"]=="" || $languageList[0]==""){$languageList = array("ko");}
+        if($_SERVER["HTTP_ACCEPT_LANGUAGE"]=="" || $languageList[0]==""){$languageList = array($this->man->language());}
         //사용자 사용언어 지정
         if(array_key_exists("language",$_GET) && $_GET["language"]!=""){
-            $language = $_GET["language"];
-            $this->user->set("language",$language);
+            if(preg_match('/^[a-z]{2}$/i', $_GET["language"]) === 1){$this->user->language($_GET["language"]);}
+            else{$language = $this->man->language();}
+            $this->user->language($language);
         }else if($this->user->language()!=""){
             $language = $this->user->language();
         }else if($languageList[0]!=""){$language = $languageList[0];}
-        else{$language = "ko";}
+        else{$language = $this->man->language();}
         $this->locale = strtolower($language);
         //URI 분석 후 라우트
         $route = "";

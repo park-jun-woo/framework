@@ -11,8 +11,8 @@ class User{
     const IP = 2;
     const SESSION = 3;
     const TOKENTIME = 4;
-    const AGENT = 5;
-    const LANGUAGE = 6;
+    const LANGUAGE = 5;
+    const AGENT = 6;
 
     protected Parkjunwoo $man;
     protected string $token;
@@ -71,6 +71,18 @@ class User{
         return $this->data[self::MEMBER];
     }
     /**
+     * 언어 조회
+     * @return string 값
+     */
+    public function language(string $language=null):string{
+        if($language!=null){
+            if(!isset($this->session)){$this->load(false);}
+            $this->data[self::LANGUAGE] = $language;
+            $this->change = true;
+        }
+        return $this->data[self::LANGUAGE];
+    }
+    /**
      * 사용자 세션 아이디
      * @return int 세션 아이디;
      */
@@ -97,13 +109,6 @@ class User{
      */
     public function agent():string{
         return $this->data[self::AGENT];
-    }
-    /**
-     * HTTP_ACCEPT_LANGUAGE 접속언어정보 조회
-     * @return string 값
-     */
-    public function language():string{
-        return $this->data[self::LANGUAGE];
     }
     /**
      * 세션 데이터 키값 조회
@@ -205,8 +210,8 @@ class User{
             ip2long($_SERVER["REMOTE_ADDR"]),
             $sessionId,
             $sessionTime,
+            "",
             isset($_SERVER["HTTP_USER_AGENT"])?$_SERVER["HTTP_USER_AGENT"]:"",
-            isset($_SERVER["HTTP_ACCEPT_LANGUAGE"])?$_SERVER["HTTP_ACCEPT_LANGUAGE"]:"",
         ];
         //토큰 생성
         $this->token = hash("sha256",$this->data[self::TOKENTIME].$sessionId);
@@ -248,10 +253,6 @@ class User{
         //agent 값 일치 여부 확인, 일치하지 않으면 블랙 처리
         if($_SERVER["HTTP_USER_AGENT"]!=$data[self::AGENT]){
             $this->black(1, "세션 HTTP_USER_AGENT 불일치");
-        }
-        //언어값 일치 여부 확인, 일치하지 않으면 블랙 처리
-        if($_SERVER["HTTP_ACCEPT_LANGUAGE"]!=$data[self::LANGUAGE]){
-            $this->black(1, "세션 HTTP_ACCEPT_LANGUAGE 불일치");
         }
         $this->session = $session;
         //토큰 신규 생성
