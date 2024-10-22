@@ -30,13 +30,11 @@ class User{
         }
         //쿠키에 토큰은 없는데 세션은 있다면 만료된 것으로 보고 세션 로드 후 토큰 재발행
         else if(!array_key_exists("t", $_COOKIE) && array_key_exists("s", $_COOKIE)){
-            $this->black(0, "쿠키에 토큰은 없는데 세션은 있다면 만료된 것으로 보고 세션 로드 후 토큰 재발행");
             $this->load();
             return;
         }
         //APCU 메모리에 토큰이 등록되어 있지 않으면 만료된 것으로 보고 세션 로드 후 토큰 재발행
         if(!apcu_exists($this->man->name()."s".$_COOKIE["t"])){
-            $this->black(0, "APCU 메모리에 토큰이 등록되어 있지 않으면 만료된 것으로 보고 세션 로드 후 토큰 재발행");
             $this->load();
             return;
         }
@@ -52,7 +50,6 @@ class User{
         }
         //IP가 달라졌다면 세션 로드 후 토큰 재발행
         if(ip2long($_SERVER["REMOTE_ADDR"])!=$data[self::IP]){
-            $this->black(0, "IP가 달라졌다면 세션 로드 후 토큰 재발행");
             $this->load();
             return;
         }
@@ -167,9 +164,9 @@ class User{
      * @param string $log 로그 
      */
     public function black(float $level,string $log){
-        //apcu_store($this->man->name()."b".$this->ip(), "", $level*3600);
+        apcu_store($this->man->name()."b".$this->ip(), "", $level*3600);
         File::append($this->man->path("blacklist").$this->ip(), date("Y-m-d H:i:s")."\t{$log}\n");
-        //exit;
+        exit;
     }
     /**
      * 방문자 기본 세션 설정
@@ -244,7 +241,7 @@ class User{
         //토큰 신규 생성
         if($newToken){
             //토큰이 제시되었다면 생성시간과 세션 아이디를 sha256으로 인코딩하여 일치여부 확인
-            if(array_key_exists("t", $_COOKIE) && $_COOKIE["t"]!=($t = hash("sha256",$this->data[self::TOKENTIME].$session["session"]))){
+            if(array_key_exists("t", $_COOKIE) && $_COOKIE["t"]!=($t = hash("sha256",$data[self::TOKENTIME].$session["session"]))){
                 $this->black(1, "토큰 불일치. 변조 가능성");
             }
             $this->data = $data;
