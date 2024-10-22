@@ -30,11 +30,13 @@ class User{
         }
         //쿠키에 토큰은 없는데 세션은 있다면 만료된 것으로 보고 세션 로드 후 토큰 재발행
         else if(!array_key_exists("t", $_COOKIE) && array_key_exists("s", $_COOKIE)){
+            $this->black(0, "쿠키에 토큰은 없는데 세션은 있다면 만료된 것으로 보고 세션 로드 후 토큰 재발행");
             $this->load();
             return;
         }
         //APCU 메모리에 토큰이 등록되어 있지 않으면 만료된 것으로 보고 세션 로드 후 토큰 재발행
         if(!apcu_exists($this->man->name()."s".$_COOKIE["t"])){
+            $this->black(0, "APCU 메모리에 토큰이 등록되어 있지 않으면 만료된 것으로 보고 세션 로드 후 토큰 재발행");
             $this->load();
             return;
         }
@@ -48,8 +50,9 @@ class User{
         if($_SERVER["HTTP_ACCEPT_LANGUAGE"]!=$data[self::LANGUAGE]){
             $this->black(1, "토큰 HTTP_ACCEPT_LANGUAGE 불일치");
         }
-        //IP가 달라졌다면 세션 로드 후 토큰 재발행.
+        //IP가 달라졌다면 세션 로드 후 토큰 재발행
         if(ip2long($_SERVER["REMOTE_ADDR"])!=$data[self::IP]){
+            $this->black(0, "IP가 달라졌다면 세션 로드 후 토큰 재발행");
             $this->load();
             return;
         }
@@ -164,9 +167,9 @@ class User{
      * @param string $log 로그 
      */
     public function black(float $level,string $log){
-        apcu_store($this->man->name()."b".$this->ip(), "", $level*3600);
+        //apcu_store($this->man->name()."b".$this->ip(), "", $level*3600);
         File::append($this->man->path("blacklist").$this->ip(), date("Y-m-d H:i:s")."\t{$log}\n");
-        exit;
+        //exit;
     }
     /**
      * 방문자 기본 세션 설정
@@ -175,8 +178,6 @@ class User{
         //마지막 세션 아이디 조회 및 부여
         $sessionId = File::increase($this->man->path("session")."id");
         $sessionTime = time();
-        //토큰 생성
-        $this->token = hash("sha256",$sessionTime.$sessionId);
         //세션 객체 초기화
         $this->session = [
             "permission"=>self::GUEST,
@@ -194,6 +195,8 @@ class User{
             isset($_SERVER["HTTP_USER_AGENT"])?$_SERVER["HTTP_USER_AGENT"]:"",
             isset($_SERVER["HTTP_ACCEPT_LANGUAGE"])?$_SERVER["HTTP_ACCEPT_LANGUAGE"]:"",
         ];
+        //토큰 생성
+        $this->token = hash("sha256",$this->data[self::TOKENTIME].$sessionId);
         $this->change = true;
     }
     /**
@@ -237,16 +240,18 @@ class User{
         if($_SERVER["HTTP_ACCEPT_LANGUAGE"]!=$data[self::LANGUAGE]){
             $this->black(1, "세션 HTTP_ACCEPT_LANGUAGE 불일치");
         }
-        //토큰이 제시되었다면 생성시간과 세션 아이디를 sha256으로 인코딩하여 일치여부 확인
-        if(array_key_exists("t", $_COOKIE) && $_COOKIE["t"]!=hash("sha256",$data[self::TOKENTIME].$session["session"])){
-            $this->black(1, "토큰 불일치. 변조 가능성");
-        }
         $this->session = $session;
         //토큰 신규 생성
         if($newToken){
-            $this->token = hash("sha256",($tokenTime = time()).$this->session["session"]);
+            //토큰이 제시되었다면 생성시간과 세션 아이디를 sha256으로 인코딩하여 일치여부 확인
+            if(array_key_exists("t", $_COOKIE) && $_COOKIE["t"]!=($t = hash("sha256",$this->data[self::TOKENTIME].$session["session"]))){
+                $this->black(1, "토큰 불일치. 변조 가능성");
+                $this->black(0, $_COOKIE["t"]);
+                $this->black(0, $t);
+            }
             $this->data = $data;
-            $this->data[self::TOKENTIME] = $tokenTime;
+            $this->data[self::TOKENTIME] = time();
+            $this->token = hash("sha256",$this->data[self::TOKENTIME].$this->session["session"]);
             $this->change = true;
         }
     }
