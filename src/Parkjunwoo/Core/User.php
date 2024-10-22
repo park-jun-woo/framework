@@ -35,12 +35,12 @@ class User{
             return;
         }
         //APCU 메모리에 토큰이 등록되어 있지 않으면 만료된 것으로 보고 세션 로드 후 토큰 재발행
-        if(!apcu_exists($this->man->name()."t".$_COOKIE["t"])){
+        if(!apcu_exists($this->man->id()."@t".$_COOKIE["t"])){
             $this->load();
             return;
         }
         //APCU 메모리 토큰으로 조회
-        $data = apcu_fetch($this->man->name()."t".$_COOKIE["t"]);
+        $data = apcu_fetch($this->man->id()."@t".$_COOKIE["t"]);
         //agent 값 일치 여부 확인, 일치하지 않으면 블랙 처리
         if($_SERVER["HTTP_USER_AGENT"]!=$data[self::AGENT]){
             $this->black(1, "토큰 HTTP_USER_AGENT 불일치");
@@ -180,7 +180,7 @@ class User{
      * @param string $log 로그 
      */
     public function black(float $level,string $log){
-        apcu_store($this->man->name()."b".$this->ip(), "", $level*3600);
+        apcu_store($this->man->id()."@b".$this->ip(), "", $level*3600);
         File::append($this->man->path("blacklist").$this->ip(), date("Y-m-d H:i:s")."\t{$log}\n");
         exit;
     }
@@ -197,7 +197,7 @@ class User{
             "session"=>$sessionId,
             "session-time"=>$sessionTime,
             "server"=>ip2long($_SERVER["SERVER_ADDR"]),
-            "app"=>$this->man->name()
+            "app"=>$this->man->id()
         ];
         //세션정보 객체 초기화
         $this->data = [
@@ -243,7 +243,7 @@ class User{
         //세션 로드
         $data = explode("\n", File::read($sessionPath));
         //세션 도메인 일치 여부 확인, 일치하지 않으면 블랙 처리
-        if($this->man->name()!=$session["app"]){
+        if($this->man->id()!=$session["app"]){
             $this->black(1, "세션 도메인 불일치");
         }
         //agent 값 일치 여부 확인, 일치하지 않으면 블랙 처리
@@ -282,7 +282,7 @@ class User{
             //쿠키에 토큰 등록
             setcookie("t", $this->token, time()+$this->man->tokenExpire(), "/", $this->man->servername(), true, true);
             //APCU 메모리에 토큰으로 세션 데이터 저장
-            apcu_store($this->man->name()."t".$this->token, $this->data, $this->man->tokenExpire());
+            apcu_store($this->man->id()."@t".$this->token, $this->data, $this->man->tokenExpire());
             //세션 파일에 정보 저장
             File::write($this->man->path("session").$this->sessionName(),implode(PHP_EOL, $this->data));
             $this->change = false;

@@ -54,18 +54,19 @@ class Parkjunwoo implements Singleton{
         self::$instance = $this;
         $this->code = $code;
         //APCU 메모리에서 서버 배열을 불러올 수 없으면 리셋합니다.
-        if(!apcu_exists($this->code["name"]."-server")){$this->reset();}
-        else{$this->server = apcu_fetch($this->code["name"]."-server");}
+        if(!apcu_exists($this->code["id"]."@s")){$this->reset();}
+        else{$this->server = apcu_fetch($this->code["id"]."@s");}
         //블랙리스트 접속차단
-        if(apcu_exists($this->code["name"]."-blacklist-".$_SERVER["REMOTE_ADDR"])){
+        if(apcu_exists($this->code["id"]."@b".$_SERVER["REMOTE_ADDR"])){
             File::append($this->path("blacklist").$_SERVER["REMOTE_ADDR"], date("Y-m-d H:i:s")."\t접속차단\n");
             http_response_code(404);
             exit;
         }
-        //사용자 세션
+        //사용자 객체
         $this->user = new User($this);
-        //요청 분석
+        //요청 객체
         $this->request = new Request($this);
+        //요청 분석
         $route = $this->request->route();
         //권한 확인
         if(!$this->user->permission($route[self::PERMISSION]))
@@ -80,6 +81,7 @@ class Parkjunwoo implements Singleton{
             $route = [0,"Parkjunwoo\\Core\\Controller","getNotFound"];
             $controller = new $route[self::CLASSNAME]($this);
         }
+        //클래스 메서드 실행
         $controller->{$route[self::METHODNAME]}($this->request);
     }
     /**
@@ -317,7 +319,7 @@ class Parkjunwoo implements Singleton{
     public function reset(){
         //RSA 키 쌍 생성
         list($this->server["privateKey"], $this->server["publicKey"]) = Security::generateRSA();
-        apcu_store($this->code["name"]."-server", $this->server);
+        apcu_store($this->code["id"]."@s", $this->server);
         //분산서버 목록 확인 및 초기 통신
         /*
         $this->server["servers"] = [];
