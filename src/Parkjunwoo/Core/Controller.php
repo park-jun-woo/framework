@@ -79,7 +79,7 @@ class Controller{
      */
     protected function file(string $key):?array {
         //사용자 정보에 회원 인덱스가 없으면 실패
-        if(!$this->user->is("member")){return ["error"=>"User 'member' is not set."];}
+        if(!$this->user->member()==0){return ["error"=>"User 'member' is not set."];}
         //파일 모델이 설정되어 있지 않으면 실패
         if(!isset($this->fileModel)){return ["error"=>"\$this->fileModel is not set."];}
         //파일이 업로드 되어 있지 않다면 실패
@@ -87,7 +87,7 @@ class Controller{
         $upload = $this->man->path("upload");
         $file = [];
         //작성자
-        $file['writer'] = $this->user->get("member");
+        $file['writer'] = $this->user->member();
         //파일 이름만
         $file['name'] = pathinfo($_FILES[$key]['name'], PATHINFO_FILENAME);
         //파일 확장자
@@ -112,7 +112,7 @@ class Controller{
      */
     protected function image(string $key, string $caption="", string $thumbnail_crop="", string $small_crop="", string $large_crop=""):?array {
         //사용자 정보에 회원 인덱스가 없으면 실패
-        if(!$this->user->is("member")){return ["error"=>"User 'member' is not set."];}
+        if(!$this->user->member()==0){return ["error"=>"User 'member' is not set."];}
         //이미지 모델이 설정되어 있지 않으면 실패
         if(!isset($this->imageModel)){return ["error"=>"\$this->imageModel is not set."];}
         //업로드 시도
@@ -128,7 +128,7 @@ class Controller{
         if($large_crop==""){Image::resize($upload.$source["path"], $upload.$source["path"]."A", 1024);}
         $image = [];
         //작성자
-        $image["writer"] = $this->user->get("member");
+        $image["writer"] = $this->user->member();
         //파일 원본
         $image["source"] = $source["no"];
         //이미지 설명

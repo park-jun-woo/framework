@@ -3,9 +3,16 @@ namespace Parkjunwoo\Core;
 
 use Parkjunwoo\Parkjunwoo;
 use Parkjunwoo\Util\File;
-
 class User{
     const GUEST = 0;
+    
+    const PERMISSION = 0;
+    const MEMBER = 1;
+    const IP = 2;
+    const TOKENTIME = 3;
+    const AGENT = 4;
+    const LANGUAGE = 5;
+
     protected Parkjunwoo $man;
     protected string $token;
     protected array $permissions, $session, $data;
@@ -34,20 +41,33 @@ class User{
         //APCU 메모리 토큰으로 조회
         $data = apcu_fetch($this->man->name()."s".$_COOKIE["t"]);
         //agent 값 일치 여부 확인, 일치하지 않으면 블랙 처리
-        if($_SERVER["HTTP_USER_AGENT"]!=$data["user-agent"]){
+        if($_SERVER["HTTP_USER_AGENT"]!=$data[self::AGENT]){
             $this->black(1, "토큰 HTTP_USER_AGENT 불일치");
         }
         //언어값 일치 여부 확인, 일치하지 않으면 블랙 처리
-        if($_SERVER["HTTP_ACCEPT_LANGUAGE"]!=$data["user-language"]){
+        if($_SERVER["HTTP_ACCEPT_LANGUAGE"]!=$data[self::LANGUAGE]){
             $this->black(1, "토큰 HTTP_ACCEPT_LANGUAGE 불일치");
         }
         //IP가 달라졌다면 세션 로드 후 토큰 재발행.
-        if(ip2long($_SERVER["REMOTE_ADDR"])!=$data["ip"]){
+        if(ip2long($_SERVER["REMOTE_ADDR"])!=$data[self::IP]){
             $this->load();
             return;
         }
         $this->token = $_COOKIE["t"];
         $this->data = $data;
+    }
+    /**
+     * 회원 인덱스 조회
+     * @param int $member 지정할 회원 인덱스
+     * @return int 값
+     */
+    public function member(int $member=null):int{
+        if($member!=null){
+            if(!isset($this->session)){$this->load(false);}
+            $this->data[self::MEMBER] = $member;
+            $this->change = true;
+        }
+        return $this->data[self::MEMBER];
     }
     /**
      * 사용자 접속한 IP
@@ -57,32 +77,48 @@ class User{
         return $_SERVER["REMOTE_ADDR"];
     }
     /**
-     * 세션 데이터에 키값이 존재하는지 여부 확인
-     * @param string $key 키
-     * @return bool 존재 여부
+     * HTTP_ACCEPT_AGENT 접속기기정보 조회
+     * @return string 값
      */
-    public function is(string $key):bool{
-        return array_key_exists($key, $this->data);
+    public function agent():string{
+        return $this->data[self::AGENT];
+    }
+    /**
+     * HTTP_ACCEPT_LANGUAGE 접속언어정보 조회
+     * @return string 값
+     */
+    public function language():string{
+        return $this->data[self::LANGUAGE];
     }
     /**
      * 세션 데이터 키값 조회
-     * @param string $key 키
+     * @param int $key 키
      * @return string 값
      */
-    public function get(string $key):string{
+    public function get(int $key):string{
         return $this->data[$key];
     }
     /**
      * 세션 데이터에 키값 입력
-     * @param string $key 키
+     * @param int $key 키
      * @param string $value 값
      * @return bool 성공 여부
      */
-    public function set(string $key, string $value):bool{
-        if(in_array($key, ["permission","ip","first-referer","user-agent","user-language","token-time"])){return false;}
-        $this->data[$key] = $value;
-        $this->change = true;
-        return true;
+    public function set(int $key, string $value):bool{
+        switch($key){
+            case self::MEMBER:
+            case self::IP:
+            case self::TOKENTIME:
+                if(!isset($this->session)){$this->load(false);}
+                $this->data[$key] = $value;
+                $this->change = true;
+                return true;
+            case self::PERMISSION:
+            case self::AGENT:
+            case self::LANGUAGE:
+            default:
+                return false;
+        }
     }
     /**
      * 권한 확인
@@ -91,14 +127,15 @@ class User{
      */
     public function permission(int $permission):bool{
         if($permission==0){return true;}
-        return ($this->data["permission"] & $permission) !== 0;
+        return ($this->data[self::PERMISSION] & $permission) !== 0;
     }
     /**
      * 권한 추가
      * @param int $permission 권한
      */
     public function add(int $permission){
-        $this->data["permission"] |= $permission;
+        if(!isset($this->session)){$this->load(false);}
+        $this->data[self::PERMISSION] |= $permission;
         $this->change = true;
     }
     /**
@@ -106,7 +143,8 @@ class User{
      * @param int $permission 권한
      */
     public function remove(int $permission){
-        $this->data["permission"] &= ~$permission;
+        if(!isset($this->session)){$this->load(false);}
+        $this->data[self::PERMISSION] &= ~$permission;
         $this->change = true;
     }
     /**
@@ -116,7 +154,7 @@ class User{
     public function permissionNames():string{
         $names = [];
         foreach($this->man->permissions() as $key=>$value){
-            if(($this->data["permission"] & $key)===$key){$names[] = $value;}
+            if(($this->data[self::PERMISSION] & $key)===$key){$names[] = $value;}
         }
         return implode(",", $names);
     }
@@ -149,12 +187,12 @@ class User{
         ];
         //세션정보 객체 초기화
         $this->data = [
-            "permission"=>self::GUEST,
-            "ip"=>ip2long($_SERVER["REMOTE_ADDR"]),
-            "first-referer"=>isset($_SERVER["HTTP_REFERER"])?$_SERVER["HTTP_REFERER"]:"",
-            "user-agent"=>isset($_SERVER["HTTP_USER_AGENT"])?$_SERVER["HTTP_USER_AGENT"]:"",
-            "user-language"=>isset($_SERVER["HTTP_ACCEPT_LANGUAGE"])?$_SERVER["HTTP_ACCEPT_LANGUAGE"]:"",
-            "token-time"=>$sessionTime,
+            self::GUEST,
+            0,
+            ip2long($_SERVER["REMOTE_ADDR"]),
+            $sessionTime,
+            isset($_SERVER["HTTP_USER_AGENT"])?$_SERVER["HTTP_USER_AGENT"]:"",
+            isset($_SERVER["HTTP_ACCEPT_LANGUAGE"])?$_SERVER["HTTP_ACCEPT_LANGUAGE"]:"",
         ];
         $this->change = true;
     }
@@ -182,30 +220,26 @@ class User{
         ];
         File::append($this->man->path("cache")."log","복호화:".json_encode($session).PHP_EOL);
         //세션 파일이 존재하지 않는다면 RSA 키 탈취 가능성 있으므로 리셋.
-        if(!file_exists($sessionPath = $this->man->path("session").base64_encode(pack("J", $session["session"])))){
+        if(!file_exists($sessionPath = $this->man->path("session").base_convert($session["session"], 10, 36))){
             $this->man->reset();
             $this->black(24, "세션 파일 존재하지 않아 RSA 키 탈취 가능성");
         }
         //세션 로드
-        foreach(explode("\n", File::read($sessionPath)) as $keyValue){
-            if($keyValue==""){continue;}
-            list($key,$value) = explode("\t", $keyValue);
-            $data[$key] = $value;
-        }
+        $data = explode("\n", File::read($sessionPath));
         //세션 도메인 일치 여부 확인, 일치하지 않으면 블랙 처리
         if($this->man->name()!=$session["app"]){
             $this->black(1, "세션 도메인 불일치");
         }
         //agent 값 일치 여부 확인, 일치하지 않으면 블랙 처리
-        if($_SERVER["HTTP_USER_AGENT"]!=$data["user-agent"]){
+        if($_SERVER["HTTP_USER_AGENT"]!=$data[self::AGENT]){
             $this->black(1, "세션 HTTP_USER_AGENT 불일치");
         }
         //언어값 일치 여부 확인, 일치하지 않으면 블랙 처리
-        if($_SERVER["HTTP_ACCEPT_LANGUAGE"]!=$data["user-language"]){
+        if($_SERVER["HTTP_ACCEPT_LANGUAGE"]!=$data[self::LANGUAGE]){
             $this->black(1, "세션 HTTP_ACCEPT_LANGUAGE 불일치");
         }
         //토큰이 제시되었다면 생성시간과 세션 아이디를 sha256으로 인코딩하여 일치여부 확인
-        if(array_key_exists("t", $_COOKIE) && $_COOKIE["t"]!=hash("sha256",$data["token-time"].$session["session"])){
+        if(array_key_exists("t", $_COOKIE) && $_COOKIE["t"]!=hash("sha256",$data[self::TOKENTIME].$session["session"])){
             $this->black(1, "토큰 불일치. 변조 가능성");
         }
         $this->session = $session;
@@ -213,7 +247,7 @@ class User{
         if($newToken){
             $this->token = hash("sha256",($tokenTime = time()).$this->session["session"]);
             $this->data = $data;
-            $this->data["token-time"] = $tokenTime;
+            $this->data[self::TOKENTIME] = $tokenTime;
             $this->change = true;
         }
     }
@@ -222,11 +256,6 @@ class User{
      */
     public function save(){
         if($this->change){
-            if(!isset($this->session)){$this->load(false);}
-            //APCU 메모리에 토큰으로 세션 데이터 저장
-            apcu_store($this->man->name()."s".$this->token, $this->data, $this->man->tokenExpire());
-            //쿠키에 토큰 등록
-            setcookie("t", $this->token, time()+$this->man->tokenExpire(), "/", $this->man->servername(), true, true);
             //쿠키에 세션 등록
             $data = pack("P", time());
             $data .= pack("P", $this->session["permission"]);
@@ -238,10 +267,12 @@ class User{
             openssl_public_encrypt($data, $crypted, $this->man->publicKey());
             $cookieData = urlencode(base64_encode($crypted));
             setcookie("s", $cookieData, time()+$this->man->sessionExpire(), "/", $this->man->servername(), true, true);
+            //쿠키에 토큰 등록
+            setcookie("t", $this->token, time()+$this->man->tokenExpire(), "/", $this->man->servername(), true, true);
+            //APCU 메모리에 토큰으로 세션 데이터 저장
+            apcu_store($this->man->name()."s".$this->token, $this->data, $this->man->tokenExpire());
             //세션 파일에 정보 저장
-            $data = "";
-            foreach($this->data as $key=>$value){$data .= "{$key}\t{$value}\n";}
-            File::write($this->man->path("session").base64_encode(pack("J", $this->session["session"])),$data);
+            File::write($this->man->path("session").base_convert($this->session["session"],10,36),implode(PHP_EOL, $this->data));
             $this->change = false;
 
         }

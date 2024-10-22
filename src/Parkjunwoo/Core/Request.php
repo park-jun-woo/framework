@@ -41,8 +41,8 @@ class Request{
         if(array_key_exists("language",$_GET) && $_GET["language"]!=""){
             $language = $_GET["language"];
             $this->user->set("language",$language);
-        }else if($this->user->is("language")){
-            $language = $this->user->get("language");
+        }else if($this->user->language()!=""){
+            $language = $this->user->language();
         }else if($languageList[0]!=""){$language = $languageList[0];}
         else{$language = "ko";}
         $this->locale = strtolower($language);
