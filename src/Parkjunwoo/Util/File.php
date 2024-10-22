@@ -66,11 +66,11 @@ class File{
     public static function increase(string $path, int $amount=1):int{
         //파일을 읽는다.
         if(file_exists($path)){
-            if(flock($handle = fopen($path, "r"), LOCK_EX)){$key = unpack("J", fread($handle, 8))[1];}
+            if(flock($handle = fopen($path, "r"), LOCK_EX)){$key = unpack("P", fread($handle, 8))[1];}
             flock($handle,LOCK_UN);fclose($handle);
         }else{$key = $amount;}
         //값을 올리고 저장한다.
-        if(flock($handle = fopen($path,"wb+"), LOCK_EX)){fwrite($handle, pack("J", $key+$amount));}
+        if(flock($handle = fopen($path,"wb+"), LOCK_EX)){fwrite($handle, pack("P", $key+$amount));}
         flock($handle, LOCK_UN);fclose($handle);
         return $key;
     }
