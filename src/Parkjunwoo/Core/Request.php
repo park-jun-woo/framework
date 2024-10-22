@@ -39,7 +39,7 @@ class Request{
         if($_SERVER["HTTP_ACCEPT_LANGUAGE"]=="" || $languageList[0]==""){$languageList = array($this->man->language());}
         //사용자 사용언어 지정
         if(array_key_exists("language",$_GET) && $_GET["language"]!=""){
-            if(preg_match('/^[a-z]{2}$/i', $_GET["language"]) === 1){$this->user->language($_GET["language"]);}
+            if(preg_match('/^[a-z]{2}$/i', $_GET["language"]) === 1){$language = $_GET["language"];}
             else{$language = $this->man->language();}
             $this->user->language($language);
         }else if($this->user->language()!=""){
