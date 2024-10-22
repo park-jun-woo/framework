@@ -45,10 +45,6 @@ class User{
         if($_SERVER["HTTP_USER_AGENT"]!=$data[self::AGENT]){
             $this->black(1, "토큰 HTTP_USER_AGENT 불일치");
         }
-        //언어값 일치 여부 확인, 일치하지 않으면 블랙 처리
-        if($_SERVER["HTTP_ACCEPT_LANGUAGE"]!=$data[self::LANGUAGE]){
-            $this->black(1, "토큰 HTTP_ACCEPT_LANGUAGE 불일치");
-        }
         //IP가 달라졌다면 세션 로드 후 토큰 재발행
         if(ip2long($_SERVER["REMOTE_ADDR"])!=$data[self::IP]){
             $this->load();
@@ -129,13 +125,13 @@ class User{
             case self::MEMBER:
             case self::IP:
             case self::TOKENTIME:
+            case self::LANGUAGE:
                 if(!isset($this->session)){$this->load(false);}
                 $this->data[$key] = $value;
                 $this->change = true;
                 return true;
             case self::PERMISSION:
             case self::AGENT:
-            case self::LANGUAGE:
             default:
                 return false;
         }
