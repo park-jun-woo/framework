@@ -9,9 +9,10 @@ class User{
     const PERMISSION = 0;
     const MEMBER = 1;
     const IP = 2;
-    const TOKENTIME = 3;
-    const AGENT = 4;
-    const LANGUAGE = 5;
+    const SESSION = 3;
+    const TOKENTIME = 4;
+    const AGENT = 5;
+    const LANGUAGE = 6;
 
     protected Parkjunwoo $man;
     protected string $token;
@@ -34,12 +35,12 @@ class User{
             return;
         }
         //APCU 메모리에 토큰이 등록되어 있지 않으면 만료된 것으로 보고 세션 로드 후 토큰 재발행
-        if(!apcu_exists($this->man->name()."s".$_COOKIE["t"])){
+        if(!apcu_exists($this->man->name()."t".$_COOKIE["t"])){
             $this->load();
             return;
         }
         //APCU 메모리 토큰으로 조회
-        $data = apcu_fetch($this->man->name()."s".$_COOKIE["t"]);
+        $data = apcu_fetch($this->man->name()."t".$_COOKIE["t"]);
         //agent 값 일치 여부 확인, 일치하지 않으면 블랙 처리
         if($_SERVER["HTTP_USER_AGENT"]!=$data[self::AGENT]){
             $this->black(1, "토큰 HTTP_USER_AGENT 불일치");
@@ -68,6 +69,20 @@ class User{
             $this->change = true;
         }
         return $this->data[self::MEMBER];
+    }
+    /**
+     * 사용자 세션 아이디
+     * @return int 세션 아이디;
+     */
+    public function session():int{
+        return $this->data[self::SESSION];
+    }
+    /**
+     * 사용자 세션 파일명
+     * @return string 세션 파일명;
+     */
+    public function sessionName():string{
+        return base_convert($this->data[self::SESSION], 10, 36);
     }
     /**
      * 사용자 접속한 IP
@@ -188,6 +203,7 @@ class User{
             self::GUEST,
             0,
             ip2long($_SERVER["REMOTE_ADDR"]),
+            $sessionId,
             $sessionTime,
             isset($_SERVER["HTTP_USER_AGENT"])?$_SERVER["HTTP_USER_AGENT"]:"",
             isset($_SERVER["HTTP_ACCEPT_LANGUAGE"])?$_SERVER["HTTP_ACCEPT_LANGUAGE"]:"",
@@ -269,9 +285,9 @@ class User{
             //쿠키에 토큰 등록
             setcookie("t", $this->token, time()+$this->man->tokenExpire(), "/", $this->man->servername(), true, true);
             //APCU 메모리에 토큰으로 세션 데이터 저장
-            apcu_store($this->man->name()."s".$this->token, $this->data, $this->man->tokenExpire());
+            apcu_store($this->man->name()."t".$this->token, $this->data, $this->man->tokenExpire());
             //세션 파일에 정보 저장
-            File::write($this->man->path("session").base_convert($this->session["session"],10,36),implode(PHP_EOL, $this->data));
+            File::write($this->man->path("session").$this->sessionName(),implode(PHP_EOL, $this->data));
             $this->change = false;
 
         }
