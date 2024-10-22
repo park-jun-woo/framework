@@ -14,7 +14,7 @@ class Controller{
     protected FileModel $fileModel;
     protected ImageModel $imageModel;
     /**
-     * 컨트롤러 실행
+     * 컨트롤러 생성자
      * @param Parkjunwoo $man 프레임워크 객체
      */
     public function __construct(Parkjunwoo $man){

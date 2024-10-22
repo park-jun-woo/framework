@@ -10,7 +10,7 @@ class Request{
     protected int $method, $type;
     protected array $route,$parameters;
     /**
-     * 요청 분석하는 생성자
+     * 요청 생성자
      */
     public function __construct(Parkjunwoo $man){
         $this->man = $man;

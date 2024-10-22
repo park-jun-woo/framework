@@ -19,7 +19,7 @@ class User{
     protected array $permissions, $session, $data;
     protected bool $change = false;
     /**
-     * 사용자 객체 생성
+     * 사용자 생성자
      */
     public function __construct(Parkjunwoo $man){
         $this->man = $man;

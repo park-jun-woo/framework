@@ -304,21 +304,21 @@ class Parkjunwoo implements Singleton{
      * @return string 루트 경로
      */
     public function privateKey():string{
-        return $this->server["privateKey"];
+        return $this->server["d"];
     }
     /**
      * 개인키
      * @return string 루트 경로
      */
     public function publicKey():string{
-        return $this->server["publicKey"];
+        return $this->server["e"];
     }
     /**
      * 시스템 리셋
      */
     public function reset(){
         //RSA 키 쌍 생성
-        list($this->server["privateKey"], $this->server["publicKey"]) = Security::generateRSA();
+        list($this->server["d"], $this->server["e"]) = Security::generateRSA();
         apcu_store($this->code["id"]."@s", $this->server);
         //분산서버 목록 확인 및 초기 통신
         /*
