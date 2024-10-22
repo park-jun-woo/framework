@@ -188,7 +188,7 @@ class User{
      */
     protected function guest(){
         //마지막 세션 아이디 조회 및 부여
-        $sessionId = File::increase($this->man->path("session")."id");
+        $sessionId = File::increase($this->man->path("session")."_id");
         $sessionTime = time();
         //세션 객체 초기화
         $this->session = [
