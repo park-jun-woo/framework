@@ -246,8 +246,6 @@ class User{
             //토큰이 제시되었다면 생성시간과 세션 아이디를 sha256으로 인코딩하여 일치여부 확인
             if(array_key_exists("t", $_COOKIE) && $_COOKIE["t"]!=($t = hash("sha256",$this->data[self::TOKENTIME].$session["session"]))){
                 $this->black(1, "토큰 불일치. 변조 가능성");
-                $this->black(0, $_COOKIE["t"]);
-                $this->black(0, $t);
             }
             $this->data = $data;
             $this->data[self::TOKENTIME] = time();
