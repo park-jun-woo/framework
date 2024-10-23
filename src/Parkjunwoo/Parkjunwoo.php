@@ -1,14 +1,13 @@
 <?php
 namespace Parkjunwoo;
 
+use Parkjunwoo\Core\Logger;
 use Parkjunwoo\Core\User;
 use Parkjunwoo\Core\Request;
 use Parkjunwoo\Core\Controller;
-use Parkjunwoo\Model\Database;
 use Parkjunwoo\Util\File;
 use Parkjunwoo\Util\Security;
 use Parkjunwoo\Interface\Singleton;
-use Parkjunwoo\Interface\Model;
 
 /**
  * The Parkjunwoo framework is a web application framework with a concise and powerful syntax.
@@ -39,7 +38,7 @@ class Parkjunwoo implements Singleton{
         if(!isset(self::$instance)){self::$instance = new self(...$params);}
         return self::$instance;
     }
-
+    protected Logger $log;
     protected User $user;
     protected Request $request;
     protected Controller $controller;
@@ -62,6 +61,8 @@ class Parkjunwoo implements Singleton{
             http_response_code(404);
             exit;
         }
+        //기록 객체
+        $this->log = new Logger($this);
         //사용자 객체
         $this->user = new User($this);
         //요청 객체
@@ -84,6 +85,11 @@ class Parkjunwoo implements Singleton{
         //클래스 메서드 실행
         $controller->{$route[self::METHODNAME]}($this->request);
     }
+    /**
+     * 기록 객체
+     * @return Logger 기록 객체
+     */
+    public function log():Logger{return $this->log;}
     /**
      * 사용자 세션 정보
      * @return User 사용자 객체
@@ -130,6 +136,13 @@ class Parkjunwoo implements Singleton{
      */
     public function name():string{
         return $this->code["name"];
+    }
+    /**
+     * 앱 이름
+     * @return string 앱 이름
+     */
+    public function app():string{
+        return $this->code["app"];
     }
     /**
      * 프로젝트 타이틀

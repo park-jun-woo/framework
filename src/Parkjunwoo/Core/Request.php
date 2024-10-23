@@ -5,6 +5,7 @@ use Parkjunwoo\Parkjunwoo;
 
 class Request{
     protected Parkjunwoo $man;
+    protected Logger $log;
     protected User $user;
     protected string $uri, $routeKey, $locale;
     protected int $method, $type;
@@ -16,7 +17,9 @@ class Request{
     public function __construct(Parkjunwoo $man){
         $this->man = $man;
         $this->parameters = [];
-        //세션 설정
+        //기록
+        $this->log = $this->man->log();
+        //사용자 세션
         $this->user = $this->man->user();
         //URI 분석
         $this->uri = explode("?",$_SERVER["REQUEST_URI"])[0];
@@ -68,6 +71,8 @@ class Request{
             $this->routeKey = $route;//"404";
             $this->route = [0,"Parkjunwoo\\Core\\Controller","getNotFound"];
         }
+        //접속 기록
+        $this->log->record($this->user->session(),$_SERVER['HTTP_REFERER'],$_SERVER["REQUEST_URI"]);
     }
     /**
      * URI

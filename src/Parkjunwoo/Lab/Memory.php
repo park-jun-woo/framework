@@ -1,5 +1,5 @@
 <?php
-namespace Parkjunwoo\Util;
+namespace Parkjunwoo\Lab;
 
 use Parkjunwoo\Parkjunwoo;
 
