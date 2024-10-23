@@ -27,6 +27,7 @@ class Logger{
     public function record(int $sessionId, string $referer, string $access){
         //기록 시간
         $time = time();
+        //날짜
         $date = date("Ymd", $time);
         //APCU 메모리에 포맷이 있으면
         if(apcu_exists($key_apcu = "{$this->key_apcu}@{$date}")){
