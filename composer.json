@@ -14,7 +14,8 @@
     "minimum-stability": "stable",
     "prefer-stable": true,
     "require": {
-        "php": "^8.0"
+        "php": "^8.0",
+        "lastguest/murmurhash": "^2.1"
     },
     "autoload": {
         "psr-4": {

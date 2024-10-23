@@ -1,5 +1,5 @@
 <?php
-namespace Parkjunwoo\Model;
+namespace Parkjunwoo\Lab;
 
 use Parkjunwoo\Util\Debug;
 use Parkjunwoo\Interface\Singleton;

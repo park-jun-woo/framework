@@ -7,7 +7,7 @@ interface SQL{
     /**
      * Model 생성자
      * DB 연결
-     * @param array $app 실행할 어플리케이션 코드 배열
+     * @param Parkjunwoo $man 프레임워크 객체
      */
     public function __construct(Parkjunwoo $man);
     /**

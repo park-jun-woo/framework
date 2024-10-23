@@ -20,6 +20,7 @@ class User{
     protected bool $change = false;
     /**
      * 사용자 생성자
+     * @param Parkjunwoo $man 프레임워크 객체
      */
     public function __construct(Parkjunwoo $man){
         $this->man = $man;
@@ -253,10 +254,6 @@ class User{
         $this->session = $session;
         //토큰 신규 생성
         if($newToken){
-            //토큰이 제시되었다면 생성시간과 세션 아이디를 sha256으로 인코딩하여 일치여부 확인
-            if(array_key_exists("t", $_COOKIE) && $_COOKIE["t"]!=($t = hash("sha256",$data[self::TOKENTIME].$session["session"]))){
-                $this->black(1, "토큰 불일치. 변조 가능성");
-            }
             $this->data = $data;
             $this->data[self::TOKENTIME] = time();
             $this->token = hash("sha256",$this->data[self::TOKENTIME].$this->session["session"]);

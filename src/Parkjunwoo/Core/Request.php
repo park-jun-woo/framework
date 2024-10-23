@@ -11,6 +11,7 @@ class Request{
     protected array $route,$parameters;
     /**
      * 요청 생성자
+     * @param Parkjunwoo $man 프레임워크 객체
      */
     public function __construct(Parkjunwoo $man){
         $this->man = $man;

@@ -6,7 +6,7 @@ use Parkjunwoo\Parkjunwoo;
 interface FileModel {
     /**
      * 모델 생성자
-     * @param Parkjunwoo $man 박준우 프레임워크 메인 객체
+     * @param Parkjunwoo $man 프레임워크 객체
      */
     public function __construct(Parkjunwoo $man);
     /**
