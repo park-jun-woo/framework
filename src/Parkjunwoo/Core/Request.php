@@ -72,7 +72,7 @@ class Request{
             $this->route = [0,"Parkjunwoo\\Core\\Controller","getNotFound"];
         }
         //접속 기록
-        $this->log->record($this->user->session(),$_SERVER['HTTP_REFERER'],$_SERVER["REQUEST_URI"]);
+        $this->log->record($this->user->session(), ip2long($this->user->ip()),$_SERVER['HTTP_REFERER'],$_SERVER["REQUEST_URI"]);
     }
     /**
      * URI

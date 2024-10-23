@@ -10,6 +10,7 @@ class File{
      * @param string $content 저장할 텍스트 내용
      */
     public static function write(string $path, string $content){
+        if(!is_dir($folder = dirname($path))) {mkdir($folder, 0777, true);}
         $handle = fopen($path, "wb+");
         if(flock($handle, LOCK_EX)){fwrite($handle, $content);}
         flock($handle, LOCK_UN);
@@ -25,6 +26,7 @@ class File{
      * @param int $max 파일을 저장할 파일의 최대 개수, 기본값은 1
      */
     public static function append(string $path, string $content, int $max=1){
+        if(!is_dir($folder = dirname($path))) {mkdir($folder, 0777, true);}
         if($max<=1){
             $handle = fopen($path, "a");
             if(flock($handle, LOCK_EX)){fwrite($handle, $content);}
@@ -64,6 +66,7 @@ class File{
      * @return int 조회한 숫자
      */
     public static function increase(string $path, int $amount=1):int{
+        if(!is_dir($folder = dirname($path))) {mkdir($folder, 0777, true);}
         //파일을 읽는다.
         if(file_exists($path)){
             if(flock($handle = fopen($path, "r"), LOCK_EX)){$key = unpack("P", fread($handle, 8))[1];}

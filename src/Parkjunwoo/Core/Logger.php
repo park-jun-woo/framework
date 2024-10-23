@@ -21,10 +21,11 @@ class Logger{
     /**
      * 기록하기
      * @param int $sessionId 세션아이디
+     * @param int $ip 접속 IP
      * @param string $referer 리퍼러URL
      * @param string $access 접속URL
      */
-    public function record(int $sessionId, string $referer, string $access){
+    public function record(int $sessionId, int $ip, string $referer, string $access){
         //기록 시간
         $time = time();
         //날짜
@@ -50,7 +51,7 @@ class Logger{
                 //4바이트 정수는 2038년1월19일까지만 가능하므로 2038년1월1일부터는 8바이트 정수로 저장
                 $time_pack = $time<2145916800?"V":"P";
                 //포맷 설정
-                $format = "{$time_pack}{$pack}{$pack}";
+                $format = "{$time_pack}V{$pack}{$pack}";
                 //포맷 파일에 저장
                 File::write($format_path, $format);
             }
@@ -64,7 +65,7 @@ class Logger{
         //로그 파일 경로 = 로그 폴더 + 날짜 + 세션아이디
         $log_path = $this->man->path("log").$date.DS.base_convert($sessionId, 10, 36);
         //로그에 기록할 데이터
-        $stream = pack($format, $time, $refererId, $accessId);
+        $stream = pack($format, $time, $ip, $refererId, $accessId);
         //기록하기
         File::append($log_path, $stream);
     }
