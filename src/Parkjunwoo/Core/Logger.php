@@ -114,12 +114,14 @@ class Logger{
             $file_handle = fopen($key_path, file_exists($key_path)?"rb+":"wb+");
             //인덱스 부여 파일 크기를 확인
             $id_stat = fstat($id_handle);$id_file_size = $id_stat['size'];
-            //인덱스 부여 파일에 내용이 없으면 초기화, 있으면 인덱스 값 조회
-            if($id_file_size===0){$id = 1;}else{$id = unpack('P', fread($id_handle, 8))[1];}
+            //인덱스 부여 파일에 내용이 없으면 초기화
+            if($id_file_size===0){$id = 1;fwrite($list_handle, "\n");}
+            //인덱스 부여 파일에 내용이 있으면 인덱스 값 조회
+            else{$id = unpack('P', fread($id_handle, 8))[1];}
             //인덱스 증가하여 덮어쓰기
             fseek($id_handle, 0);fwrite($id_handle, pack('P', $id+1));
             //인덱스로 URL 조회를 위해 기록
-            fwrite($list_handle, "$id $url\n");
+            fwrite($list_handle, "$url\n");
             //파일에 데이터 저장
             fwrite($file_handle, $stream = pack('P', $id));
             //인덱스 부여 파일 강제적용
