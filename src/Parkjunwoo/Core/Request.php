@@ -72,7 +72,7 @@ class Request{
             $this->route = [0,"Parkjunwoo\\Core\\Controller","getNotFound"];
         }
         //리퍼러
-        $referer = $_SERVER['HTTP_REFERER']==null?"":$_SERVER['HTTP_REFERER'];
+        $referer = isset($_SERVER['HTTP_REFERER'])?$_SERVER['HTTP_REFERER']:"";
         //접속 기록
         $this->log->record($this->user->session(), ip2long($this->user->ip()), $referer,$_SERVER["REQUEST_URI"]);
     }
