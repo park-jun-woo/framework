@@ -100,16 +100,41 @@ class Logger{
             //인덱스 데이터를 정수로 변환해서 반환
             return unpack('P', substr($stream, 0, 8))[1];
         }
-        //마지막 세션 아이디 조회 및 부여
-        $id = File::increase($this->key_path.".id");
-        //인덱스로 URL 조회를 위해 기록
-        File::append($this->key_path.".list", "$id $url\n");
-        //인덱스 정수를 데이터로 변환
-        $stream = pack('P', $id);
-        //APCU 메모리에 데이터 저장
-        apcu_store($key_apcu, $stream);
-        //파일에 데이터 저장
-        File::write($key_path, $stream);
+        //폴더가 없으면 생성한다.
+        if(!is_dir($folder = dirname($this->key_path))) {mkdir($folder, 0777, true);}
+        if(
+            //인덱스 부여 파일 열고 배타락
+            flock($id_handle = fopen($this->key_path.".id","rb+"), LOCK_EX) &&
+            //인덱스 목록 파일 열고 배타락
+            flock($list_handle = fopen($this->key_path.".list","a"), LOCK_EX) &&
+            //데이터 파일 열고 배타락
+            flock($file_handle = fopen($key_path,"rb+"), LOCK_EX)
+        ){
+            //인덱스 부여 파일 크기를 확인
+            $id_stat = fstat($id_handle);$id_file_size = $id_stat['size'];
+            //인덱스 부여 파일에 내용이 없으면 초기화, 있으면 인덱스 값 조회
+            if($id_file_size===0){$id = 1;}else{$id = unpack('P', fread($id_handle, 8))[1];}
+            //인덱스 증가하여 덮어쓰기
+            fseek($id_handle, 0);fwrite($id_handle, pack('P', $id+1));
+            //인덱스로 URL 조회를 위해 기록
+            fwrite($list_handle, "$id $url\n");
+            //파일에 데이터 저장
+            fwrite($file_handle, $stream = pack('P', $id));
+            //APCU 메모리에 데이터 저장
+            apcu_store($key_apcu, $stream);
+            //인덱스 부여 파일 언락
+            flock($id_handle, LOCK_UN);
+            //인덱스 목록 파일 언락
+            flock($list_handle, LOCK_UN);
+            //데이터 파일 언락
+            flock($file_handle, LOCK_UN);
+        }
+        //인덱스 부여 파일 닫기
+        fclose($id_handle);
+        //인덱스 목록 파일 닫기
+        fclose($list_handle);
+        //데이터 파일 닫기
+        fclose($file_handle);
         return $id;
     }
 }
