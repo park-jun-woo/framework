@@ -102,6 +102,8 @@ class Logger{
         }
         //마지막 세션 아이디 조회 및 부여
         $id = File::increase($this->key_path.".id");
+        //인덱스로 URL 조회를 위해 기록
+        File::append($this->key_path.".list", "$id $url\n");
         //인덱스 정수를 데이터로 변환
         $stream = pack('P', $id);
         //APCU 메모리에 데이터 저장
