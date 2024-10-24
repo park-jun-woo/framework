@@ -77,4 +77,36 @@ class File{
         flock($handle, LOCK_UN);fclose($handle);
         return $key;
     }
+    /**
+     * 폴더 목록 조회
+     *
+     * @param string $path 조회할 경로
+     * @return array
+     */
+    public function getDirectories(string $path):array{
+        $contents = scandir($path);
+        $dirs = [];
+        foreach($contents as $item) {
+            if ($item != '.' && $item != '..' && is_dir($path.DS.$item)) {
+                $dirs[] = $item;
+            }
+        }
+        return $dirs;
+    }
+    /**
+     * 파일 목록 조회
+     *
+     * @param string $path 조회할 경로
+     * @return array
+     */
+    public static function getFiles(string $path):array{
+        $contents = scandir($path);
+        $files = [];
+        foreach($contents as $item) {
+            if ($item!='.' && $item!='..' && !is_dir($path.DS.$item)) {
+                $files[] = $item;
+            }
+        }
+        return $files;
+    }
 }
