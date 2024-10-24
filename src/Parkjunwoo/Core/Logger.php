@@ -100,22 +100,14 @@ class Logger{
             //인덱스 데이터를 정수로 변환해서 반환
             return unpack('P', substr($stream, 0, 8))[1];
         }
-        /*
-        //마지막 세션 아이디 조회 및 부여
-        $id = File::increase($this->key_path.".id");
-        //인덱스로 URL 조회를 위해 기록
-        File::append($this->key_path.".list", "$id $url\n");
-        //인덱스 정수를 데이터로 변환
-        $stream = pack('P', $id);
-        //파일에 데이터 저장
-        File::write($key_path, $stream);
-        //APCU 메모리에 데이터 저장
-        apcu_store($key_apcu, $stream);
-        /*/
         //폴더가 없으면 생성한다.
         if(!is_dir($this->key_path)) {mkdir($this->key_path, 0777, true);}
-        //인덱스 부여 파일 열고 배타락
-        if(flock($id_handle = fopen($this->key_path.".id","rb+"), LOCK_EX)){
+        //인덱스 부여 파일 경로
+        $id_path = $this->key_path.".id";
+        //인덱스 부여 파일 열기
+        $id_handle = fopen($id_path, file_exists($id_path)?"rb+":"wb+");
+        // 배타락
+        if(flock($id_handle, LOCK_EX)){
             //인덱스 목록 파일 열기
             $list_handle = fopen($this->key_path.".list","a");
             //데이터 파일 열기
@@ -147,7 +139,7 @@ class Logger{
         fclose($list_handle);
         //데이터 파일 닫기
         fclose($file_handle);
-        //*/
+        //인덱스 반환
         return $id;
     }
 }
