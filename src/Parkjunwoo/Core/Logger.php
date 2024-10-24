@@ -75,6 +75,9 @@ class Logger{
      * @return int 조회한 인덱스
      */
     public function getIndex(string $url):int{
+        //URL이 빈문자열이면 0 반환
+        if($url==""){return 0;}
+        //URL 변환
         $key = str_replace('/', ':', $url);
         //APCU 메모리에 URL값이 있으면 바로 반환
         if(apcu_exists($key_apcu = $this->key_apcu.$key)){
