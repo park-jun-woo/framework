@@ -113,7 +113,7 @@ class Logger{
         apcu_store($key_apcu, $stream);
         /*/
         //폴더가 없으면 생성한다.
-        if(!is_dir($folder = dirname($this->key_path))) {mkdir($folder, 0777, true);}
+        if(!is_dir($this->key_path)) {mkdir($this->key_path, 0777, true);}
         //인덱스 부여 파일 열고 배타락
         if(flock($id_handle = fopen($this->key_path.".id","rb+"), LOCK_EX)){
             //인덱스 목록 파일 열기
