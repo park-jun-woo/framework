@@ -111,7 +111,7 @@ class Logger{
             //인덱스 목록 파일 열기
             $list_handle = fopen($this->key_path.".list","a");
             //데이터 파일 열기
-            $file_handle = fopen($key_path,"rb+");
+            $file_handle = fopen($key_path, file_exists($key_path)?"rb+":"wb+");
             //인덱스 부여 파일 크기를 확인
             $id_stat = fstat($id_handle);$id_file_size = $id_stat['size'];
             //인덱스 부여 파일에 내용이 없으면 초기화, 있으면 인덱스 값 조회
