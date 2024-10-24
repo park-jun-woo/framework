@@ -83,7 +83,7 @@ class File{
      * @param string $path 조회할 경로
      * @return array
      */
-    public function getDirectories(string $path):array{
+    public static function getDirectories(string $path):array{
         $contents = scandir($path);
         $dirs = [];
         foreach($contents as $item) {
