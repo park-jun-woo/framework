@@ -76,7 +76,6 @@ class Request{
         $referer = isset($_SERVER['HTTP_REFERER'])?$_SERVER['HTTP_REFERER']:"";
         //접속 기록
         $this->log->record($this->user->session(), ip2long($this->user->ip()), $referer,$_SERVER["REQUEST_URI"]);
-        File::append($this->man->path("log").base_convert($this->user->session(), 10, 36),date("Y-m-d H:i:s")." R ".$_SERVER["REQUEST_URI"].PHP_EOL);
     }
     /**
      * URI

@@ -84,7 +84,6 @@ class Parkjunwoo implements Singleton{
         }
         //클래스 메서드 실행
         $controller->{$route[self::METHODNAME]}($this->request);
-        File::append($this->path("log").base_convert($this->user->session(), 10, 36),date("Y-m-d H:i:s")." P ".$_SERVER["REQUEST_URI"].PHP_EOL);
     }
     /**
      * 기록 객체
