@@ -12,7 +12,6 @@ class User{
     const SESSION = 3;
     const TOKENTIME = 4;
     const LANGUAGE = 5;
-    const AGENT = 6;
 
     protected Parkjunwoo $man;
     protected string $token;
@@ -42,10 +41,6 @@ class User{
         }
         //APCU 메모리 토큰으로 조회
         $data = apcu_fetch($this->man->id()."@t".$_COOKIE["t"]);
-        //agent 값 일치 여부 확인, 일치하지 않으면 블랙 처리
-        if($_SERVER["HTTP_USER_AGENT"]!=$data[self::AGENT]){
-            $this->black(1, "토큰 HTTP_USER_AGENT 불일치");
-        }
         //IP가 달라졌다면 세션 로드 후 토큰 재발행
         if(ip2long($_SERVER["REMOTE_ADDR"])!=$data[self::IP]){
             $this->load();
@@ -105,7 +100,7 @@ class User{
      * @return string 값
      */
     public function agent():string{
-        return $this->data[self::AGENT];
+        return $_SERVER["HTTP_USER_AGENT"];
     }
     /**
      * 세션 데이터 키값 조회
@@ -132,7 +127,6 @@ class User{
                 $this->change = true;
                 return true;
             case self::PERMISSION:
-            case self::AGENT:
             default:
                 return false;
         }
@@ -207,8 +201,7 @@ class User{
             ip2long($_SERVER["REMOTE_ADDR"]),
             $sessionId,
             $sessionTime,
-            "",
-            isset($_SERVER["HTTP_USER_AGENT"])?$_SERVER["HTTP_USER_AGENT"]:"",
+            ""
         ];
         //토큰 생성
         $this->token = hash("sha256",$this->data[self::TOKENTIME].$sessionId);
@@ -247,10 +240,6 @@ class User{
         if($this->man->id()!=$session["app"]){
             $this->black(1, "세션 도메인 불일치");
         }
-        //agent 값 일치 여부 확인, 일치하지 않으면 블랙 처리
-        if($_SERVER["HTTP_USER_AGENT"]!=$data[self::AGENT]){
-            $this->black(1, "세션 HTTP_USER_AGENT 불일치");
-        }
         $this->session = $session;
         //토큰 신규 생성
         if($newToken){
@@ -283,7 +272,6 @@ class User{
             //세션 파일에 정보 저장
             File::write($this->man->path("session").$this->sessionName(),implode(PHP_EOL, $this->data));
             $this->change = false;
-
         }
     }
 }
