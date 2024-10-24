@@ -34,6 +34,11 @@ class Logger{
         if(apcu_exists($key_apcu = "{$this->key_apcu}@{$date}")){
             //APCU 메모리에서 포맷 조회
             $format = apcu_fetch($key_apcu);
+            //포맷 파일이 없으면
+            if(!file_exists($format_path = $this->man->path("log").$date.DS.".f")){
+                //포맷 파일에 저장
+                File::write($format_path, $format);
+            }
         }else{
             //포맷 파일이 있으면
             if(file_exists($format_path = $this->man->path("log").$date.DS.".f")){
