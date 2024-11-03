@@ -2,7 +2,6 @@
 namespace Parkjunwoo\Util;
 
 class File{
-    protected const MAP = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz-_";
     /**
      * 지정한 경로에 텍스트를 덮어쓰기로 저장해준다.
      * 덮어 쓰기이므로 멀티쓰레드 기능은 제공하지 않는다.
@@ -33,7 +32,14 @@ class File{
         }else{
             $process = 0;
             while(true){
-                $handle = fopen($path.($process==0?"":".".File::MAP[$process++]), "a");
+                if($process==0){
+                    $filepath = $path;
+                }else{
+                    $no = base_convert($process, 10, 36);
+                    $filepath = "{$path}.{$no}";
+                }
+                $process++;
+                $handle = fopen($filepath, "a");
                 if(flock($handle, LOCK_EX|LOCK_NB)){break;}
                 fclose($handle);
                 if($process>=$max){$process = 0;}
@@ -72,9 +78,12 @@ class File{
             if(flock($handle = fopen($path, "r"), LOCK_EX)){$key = unpack("P", fread($handle, 8))[1];}
             flock($handle,LOCK_UN);fclose($handle);
         }else{$key = $amount;}
-        //값을 올리고 저장한다.
-        if(flock($handle = fopen($path,"wb+"), LOCK_EX)){fwrite($handle, pack("P", $key+$amount));}
-        flock($handle, LOCK_UN);fclose($handle);
+        //증가값이 0이 아니라면
+        if($amount!=0){
+            //값을 올리고 저장한다.
+            if(flock($handle = fopen($path,"wb+"), LOCK_EX)){fwrite($handle, pack("P", $key+$amount));}
+            flock($handle, LOCK_UN);fclose($handle);
+        }
         return $key;
     }
     /**
@@ -84,10 +93,11 @@ class File{
      * @return array
      */
     public static function getDirectories(string $path):array{
+        $DS = DIRECTORY_SEPARATOR;
         $contents = scandir($path);
         $dirs = [];
         foreach($contents as $item) {
-            if ($item != '.' && $item != '..' && is_dir($path.DS.$item)) {
+            if ($item != '.' && $item != '..' && is_dir("$path$DS$item")) {
                 $dirs[] = $item;
             }
         }
@@ -100,10 +110,11 @@ class File{
      * @return array
      */
     public static function getFiles(string $path):array{
+        $DS = DIRECTORY_SEPARATOR;
         $contents = scandir($path);
         $files = [];
         foreach($contents as $item) {
-            if ($item!='.' && $item!='..' && !is_dir($path.DS.$item)) {
+            if ($item!='.' && $item!='..' && !is_dir("$path$DS$item")) {
                 $files[] = $item;
             }
         }

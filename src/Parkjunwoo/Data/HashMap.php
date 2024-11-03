@@ -1,7 +1,9 @@
 <?php
-namespace Parkjunwoo\Lab;
+namespace Parkjunwoo\Data;
+
 use Parkjunwoo\Util\File;
 use lastguest\Murmur;
+
 class HashMap{
     protected string $id;
 

@@ -4,6 +4,7 @@ namespace Parkjunwoo\Interface;
 use Parkjunwoo\Parkjunwoo;
 
 interface SQL{
+    const MYSQL = 1;
     /**
      * Model 생성자
      * DB 연결

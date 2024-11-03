@@ -2,7 +2,7 @@
 namespace Parkjunwoo\Connector;
 
 use mysqli;
-use Parkjunwoo\Parkjunwoo;
+use Parkjunwoo\Config\Database;
 use Parkjunwoo\Interface\Singleton;
 use Parkjunwoo\Interface\SQL;
 
@@ -25,16 +25,15 @@ class Mysql implements Singleton, SQL{
         if(!isset(self::$instance)){self::$instance = new self(...$params);}
         return self::$instance;
     }
-
-    protected Parkjunwoo $man;
+    protected Database $database;
     protected mysqli $connection;
     /**
      * Mysql 생성자
      * DB 연결
-     * @param Parkjunwoo $man 프레임워크 객체
+     * @param Database $database 데이터베이스 설정 객체
      */
-    public function __construct(Parkjunwoo $man){
-        $this->man = $man;
+    public function __construct(Database $database){
+        $this->database = $database;
     }
     /**
      * Mysql 파괴자
@@ -120,11 +119,12 @@ class Mysql implements Singleton, SQL{
      */
     protected function connect(){
         if(isset($this->connection)===false){
-            $host = $this->man->database("host");
-            $username = $this->man->database("username");
-            $password = $this->man->database("password");
-            $database = $this->man->database("database");
-            $this->connection = new mysqli($host, $username, $password, $database);
+            $this->connection = new mysqli(
+                $this->database->host(),
+                $this->database->username(),
+                $this->database->password(),
+                $this->database->database()
+            );
             if($this->connection->connect_error){
                 die('Connection failed: '.$this->connection->connect_error);
             }

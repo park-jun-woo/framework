@@ -8,19 +8,23 @@ use Parkjunwoo\Interface\FileModel;
 use Parkjunwoo\Interface\ImageModel;
 
 class Controller{
-    protected Parkjunwoo $man;
+    protected Config $config;
     protected User $user;
     protected Request $request;
     protected FileModel $fileModel;
     protected ImageModel $imageModel;
+    protected string $key, $view_path, $upload_path;
     /**
      * 컨트롤러 생성자
      * @param Parkjunwoo $man 프레임워크 객체
      */
-    public function __construct(Parkjunwoo $man){
-        $this->man = $man;
-        $this->user = $this->man->user();
-        $this->request = $man->request();
+    protected function __construct(Config $config, User $user, Request $request){
+        $this->config = $config;
+        $this->user = $user;
+        $this->request = $request;
+        $this->key = $config->key();
+        $this->view_path = $config->path()->view();
+        $this->upload_path = $config->path()->upload();
     }
     /**
      * 라우터가 존재하지 않거나 오류가 났을 때, 출력할 404
@@ -36,7 +40,7 @@ class Controller{
      */
     protected function view(string $view, array $result=[]):void {
         $this->user->save();
-        $path = $this->man->path("view")."{$view}.php";
+        $path = "{$this->view_path}{$view}.php";
         if(file_exists($path)){
             extract($result);
             include $path;
@@ -58,10 +62,10 @@ class Controller{
     protected function message(int $code, array $result=[]):void {
         $this->user->save();
         $result["code"] = $code;
-        $result["message"] = $this->man->message($code);
-        switch($this->request->type()){
-            case Parkjunwoo::JSON:echo json_encode($result);break;
-            case Parkjunwoo::HTML:echo $result["message"];break;
+        $result["message"] = $this->config->message($code, $this->request->locale());
+        switch($this->request->contentType()){
+            case Request::JSON:echo json_encode($result);break;
+            case Request::HTML:echo $result["message"];break;
         }
     }
     /**
@@ -84,7 +88,7 @@ class Controller{
         if(!isset($this->fileModel)){return ["error"=>"\$this->fileModel is not set."];}
         //파일이 업로드 되어 있지 않다면 실패
         if(!isset($_FILES[$key]) || $_FILES[$key]['error'] !== UPLOAD_ERR_OK) {return ["error"=>"\$_FILES['{$key}'] is not uploaded."];}
-        $upload = $this->man->path("upload");
+        $datetime = date("YmdHis");
         $file = [];
         //작성자
         $file['writer'] = $this->user->member();
@@ -93,9 +97,10 @@ class Controller{
         //파일 확장자
         $file['ext'] = pathinfo($_FILES[$key]['name'], PATHINFO_EXTENSION);
         //서버에 업로드할 파일명
-        $file['path'] = md5($this->man->id().date("YmdHis").$file['name']);
+        $file['path'] = md5("{$this->key}{$datetime}{$file['name']}");
         //지정한 폴더에 파일 업로드
-        if(!move_uploaded_file($_FILES[$key]['tmp_name'], $upload.$file['path'])) {return ["error"=>"move_uploaded_file fail. name:".$upload.$file['path']];}
+        if(!move_uploaded_file($_FILES[$key]['tmp_name'], $file_path = "{$this->upload_path}{$file['path']}"))
+        {return ["error"=>"move_uploaded_file fail. name:{$file_path}"];}
         //모델을 통해 데이터베이스에 정보 등록
         $file['no'] = $this->fileModel->postFile($file['writer'], $file['name'], $file['ext'], $file['path']);
         //결과 반환
@@ -119,13 +124,12 @@ class Controller{
         $source = $this->file($key);
         //파일이 업로드 되어 있지 않다면 실패
         if(array_key_exists("error",$source)){return $source;}
-        $upload = $this->man->path("upload");
         //썸네일 이미지 생성
-        if($thumbnail_crop==""){Image::resize($upload.$source["path"], $upload.$source["path"]."2", 256);}
+        if($thumbnail_crop==""){Image::resize("{$this->upload_path}{$source['path']}", "{$this->upload_path}{$source['path']}2", 256);}
         //작은 이미지 생성
-        if($small_crop==""){Image::resize($upload.$source["path"], $upload.$source["path"]."5", 512);}
+        if($small_crop==""){Image::resize("{$this->upload_path}{$source['path']}", "{$this->upload_path}{$source['path']}5", 512);}
         //큰 이미지 생성
-        if($large_crop==""){Image::resize($upload.$source["path"], $upload.$source["path"]."A", 1024);}
+        if($large_crop==""){Image::resize("{$this->upload_path}{$source['path']}", "{$this->upload_path}{$source['path']}A", 1024);}
         $image = [];
         //작성자
         $image["writer"] = $this->user->member();
@@ -134,11 +138,11 @@ class Controller{
         //이미지 설명
         $image["caption"] = $caption;
         //썸네일 이미지 경로
-        $image["thumbnail"] = $source["path"]."2";
+        $image["thumbnail"] = "{$source['path']}2";
         //작은 이미지 경로
-        $image["small"] = $source["path"]."5";
+        $image["small"] = "{$source['path']}5";
         //큰 이미지 경로
-        $image["large"] = $source["path"]."A";
+        $image["large"] = "{$source['path']}A";
         //모델을 통해 데이터베이스에 정보 등록
         $image["no"] = $this->imageModel->postImage(
             $image["writer"], $image["source"], $image["caption"],
