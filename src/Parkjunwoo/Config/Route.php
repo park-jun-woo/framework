@@ -11,6 +11,8 @@ class Route {
     public const PERMISSION = 0;
     public const CLASSNAME = 1;
     public const METHODNAME = 2;
+    public const CACHEEXPIRE = 3;
+    public const OPTIONS = 4;
     
     /** @var int HTTP 메서드 */
     protected int $http_method;
@@ -22,6 +24,10 @@ class Route {
     protected string $class;
     /** @var string 클래스 내에서 실행할 메서드 이름 */
     protected string $method;
+    /** @var int 캐시 유효 기간 */
+    protected int $cache_expire;
+    /** @var array 옵션 */
+    protected array $options;
     /**
      * Route 생성자
      *
@@ -31,14 +37,17 @@ class Route {
      * @param string $uri 라우트 URI 경로
      * @param int $permission 해당 라우트의 접근 권한 (예: 0=guest, 1=member 등)
      * @param string $class 라우트를 처리할 클래스 이름
+     * @param int $cache_expire 캐시 유효 기간
      * @param string $method 클래스 내에서 실행할 메서드 이름
      */
-    public function __construct(int $http_method, string $uri, int $permission, string $class, string $method) {
+    public function __construct(int $http_method, string $uri, int $permission, string $class, string $method, int $cache_expire, array $options=[]) {
         $this->http_method = $http_method;
         $this->uri = $uri;
         $this->permission = $permission;
         $this->class = $class;
         $this->method = $method;
+        $this->cache_expire = $cache_expire;
+        $this->options = $options;
     }
     /**
      * HTTP 메서드를 반환합니다.
@@ -70,4 +79,16 @@ class Route {
      * @return string 실행할 메서드 이름
      */
     public function method():string {return $this->method;}
+    /**
+     * 캐시 유효 기간
+     *
+     * @return int 유효 기간
+     */
+    public function cacheExpire():int {return $this->cache_expire;}
+    /**
+     * 옵션 배열을 반환합니다.
+     *
+     * @return array 옵션 배열
+     */
+    public function options():array {return $this->options;}
 }

@@ -1,11 +1,7 @@
 <?php
-namespace Parkjunwoo\Core;
+namespace Parkjunwoo\Util;
 
-use Parkjunwoo\Core\User;
-use Parkjunwoo\Core\Request;
 use Parkjunwoo\Data\Index;
-use Parkjunwoo\Util\File;
-use Parkjunwoo\Interface\Config;
 
 class Log{
     protected Index $index;
@@ -17,14 +13,8 @@ class Log{
      * @param string $data_path 데이터 폴더 경로
      * @param string $log_path 로그 폴더 경로
      */
-    protected function __construct(Config $config, User $user, Request $request){
-        $path = $config->path();
-        $this->key_apcu = $config->key();
-        $this->key_path = $path->data();
-        $this->log_path = $path->log();
-        $this->index = new Index("url", $path->data());
+    protected function __construct(){
         
-        $this->write($user->session(), $user->ip(), $request->referer(), $_SERVER["REQUEST_URI"]);
     }
     /**
      * 기록하기

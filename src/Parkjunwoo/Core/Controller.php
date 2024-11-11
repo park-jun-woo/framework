@@ -4,6 +4,7 @@ namespace Parkjunwoo\Core;
 use Parkjunwoo\Parkjunwoo;
 use Parkjunwoo\Util\Image;
 use Parkjunwoo\Util\Security;
+use Parkjunwoo\Interface\Config;
 use Parkjunwoo\Interface\FileModel;
 use Parkjunwoo\Interface\ImageModel;
 
@@ -13,7 +14,7 @@ class Controller{
     protected Request $request;
     protected FileModel $fileModel;
     protected ImageModel $imageModel;
-    protected string $key, $view_path, $upload_path;
+    protected string $key, $view_path, $upload_path, $response;
     /**
      * 컨트롤러 생성자
      * @param Parkjunwoo $man 프레임워크 객체
@@ -26,6 +27,11 @@ class Controller{
         $this->view_path = $config->path()->view();
         $this->upload_path = $config->path()->upload();
     }
+    /**
+     * 결과 스트림
+     * @return string 결과 스트림
+     */
+    public function response():string{return $this->response;}
     /**
      * 라우터가 존재하지 않거나 오류가 났을 때, 출력할 404
      */
@@ -42,8 +48,10 @@ class Controller{
         $this->user->save();
         $path = "{$this->view_path}{$view}.php";
         if(file_exists($path)){
+            ob_start();
             extract($result);
             include $path;
+            $this->response = ob_get_clean();
         }
     }
     /**
@@ -64,8 +72,8 @@ class Controller{
         $result["code"] = $code;
         $result["message"] = $this->config->message($code, $this->request->locale());
         switch($this->request->contentType()){
-            case Request::JSON:echo json_encode($result);break;
-            case Request::HTML:echo $result["message"];break;
+            case Request::JSON:$this->response = json_encode($result);break;
+            case Request::HTML:$this->response = $result["message"];break;
         }
     }
     /**

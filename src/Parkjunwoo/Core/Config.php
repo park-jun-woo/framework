@@ -8,25 +8,10 @@ use Parkjunwoo\Config\Route;
 use Parkjunwoo\Util\File;
 use Parkjunwoo\Util\Security;
 
-class Config{
-    public static function load(string $key, string $app_name):?Config{
-        //APCU 메모리에 설정값이 있다면
-        if(apcu_exists($config_apcu="{$key}@{$app_name}")){
-            //APCU 메모리에서 설정값 가져오기
-            return apcu_fetch($config_apcu);
-        //설정 파일이 있다면
-        }else{
-            //설정 객체 생성
-            $config = new Config($app_name);
-            //APCU 메모리에 설정 저장
-            apcu_store($config_apcu, $config);
-            //설정 객체 반환
-            return $config;
-        }
-    }
+class Config implements \Parkjunwoo\Interface\Config{
     protected Database $database;
     protected Path $path;
-    protected int $id, $token_expire, $session_expire;
+    protected int $id, $token_expire, $session_expire, $cache_expire;
     protected string $key, $private_key, $public_key;
     protected string $project_name, $app_name, $server_name, $default_language, $locale;
     protected array $levels, $permissions, $routes, $messages;
@@ -62,6 +47,9 @@ class Config{
         //세션 유효기간
         if(isset($config['session-expire'])){$this->session_expire = $config['session-expire'];}
         else{$this->session_expire = 15552000;}
+        //캐시 유효기간
+        if(isset($config['cache-expire'])){$this->cache_expire = $config['cache-expire'];}
+        else{$this->cache_expire = 600;}
 
         //데이터베이스 배열
         if(!isset($config['database'])){$this->error("데이터베이스 접속 정보를 설정하세요.");exit;}
@@ -145,11 +133,27 @@ class Config{
         $this->routes = [];
         //GET 라우터 객체 생성
         foreach($config['get'] as $key=>$value){
-            $this->routes["0{$key}"] = new Route(Request::GET, $key, $value[Route::PERMISSION], $value[Route::CLASSNAME], $value[Route::METHODNAME]);
+            $this->routes["0{$key}"] = new Route(
+                Request::GET,
+                $key, 
+                $value[Route::PERMISSION],
+                $value[Route::CLASSNAME],
+                $value[Route::METHODNAME],
+                isset($value[Route::CACHEEXPIRE])?$value[Route::CACHEEXPIRE]:$this->cache_expire,
+                isset($value[Route::OPTIONS])?$value[Route::OPTIONS]:[]
+            );
         }
         //POST 라우터 객체 생성
         foreach($config['post'] as $key=>$value){
-            $this->routes["1{$key}"] = new Route(Request::POST, $key, $value[Route::PERMISSION], $value[Route::CLASSNAME], $value[Route::METHODNAME]);
+            $this->routes["1{$key}"] = new Route(
+                Request::POST,
+                $key, 
+                $value[Route::PERMISSION],
+                $value[Route::CLASSNAME],
+                $value[Route::METHODNAME],
+                isset($value[Route::CACHEEXPIRE])?$value[Route::CACHEEXPIRE]:$this->cache_expire,
+                isset($value[Route::OPTIONS])?$value[Route::OPTIONS]:[]
+            );
         }
         //메세지 배열
         $this->messages = [
@@ -208,8 +212,12 @@ class Config{
         ] + (isset($config['message'])?$config['message']:[]);
         //데이터 경로
         $data_path = $this->path->data();
+        //RSA 개인키 경로
+        $private_path = "{$data_path}.private";
+        //RSA 공개키 경로
+        $public_path = "{$data_path}.public";
         //RSA키 파일이 있다면
-        if(file_exists($private_path = "{$data_path}.private") && file_exists($public_path = "{$data_path}.public")){
+        if(file_exists($private_path) && file_exists($public_path)){
             $this->private_key = File::read($private_path);
             $this->public_key = File::read($public_path);
         //RSA키 파일이 없다면
@@ -269,6 +277,11 @@ class Config{
      * @return int 유효기간
      */
     public function sessionExpire():int{return $this->session_expire;}
+    /**
+     * 캐시 유효기간
+     * @return int 유효기간
+     */
+    public function cacheExpire():int{return $this->cache_expire;}
     /**
      * 권한 목록
      * @return array 권한 목록 배열

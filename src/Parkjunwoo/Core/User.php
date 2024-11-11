@@ -2,6 +2,7 @@
 namespace Parkjunwoo\Core;
 
 use Parkjunwoo\Util\File;
+use Parkjunwoo\Interface\Config;
 
 class User{
     const GUEST = 0;

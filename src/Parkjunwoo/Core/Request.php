@@ -2,6 +2,7 @@
 namespace Parkjunwoo\Core;
 
 use Parkjunwoo\Config\Route;
+use Parkjunwoo\Interface\Config;
 
 class Request{
     public const HTML = 0;
@@ -11,7 +12,7 @@ class Request{
     public const POST = 1;
 
     protected User $user;
-    protected string $referer, $uri, $route_key, $locale;
+    protected string $referer, $uri, $cache_key, $route_key, $locale;
     protected int $content_type, $http_method;
     protected Route $route;
     protected array $parameters;
@@ -39,8 +40,12 @@ class Request{
         }
         //리퍼러
         $this->referer = isset($_SERVER['HTTP_REFERER'])?$_SERVER['HTTP_REFERER']:"";
-        //URI 분해
-        $this->uri = explode("?",$_SERVER["REQUEST_URI"])[0];
+        //URL 분해
+        $uri_exploded = explode("?",$_SERVER["REQUEST_URI"]);
+        //URL 디코드
+        $this->uri = urldecode($uri_exploded[0]);
+        //파라미터 분해
+        if(isset($uri_exploded[1])){parse_str($uri_exploded[1], $this->parameters);}
         //사용자 환경 언어 처리
         if(!array_key_exists("HTTP_ACCEPT_LANGUAGE",$_SERVER)){$_SERVER["HTTP_ACCEPT_LANGUAGE"] = "";}
         else{$languageList = explode("-",preg_split("[;,]",$_SERVER["HTTP_ACCEPT_LANGUAGE"])[0]);}
@@ -68,9 +73,20 @@ class Request{
         }
         if(($this->route = $config->route($this->http_method, $route))!=null){
             $this->route_key = $route;
+            $this->cache_key = $this->route_key;
         }else{
-            $this->route = new Route(self::GET, $route, 0, "Parkjunwoo\\Core\\Controller", "getNotFound");
+            $this->route = new Route(self::GET, $route, 0, "Parkjunwoo\\Core\\Controller", "getNotFound", 0);
+            $this->route_key = "/404";
+            $this->cache_key = $this->route_key;
         }
+        $options = $this->route->options();
+        $query = "";
+        foreach($options as $key=>$value){
+            if(isset($this->parameters[$key])){$value = $this->parameters[$key];}
+            if($query!=""){$query .= "&";}
+            $query .= "{$key}={$value}";
+        }
+        if($query!=""){$this->cache_key .= "{$this->cache_key}?{$query}";}
     }
     /**
      * 컨텐트 타입
@@ -98,13 +114,18 @@ class Request{
      */
     public function uri():string{return $this->uri;}
     /**
+     * 캐시 검색 키
+     * @return string 캐시 검색 키
+     */
+    public function cacheKey():string{return $this->cache_key;}
+    /**
      * 라우트 패턴
      * @return string 패턴
      */
     public function routeKey():string{return $this->route_key;}
     /**
-     * 시퀀스 배열
-     * @return array 시퀀스 배열
+     * 라우트 객체
+     * @return Route 라우트 객체
      */
     public function route():Route{return $this->route;}
     /**
